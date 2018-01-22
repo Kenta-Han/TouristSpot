@@ -1,0 +1,64 @@
+body{
+  text-align: center;
+  margin: 2% auto;
+}
+
+table.imagetable {
+	font-family: verdana,arial,sans-serif;
+	font-size:16px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #999999;
+	border-collapse: collapse;
+  margin:1% auto;
+}
+table.imagetable th {
+	background:#dcddc0 url('1.jpg');
+	border-width: 1px;
+	padding: 5px;
+	border-style: solid;
+	border-color: #999999;
+}
+table.imagetable td {
+	background:#b5cfd2 url('cell-blue.jpg');
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #999999;
+  text-align: left;
+}
+
+ol{
+  text-align: center;
+  margin: auto;
+  padding: 0;
+  font-size: 18px;
+}
+
+li{
+  font-size: 18px;
+  margin: 20px auto;
+  list-style:none;
+}
+
+.button1 {
+  display: inline-block;
+  border-radius: 5%;          /* 角丸       */
+  font-size: 16px;        /* 文字サイズ */
+  text-align: center;      /* 文字位置   */
+  cursor: pointer;     /* カーソル   */
+  padding: 12px 20px;   /* 余白       */
+  background: #000066;     /* 背景色     */
+  color: #ffffff;     /* 文字色     */
+  line-height: 1em;         /* 1行の高さ  */
+  transition: .3s;         /* なめらか変化 */
+  box-shadow: 6px 6px 3px #666666;  /* 影の設定 */
+  border: 2px solid #000066;    /* 枠の指定 */
+  margin: 1% auto;
+}
+
+.button1:hover {
+  box-shadow: none;        /* カーソル時の影消去 */
+  color: #000066;     /* 背景色     */
+  background: #ffffff;     /* 文字色     */
+}
