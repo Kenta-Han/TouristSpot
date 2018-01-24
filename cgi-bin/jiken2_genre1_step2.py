@@ -73,6 +73,7 @@ function stopload(){
 }
 </script>
 </head>
+
 <body>
 <div id="loader-bg">
   <div id="loader">
