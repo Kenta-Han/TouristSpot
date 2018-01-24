@@ -57,7 +57,7 @@ function send(){
     var a;
     a = 1 + Math.round(Math.random()*2);
     if(a==1){
-        location.href="/cgi-bin/jiken2_genre0_step1.py?"+pram;
+        location.href="/cgi-bin/jiken2_review1_step1.py?"+pram;
     }
     if(a==2){
         location.href="/cgi-bin/jiken2_genre0_step1.py?"+pram;
