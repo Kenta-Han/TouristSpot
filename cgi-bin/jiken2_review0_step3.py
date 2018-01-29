@@ -18,7 +18,6 @@ review_msg = form.getvalue('review_msg')
 
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
-
 list_by_check = myp_other.Check(review_check1,review_check2,review_check3,review_count)
 
 c.execute("update jiken2 set review_selected_spot1='" + str(list_by_check[0]) + "', review_selected_spot2='" + str(list_by_check[1]) + "', review_selected_spot3='" + str(list_by_check[2]) + "', review_msg ='" + str(review_msg) + "',review_count = '" + str(list_by_check[3]) + "',review_count_list = '" + str(list_by_check[4]) + "',finish_datetime = '" + finish_datetime + "' where id=" + str(record_id) + ";")

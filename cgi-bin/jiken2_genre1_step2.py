@@ -77,7 +77,7 @@ function stopload(){
 <body>
 <div id="loader-bg">
   <div id="loader">
-    <h2>Now Loading...</br>次のページが開くまでしばらく時間</br>(約30秒~90秒)がかかります．</h2>
+    <h2>Now Loading...</br>次のページが開くまでしばらく時間</br>(約30秒~90秒)がかかります．<br>更新せずにお待ちして下さい．</h2>
   </div>
 </div>
 <div id="wrap">

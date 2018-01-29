@@ -12,7 +12,7 @@ c = connect.cursor()
 
 form = cgi.FieldStorage()
 user_id = form.getvalue('user_id') ##CrowdWorksID
-type_id = form.getvalue('type1') ##タイプ
+type_id = int(form.getvalue('type1')) ##タイプ
 keyword = [form.getvalue('keyword1'),form.getvalue('keyword2'),form.getvalue('keyword3')] ##要求3つ
 
 start_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
@@ -117,7 +117,7 @@ $(function () {
 <body>
 <div id="loader-bg">
   <div id="loader">
-    <h2>Now Loading...</br>次のページが開くまでしばらく時間</br>(約30秒~90秒)がかかります．</h2>
+    <h2>Now Loading...</br>次のページが開くまでしばらく時間</br>(約30秒~90秒)がかかります．<br>更新せずにお待ちして下さい．</h2>
   </div>
 </div>
 <div id='wrap'>

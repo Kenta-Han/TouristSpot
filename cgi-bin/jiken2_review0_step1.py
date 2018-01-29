@@ -104,10 +104,7 @@ $(function () {
         var h = $(window).height();
         $('#wrap').css('display','none');
         $('#loader-bg ,#loader').height(h).css('display','block');
-<<<<<<< HEAD
-=======
 
->>>>>>> 4145fbd2e9deb0fb8e4ea418c6921176236577e6
         /* 画面n秒後を表示 */
         var min = 30000 ; //30秒
         var max = 60000 ; //60秒
@@ -119,14 +116,11 @@ $(function () {
 });
 </script>
 </head>
-<<<<<<< HEAD
-=======
 
->>>>>>> 4145fbd2e9deb0fb8e4ea418c6921176236577e6
 <body>
 <div id="loader-bg">
   <div id="loader">
-    <h2>Now Loading...</br>次のページが開くまでしばらく時間</br>(約30秒~90秒)がかかります．</h2>
+    <h2>Now Loading...</br>次のページが開くまでしばらく時間</br>(約30秒~90秒)がかかります．<br>更新せずにお待ちして下さい．</h2>
   </div>
 </div>
 <div id='wrap'>
@@ -240,7 +234,7 @@ print("<input type='hidden' name='keyword1' value='" + str(keyword[0]) + "'>")
 print("<input type='hidden' name='keyword2' value='" + str(keyword[1]) + "'>")
 print("<input type='hidden' name='keyword3' value='" + str(keyword[2]) + "'>")
 print("<input type='hidden' name='record_id' value='" + str(record_id) + "'>")
-print("<p>※ 次のページが開くまでしばらく時間(約30秒~09秒)がかかります．</p>")
+print("<p>※ 次のページが開くまでしばらく時間(約30秒~90秒)がかかります．</p>")
 print("<input type='submit' class='button1' value='次へ'/>")
 print("<div>")
 print("</form>")
