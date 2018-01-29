@@ -93,8 +93,33 @@ html_body = u"""
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 <link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>レビュー選択</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+$(function () {
+    $('.button1').click(function() {
+        /* 画面を隠す */
+        var h = $(window).height();
+        $('#wrap').css('display','none');
+        $('#loader-bg ,#loader').height(h).css('display','block');
+
+        /* 画面n秒後を表示 */
+        var min = 30000 ; //30秒
+        var max = 60000 ; //60秒
+        var a = Math.floor( Math.random() * (max + 1 - min) ) + min ;
+        $('#loader-bg').delay(a).fadeOut(1000);
+        //$('#loader').delay(30000).fadeOut(1000);
+        $('#wrap').css('display', 'block');
+    });
+});
+</script>
 </head>
+
 <body>
+<div id="loader-bg">
+  <div id="loader">
+    <h2>Now Loading...</br>次のページが開くまでしばらく時間</br>(約30秒~90秒)がかかります．</h2>
+  </div>
+</div>
 <div id='wrap'>
 <header><h1 class='title'>観光スポット検索(A)</h1></header>
 """
@@ -206,7 +231,7 @@ print("<input type='hidden' name='type_id' value='" + str(type_id) + "'>")
 print("<input type='hidden' name='keyword1' value='" + str(keyword[0]) + "'>")
 print("<input type='hidden' name='keyword2' value='" + str(keyword[1]) + "'>")
 print("<input type='hidden' name='keyword3' value='" + str(keyword[2]) + "'>")
-print("<p>※ 次のページが開くまでしばらく時間(約30秒~2分)がかかります．</p>")
+print("<p>※ 次のページが開くまでしばらく時間(約30秒~90秒)がかかります．</p>")
 print("<input type='submit' class='button1' value='次へ'/>")
 print("<div>")
 print("</form>")

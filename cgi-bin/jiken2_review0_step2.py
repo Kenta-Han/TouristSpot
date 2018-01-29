@@ -34,41 +34,6 @@ html_body = u"""
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 <link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>観光スポット</title>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script>
-$(function() {
-    var h = $(window).height();
-    $('#wrap').css('display','none');
-    $('#loader-bg ,#loader').height(h).css('display','block');
-});
-
-$(window).load(function () { //全ての読み込みが完了したら実行
-    var min = 10000 ; //10秒
-    var max = 30000 ; //30秒
-    var a = Math.floor( Math.random() * (max + 1 - min) ) + min ;
-    $('#loader-bg').delay(a).fadeOut(1000);
-    //$('#loader').delay(30000).fadeOut(1000);
-    $('#wrap').css('display', 'block');
-});
-
-//300秒たったら強制的にロード画面を非表示
-$(function(){
-    setTimeout('stopload()',300000);
-});
-
-function stopload(){
-    $('#wrap').css('display','block');
-    $('#loader-bg').delay(900).fadeOut(800);
-    $('#loader').delay(600).fadeOut(300);
-}
-</script>
-</head>
-<body>
-<div id="loader-bg">
-  <div id="loader">
-    <h1>Now Loading...</h1>
-  </div>
-</div>
 </head>
 <body>
 <div id='wrap'>

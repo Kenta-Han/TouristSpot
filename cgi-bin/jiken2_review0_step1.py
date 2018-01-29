@@ -104,6 +104,10 @@ $(function () {
         var h = $(window).height();
         $('#wrap').css('display','none');
         $('#loader-bg ,#loader').height(h).css('display','block');
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4145fbd2e9deb0fb8e4ea418c6921176236577e6
         /* 画面n秒後を表示 */
         var min = 30000 ; //30秒
         var max = 60000 ; //60秒
@@ -115,6 +119,10 @@ $(function () {
 });
 </script>
 </head>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4145fbd2e9deb0fb8e4ea418c6921176236577e6
 <body>
 <div id="loader-bg">
   <div id="loader">
