@@ -45,10 +45,8 @@ html_body = u"""
 <link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>ジャンル選択</title>
 </head>
-
 <body>
 <header><h1 class='title'>観光スポット検索(B)</h1></header>
-
 <form action='jiken2_genre0_step2.py' method='post'>
 <table class='genre_table'>
 <tr>

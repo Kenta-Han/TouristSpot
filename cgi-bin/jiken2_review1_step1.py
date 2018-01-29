@@ -12,7 +12,7 @@ c = connect.cursor()
 
 form = cgi.FieldStorage()
 user_id = form.getvalue('user_id') ##CrowdWorksID
-type_id = int(form.getvalue('type1')) ##タイプ
+type_id = form.getvalue('type1') ##タイプ
 keyword = [form.getvalue('keyword1'),form.getvalue('keyword2'),form.getvalue('keyword3')] ##要求3つ
 
 start_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")

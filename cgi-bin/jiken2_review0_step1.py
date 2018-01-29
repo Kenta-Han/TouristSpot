@@ -96,140 +96,31 @@ html_body = u"""
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 <link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>レビュー選択</title>
-</head>
-
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
-function send(){
-    var user_id='';
-    var keyword1='';
-    var keyword2='';
-    var keyword3='';
-    var type1='';
-
-    /* CrowdWorksID */
-    if (document.form1.user_id.value!=''){
-        user_id = escape(document.form1.user_id.value);
-    }
-
-    /* 要求 */
-    if (document.form1.keyword1.value!=''){
-        keyword1 = escape(document.form1.keyword1.value);
-    }
-    if (document.form1.keyword2.value!=''){
-        keyword2 = escape(document.form1.keyword2.value);
-    }
-    if (document.form1.keyword3.value!=''){
-        keyword3 = escape(document.form1.keyword3.value);
-    }
-
-    /* タイプ */
-    if(document.form1.type_id[0].checked){
-        type1 = escape(document.form1.type_id[0].value);
-    }else if(document.form1.type_id[1].checked){
-        type1 = escape(document.form1.type_id[1].value);
-    }else if(document.form1.type_id[2].checked){
-        type1 = escape(document.form1.type_id[2].value);
-    }else if(document.form1.type_id[3].checked){
-        type1 = escape(document.form1.type_id[3].value);
-    }else if(document.form1.type_id[4].checked){
-        type1 = escape(document.form1.type_id[4].value);
-    }
-
-    /* 季節 */
-    var sql_season0='';
-    var sql_season1='';
-    var season_word0='';
-    var season_word1='';
-    var season_word2=‘';
-
-    /* 季節のSQL文 */
-    if (document.form1.sql_season0.value!=''){
-        sql_season0 = escape(document.form1.sql_season0.value);
-    }
-    if (document.form1.sql_season1.value!=''){
-        sql_season1 = escape(document.form1.sql_season1.value);
-    }
-
-    /* 季節のワード */
-    if (document.form1.season_word0.value!=''){
-        season_word0 = escape(document.form1.season_word0.value);
-    }
-    if (document.form1.season_word1.value!=''){
-        season_word1 = escape(document.form1.season_word1.value);
-    }
-    if (document.form1.season_word2.value!=''){
-        season_word2 = escape(document.form1.season_word2.value);
-    }
-
-    /* タイプ */
-    var sql_type0='';
-    var sql_type1='';
-    var type_word0='';
-    var type_word1='';
-    var type_word2=‘’;
-
-    /* タイプのSQL文 */
-    if (document.form1.sql_type0.value!=''){
-        sql_type0 = escape(document.form1.sql_type0.value);
-    }
-    if (document.form1.sql_type1.value!=''){
-        sql_type1 = escape(document.form1.sql_type1.value);
-    }
-
-    /* タイプのワード */
-    if (document.form1.type_word0.value!=''){
-        type_word0 = escape(document.form1.type_word0.value);
-    }
-    if (document.form1.type_word1.value!=''){
-        type_word1 = escape(document.form1.type_word1.value);
-    }
-    if (document.form1.type_word2.value!=''){
-        type_word2 = escape(document.form1.type_word2.value);
-    }
-
-    /* レビュー */
-    var review_num=‘';
-    if (document.form1.review_num.value!=''){
-        review_num = escape(document.form1.type_word0.value);
-    }
-
-    /* 取得した値をパラメータにセット(アンパサンド'&'で連結) */
-    var pram = 'user_id=' + user_id + '&keyword1=' + keyword1 + '&keyword2=' + keyword2 + '&keyword3=' + keyword3 + '&type1=' + type1;
-
-    /* アドレスにパラメータを付加 */
-    location.href="/cgi-bin/jiken2_genre0_step1.py?"+pram;
-    return false;
-}
-
-$(function() {
-    var h = $(window).height();
-    $('#wrap').css('display','none');
-    $('#loader-bg ,#loader').height(h).css('display','block');
+$(function () {
+    $('.button1').click(function() {
+        /* 画面を隠す */
+        var h = $(window).height();
+        $('#wrap').css('display','none');
+        $('#loader-bg ,#loader').height(h).css('display','block');
+        /* 画面n秒後を表示 */
+        var min = 30000 ; //30秒
+        var max = 60000 ; //60秒
+        var a = Math.floor( Math.random() * (max + 1 - min) ) + min ;
+        $('#loader-bg').delay(a).fadeOut(1000);
+        //$('#loader').delay(30000).fadeOut(1000);
+        $('#wrap').css('display', 'block');
+    });
 });
-
-$(window).load(function () { //全ての読み込みが完了したら実行
-    var min = 10000 ; //10秒
-    var max = 20000 ; //20秒
-    var a = Math.floor( Math.random() * (max + 1 - min) ) + min ;
-    $('#loader-bg').delay(a).fadeOut(1000);
-    //$('#loader').delay(30000).fadeOut(1000);
-    $('#wrap').css('display', 'block');
-});
-
-//300秒たったら強制的にロード画面を非表示
-$(function(){
-    setTimeout('stopload()',300000);
-});
-
-function stopload(){
-    $('#wrap').css('display','block');
-    $('#loader-bg').delay(900).fadeOut(800);
-    $('#loader').delay(600).fadeOut(300);
-}
-
 </script>
-
+</head>
 <body>
+<div id="loader-bg">
+  <div id="loader">
+    <h2>Now Loading...</br>次のページが開くまでしばらく時間</br>(約30秒~90秒)がかかります．</h2>
+  </div>
+</div>
 <div id='wrap'>
 <header><h1 class='title'>観光スポット検索(A)</h1></header>
 """
@@ -321,7 +212,7 @@ pulldown = """
 print("<div class='review'>")
 print(pulldown)
 
-print("<form action='#' method='post' id='example' name='form1' onsubmit='return send();'>")
+print("<form action='jiken2_review0_step2.py' method='post' id='example' name='form1'>")
 print("<input type='hidden' name='sql_season0' value='" + sql_season[0] + "'>")
 print("<input type='hidden' name='sql_season1' value='" + sql_season[1] + "'>")
 print("<input type='hidden' name='season_word0' value='" + season_word[0] + "'>")
@@ -341,7 +232,7 @@ print("<input type='hidden' name='keyword1' value='" + str(keyword[0]) + "'>")
 print("<input type='hidden' name='keyword2' value='" + str(keyword[1]) + "'>")
 print("<input type='hidden' name='keyword3' value='" + str(keyword[2]) + "'>")
 print("<input type='hidden' name='record_id' value='" + str(record_id) + "'>")
-print("<p>※ 次のページが開くまでしばらく時間(約30秒~2分)がかかります．</p>")
+print("<p>※ 次のページが開くまでしばらく時間(約30秒~09秒)がかかります．</p>")
 print("<input type='submit' class='button1' value='次へ'/>")
 print("<div>")
 print("</form>")

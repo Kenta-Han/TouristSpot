@@ -12,7 +12,6 @@ html_body = u"""
 <link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>観光スポット検索</title>
 </head>
-
 <script>
 function send(){
     var user_id='';
@@ -20,12 +19,10 @@ function send(){
     var keyword2='';
     var keyword3='';
     var type1='';
-
     /* CrowdWorksID */
     if (document.form1.user_id.value!=''){
         user_id = escape(document.form1.user_id.value);
     }
-
     /* 要求 */
     if (document.form1.keyword1.value!=''){
         keyword1 = escape(document.form1.keyword1.value);
@@ -36,7 +33,6 @@ function send(){
     if (document.form1.keyword3.value!=''){
         keyword3 = escape(document.form1.keyword3.value);
     }
-
     /* タイプ */
     if(document.form1.type1[0].checked){
         type1 = escape(document.form1.type1[0].value);
@@ -49,29 +45,25 @@ function send(){
     }else if(document.form1.type1[4].checked){
         type1 = escape(document.form1.type1[4].value);
     }
-
     /* 取得した値をパラメータにセット(アンパサンド'&'で連結) */
     var pram = 'user_id=' + user_id + '&keyword1=' + keyword1 + '&keyword2=' + keyword2 + '&keyword3=' + keyword3 + '&type1=' + type1;
-
     /* アドレスにパラメータを付加 */
     var a;
     a = 1 + Math.round(Math.random()*2);
     if(a==1){
-        location.href="/cgi-bin/jiken2_genre0_step1.py?"+pram;
+        location.href="/cgi-bin/jiken2_review1_step1.py?"+pram;
     }
     if(a==2){
         location.href="/cgi-bin/jiken2_genre0_step1.py?"+pram;
     }
     return false;
 }
-
 $(function() {
     inputCheck();
     $(':radio').change(function(){
         inputCheck();
     });
 });
-
 function inputCheck() {
     if($('#input-check').is(':checked')) {
         $('.button1').prop('disabled', false);
@@ -80,7 +72,6 @@ function inputCheck() {
     }
 }
 </script>
-
 <body>
 <header>
 <h1 class='title'>観光スポット検索</h1>
@@ -92,7 +83,6 @@ function inputCheck() {
 <h4 class='keyword'>要求1：<input type='text' name='keyword1' style='width: 250px;height: 24px;font-size:16px;'></h4>
 <h4 class='keyword'>要求2：<input type='text' name='keyword2' style='width: 250px;height: 24px;font-size:16px;'></h4>
 <h4 class='keyword'>要求3：<input type='text' name='keyword3' style='width: 250px;height: 24px;font-size:16px;'></h4>
-
 <h2 class='subtitle'>== タイプを選択してください ==</h2>
 <ol class='type_choice'>
 <li class='type_choice_li'><input type='radio' name='type1' value='1'>&nbsp一人</li>
@@ -101,12 +91,10 @@ function inputCheck() {
 <li class='type_choice_li'><input type='radio' name='type1' value='4'>&nbsp友達同士</li>
 <li class='type_choice_li'><input type='radio' name='type1' value='5'>&nbspその他</li>
 </ol>
-
 <p style='color:#ff0000'><input type='radio' name='user' id='input-check' /> 全ての項目の入力し終えたら，チェックしてから「実験開始」をクリックしてください．</p>
 <input type='submit' class='button1' value='実験開始'/>
 </form>
 </div>
-
 <div class='right'>
 <h2 style='color:red;'>注意事項！！</h2>
 <h3>== CrowdWorksIDについて ==</h3>
@@ -118,7 +106,6 @@ function inputCheck() {
 <li>気分，感情「○」<br/><span>例：広い，のんびり，自然豊か...</span></li>
 </ol>
 </div>
-
 </body>
 </html>
 """
