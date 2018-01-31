@@ -56,7 +56,7 @@ $('.button1').click(function() {
         link= "jiken2_review1_step1.py";
     }
     if(a==2){
-        link="jiken2_review1_step1.py";
+        link="jiken2_genre0_step1.py";
     }
 
     $(this).parents('form').attr('action', link);
