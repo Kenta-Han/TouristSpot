@@ -128,7 +128,7 @@ user_words_kantou = myp_other.Change_To_Dic(words_kantou[0])
 ## ====== スポット検索(wordfとtfidf_kantouを使ってフィルタ) ======
 search_spot = []
 for i in tqdm(range(len(words_kantou[0]))) :
-    sql_search_spot = "select spot from tt_unity_kantou where word = '" + str(words_kantou[0][i][0]) +"' and tfidf_kantou > " + str(words_kantou[0][i][1] - 0.01) + " and tfidf_kantou < "  + str(words_kantou[0][i][1] + 0.01)
+    sql_search_spot = "select spot from tt_unity_kantou where word = '" + str(words_kantou[0][i][0]) +"' and tfidf_kantou > " + str(words_kantou[0][i][1] - 0.1) + " and tfidf_kantou < "  + str(words_kantou[0][i][1] + 0.1)
     c.execute(sql_search_spot)
     for j in c:
         search_spot.append(j[0])
