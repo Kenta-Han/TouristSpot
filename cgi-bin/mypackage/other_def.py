@@ -280,3 +280,39 @@ def Average122_yobi(kantou,season,type_all):
 					result.append([kantou[i][0],kantou[i][1],math])
 	result = Top10_yobi(result)
 	# return result
+
+
+
+#############################################
+##### deim用
+#############################################
+## Top10を表示
+def Top10_deim(average):
+	result = sorted(average,key=lambda x:x[2],reverse=True)
+	# print("<h4>==== トップ10 ====</h4>")
+	spot_list = []
+	column_list = ["spot01","spot02","spot03","spot04","spot05","spot06","spot07","spot08","spot09","spot10"]
+
+	print("<ol>")
+	for i,column in zip(range(len(result)),column_list): ## トップ10を表示
+		if i >= 10:
+			continue
+		print("<li><a href='http://www.jalan.net/kankou/")
+		print(str(result[i][0]))
+		print("/' target='_blank'>")
+		print(result[i][1])
+		# print(str(result[i][2])) ## 類似度
+		print("</a></li>")
+	print("</ol>")
+
+## 関東1 : 季節2.5 : タイプ2.5(予備実験用)
+def Average122_deim(kantou,season,type_all):
+	result = []
+	for i in range(len(kantou)):
+		for j in range(len(season)):
+			for k in range(len(type_all)):
+				if (kantou[i][1] == season[j][1]) and (season[j][1] == type_all[k][1]):
+					math = (kantou[i][2]/6 + season[j][2]*2.5/6 + type_all[k][2]*2.5/6) / 3
+					result.append([kantou[i][0],kantou[i][1],math])
+	result = Top10_deim(result)
+	# return result
