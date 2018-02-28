@@ -18,7 +18,7 @@ html_body = u"""
 </header>
 <div class='left'>
 <form method='post' name='form1'>
-<h3 class='crowdworks_id'>CrowdWorks ID：<input type='text' name='user_id' id='user_id' maxlength='40' style='width: 200px;height: 24px;font-size:16px;'/></h3>
+<h3 class='crowdworks_id'>ユーザ名：<input type='text' name='user_id' id='user_id' maxlength='40' style='width: 200px;height: 24px;font-size:16px;'/></h3>
 <p style='text-align:center;'>要求を3つ入力してください．</p>
 <h4 class='keyword'>要求1：<input type='text' name='keyword1' style='width: 250px;height: 24px;font-size:16px;'/></h4>
 <h4 class='keyword'>要求2：<input type='text' name='keyword2' style='width: 250px;height: 24px;font-size:16px;'/></h4>
@@ -56,7 +56,7 @@ $('.button1').click(function() {
         link= "jiken2_review1_step1.py";
     }
     if(a==2){
-        link="jiken2_genre0_step1.py";
+        link= "jiken2_genre0_step1.py";
     }
 
     $(this).parents('form').attr('action', link);
