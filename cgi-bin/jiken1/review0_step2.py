@@ -4,7 +4,7 @@ import cgi,cgitb
 import MySQLdb
 import datetime
 import sys
-import mypackage.other_def as myp_other
+import other_def as myp_other
 
 # DBに接続しカーソルを取得する
 connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
@@ -85,7 +85,7 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../data/stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='/data/stylesheet.css' rel='stylesheet' type='text/css' />
 <title>レビュー選択</title>
 
 <script>
@@ -201,7 +201,7 @@ pulldown = """
 print("<div class='review'>")
 print(pulldown)
 
-print("<form method='post' action='jiken1_review1_step3.py' id='example'>")
+print("<form method='post' action='review0_step3.py' id='example'>")
 print("<h4><input type='hidden' name='type1' value='" + type1 + "'></h4>")
 print("<input type='hidden' name='sql_season0' value='" + sql_season[0] + "'>")
 print("<input type='hidden' name='sql_season1' value='" + sql_season[1] + "'>")
@@ -216,7 +216,7 @@ print("<input type='hidden' name='type_word2' value='" + type_word[2] + "'>")
 
 print("<input type='hidden' name='review_num[]' value='"+review_all[0][0]+","+review_all[1][0]+","+review_all[2][0]+","+review_all[3][0]+","+review_all[4][0]+","+review_all[5][0]+","+review_all[6][0]+","+review_all[7][0]+","+review_all[8][0]+","+review_all[9][0]+","+review_all[10][0]+","+review_all[11][0]+","+review_all[12][0]+","+review_all[13][0]+","+review_all[14][0]+","+review_all[15][0]+","+review_all[16][0]+","+review_all[17][0]+","+review_all[18][0]+","+review_all[19][0]+"'>")
 
-print("<h3 style='text-align:center;'>CrowdWorks ID：<input type='text' name='user_id' id='user_id' maxlength='40' style='width: 200px;height: 24px;font-size:16px;'/></h3>")
+print("<h3 style='text-align:center;'>CrowdWorks ID：<input type='text' name='user_id' id='user_id' maxlength='40' style='width: 200px;height: 24px;font-size:16px;'/></h3><p>(匿名は判別できません)</p>")
 
 print("<p style='text-align:center;'>選択したレビューの中から重要と思うキーワードを抜き出し，</br>3つ入力してください．</p>")
 
@@ -228,7 +228,7 @@ print("<h4 style='text-align:center;'>キーワード3：<input type='text' name
 print("<div style='text-align:center;'>")
 print("<p style='text-align:center;color:#ff0000'><input type='radio' name='user' id='input-check' />項目の入力し終えたら，チェックしてください．</p>")
 print("<input type='submit' class='button1' value='送信'/>")
-# print("</br><p>※ 次のページが開くまでしばらく時間(約10秒~1分)がかかります．</p>")
+print("</br><p>※ 次のページが開くまでしばらく時間(約10秒~1分)がかかります．</p>")
 print("<div>")
 
 print("</form>")

@@ -4,7 +4,7 @@ import cgi,cgitb
 import MySQLdb
 import datetime
 import sys
-import mypackage.other_def as myp_other
+import other_def as myp_other
 
 connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
 c = connect.cursor()
@@ -12,24 +12,29 @@ c = connect.cursor()
 form = cgi.FieldStorage()
 user_id = form.getvalue('user_id') ##CrowdWorksID
 type_id = int(form.getvalue('type1')) ##タイプ
+season_id = int(form.getvalue('season1')) ##季節
 keyword = [form.getvalue('keyword1'),form.getvalue('keyword2'),form.getvalue('keyword3')] ##要求3つ
 
 start_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+
+season_all = ["春","夏","秋","冬"]
 ## ====== 季節 ======
 now = datetime.datetime.today() ## 現在の日付を取得
-if now.month >= 3 and now.month <= 5 :
+if season_id  == 1 :
     sql_season = ["select * from tfidf_season_spring","select * from kld_season_spring3"]
     season_word = ["tfidf_spring","kld_spring","spring"]
-elif now.month >= 6 and now.month <= 8 :
+elif season_id == 2 :
     sql_season= ["select * from tfidf_season_summer","select * from kld_season_summer3"]
     season_word = ["tfidf_summer","kld_summer","summer"]
-elif now.month >= 9 and now.month <= 11 :
+elif season_id == 3 :
     sql_season = ["select * from tfidf_season_autumn","select * from kld_season_autumn3"]
     season_word = ["tfidf_autumn","kld_autumn","autumn"]
-elif now.month == 12 or (now.month >= 1 and now.month <= 2) :
+elif season_id == 4 :
     sql_season = ["select * from tfidf_season_winter","select * from kld_season_winter3"]
     season_word = ["tfidf_winter","kld_winter","winter"]
 ## ====== 季節〆 ======
+
+
 type_all = ["一人","カップル・夫婦","家族","友達同士","その他"]
 ## ====== タイプ ======
 if type_id  == 1 :
@@ -49,11 +54,11 @@ elif type_id == 5 :
     sql_type = ["select * from tfidf_type_other","select * from kld_type_other3"]
 ## ====== タイプ〆 ======
 
-sql_insert = "insert into jiken2(user_id, type, season, keyword1, keyword2, keyword3, access_order, start_datetime) values(%s,%s,%s,%s,%s,%s,%s,%s);"
-c.execute(sql_insert,(user_id,type_word[2],season_word[2],keyword[0],keyword[1],keyword[2],"1",start_datetime))
+sql_insert = "insert into soc2018(user_id, type, season, keyword1, keyword2, keyword3, access_order, start_datetime) values(%s,%s,%s,%s,%s,%s,%s,%s);"
+c.execute(sql_insert,(user_id,type_word[2],season_word[2],keyword[0],keyword[1],keyword[2],"4",start_datetime))
 connect.commit()
 
-c.execute("select max(id) from jiken2 where user_id='" + str(user_id) + "';")
+c.execute("select max(id) from soc2018 where user_id='" + str(user_id) + "';")
 record_id = c.fetchone()[0]
 
 ## ====== 関東スポットリスト ======
@@ -90,8 +95,8 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
-<title>レビュー選択</title>
+<link href='/data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<title>レビュー選択(RA)</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
 $(function () {
@@ -120,7 +125,7 @@ $(function () {
   </div>
 </div>
 <div id='wrap'>
-<header><h1 class='title'>観光スポット検索(A)</h1></header>
+<header><h1 class='title'>観光スポット検索(RA)</h1></header>
 """
 print(html_body)
 
@@ -210,7 +215,7 @@ pulldown = """
 print("<div class='review'>")
 print(pulldown)
 
-print("<form method='post' action='jiken2_review1_step2.py' id='example'>")
+print("<form method='post' action='review_all2.py' id='example'>")
 print("<input type='hidden' name='sql_season0' value='" + sql_season[0] + "'>")
 print("<input type='hidden' name='sql_season1' value='" + sql_season[1] + "'>")
 print("<input type='hidden' name='season_word0' value='" + season_word[0] + "'>")
@@ -227,11 +232,12 @@ print("<input type='hidden' name='review_num[]' value='"+review_all[0][0]+","+re
 print("<div style='text-align:center;'>")
 print("<input type='hidden' name='record_id' value='" + str(record_id) + "'>")
 print("<input type='hidden' name='type_id' value='" + str(type_id) + "'>")
+print("<input type='hidden' name='season_id' value='" + str(season_id) + "'>")
 print("<input type='hidden' name='keyword1' value='" + str(keyword[0]) + "'>")
 print("<input type='hidden' name='keyword2' value='" + str(keyword[1]) + "'>")
 print("<input type='hidden' name='keyword3' value='" + str(keyword[2]) + "'>")
 print("<p>※ 次のページが開くまでしばらく時間(約30秒~90秒)がかかります．</p>")
-print("<input type='submit' class='button1' value='次へ'/>")
+print("<br><input type='submit' class='button1' value='次へ'/>")
 print("<div>")
 print("</form>")
 print("</div></div></br>")

@@ -54,14 +54,13 @@ user_max_id = c.fetchone()[0]
 sql_select = "select distinct name,spot_id,review from unity_kantou_add_category where category1 = '" + category + "' and season4 = '" + season + "'and companion = '" + type_all[type_id-1] + "' order by review desc limit 10;"
 c.execute(sql_select)
 
-print("<form action='jiken1_genre0_step4.py' method='post'>")
+print("<form action='genre1_step4.py' method='post'>")
 
 print("<table class='imagetable'>")
 print("<p>以下の観光スポットを押すとじゃらんの紹介ページが開きます．</br>内容を確認した上でいくつか選択してください．</br></br> 「キーワード」:キーワードに満たしているならチェックしてください．</br>「既知」:既知の観光スポットならチェックしてください </p>")
 print("<p>キーワード1：" + str(keyword[0]) + "</br>キーワード2：" + str(keyword[1]) + "</br>キーワード3：" + str(keyword[2]) + "</p>")
 
 column_list = ["spot01","spot02","spot03","spot04","spot05","spot06","spot07","spot08","spot09","spot10"]
-
 
 print("<tr><th>観光スポット</th><th>キーワード1</th><th>キーワード2</th><th>キーワード3</th><th>既知</th></tr>")
 for spot,column in zip(c,column_list):
@@ -80,7 +79,6 @@ print("</table>")
 print("<h3>意見<span style='font-size: 14px;'>(※ご自由にどうぞ)：</span></h3>")
 print("<textarea name='msg' cols=70 rows=7 />")
 print("</textarea>")
-print("<p>「結果送信」を押した後次のページ表示するまでお待ちしてください</p>")
 print("<input type='hidden' name='user_max_id' value='" + str(user_max_id) + "'>")
 print("</br><input type='submit' value='結果送信' class='button1'/>")
 print("</form>")

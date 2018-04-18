@@ -17,20 +17,21 @@ msg = form.getvalue('msg')
 print("<!DOCTYPE html>")
 print("<head>")
 print("Content-type:text/html; charset=UTF-8\r\n")
-print("<meta http-equiv='content-type' content='text/html; />")
-print("<script src='https://code.jquery.com/jquery-3.0.0.min.js'></script>")
-print("<link href='../data/stylesheet_onlytype.css' rel='stylesheet' type='text/css' />")
+print("<link href='/data/stylesheet.css' rel='stylesheet' type='text/css' />")
 print("<title>観光スポット</title>")
 print("</head>")
-
 print("<body>")
-print("<header><h1 style='text-align:center;'>観光スポット検索(B)</h1></header>")
-print("<h2 style='text-align:center;'>ジャンルによる観光スポット検索の実験のご協力ありがとうございます</h2>")
-print("<p style='text-align:center;'>「レビューによる観光スポット検索へ」をクリックして次の実験をお願いします．</p>")
+print("<div class='box1'>")
+print("<header>")
+print("<h1>観光スポット検索(A)</h1>")
+print("</header>")
 
-print("<form action='jiken1_review0_step1.py' method='post'>")
+print("<h2 style='text-align:center;'>レビューによる観光スポット検索の実験のご協力ありがとうございます．</h2>")
+print("<p style='text-align:center;'>「ジャンルによる観光スポット検索へ」をクリックして次の実験をお願いします．</p>")
+
+print("<form action='genre1_step1.py' method='post'>")
 print("<div style='text-align:center;'>")
-print("<input type='submit' value='レビューによる観光スポット検索へ' class='button1'/>")
+print("<input type='submit' value='ジャンルによる観光スポット検索へ' class='button1'/>")
 print("</div></form>")
 
 if check1_list == None:
@@ -61,7 +62,7 @@ elif type(count_list)==str:
 else:
     count = len(count_list)
 
-c.execute("update exp_data_category_test set selected_spot1='" + str(check1) + "', selected_spot2='" + str(check2) + "', selected_spot3='" + str(check3) + "', msg ='" + str(msg) + "',count = '" + str(count) +  "', access_order=0  where id=" + str(user_max_id) + ";")
+c.execute("update exp_data_proposal_test set selected_spot1='" + str(check1) + "', selected_spot2='" + str(check2) + "', selected_spot3='" + str(check3) + "', msg ='" + str(msg) + "',count = '" + str(count) +  "', access_order=1 where id=" + str(user_max_id) + ";")
 
 print("</body></html>")
 

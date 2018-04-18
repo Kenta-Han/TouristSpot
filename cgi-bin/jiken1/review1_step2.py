@@ -4,19 +4,15 @@ import cgi,cgitb
 import MySQLdb
 import datetime
 import sys
-import mypackage.other_def as myp_other
+import other_def as myp_other
 
+# DBに接続しカーソルを取得する
 connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
 c = connect.cursor()
 
-form = cgi.FieldStorage()
-user_id = form.getvalue('user_id') ##CrowdWorksID
-type_id = int(form.getvalue('type1')) ##タイプ
-keyword = [form.getvalue('keyword1'),form.getvalue('keyword2'),form.getvalue('keyword3')] ##要求3つ
-
-start_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 ## ====== 季節 ======
 now = datetime.datetime.today() ## 現在の日付を取得
+
 if now.month >= 3 and now.month <= 5 :
     sql_season = ["select * from tfidf_season_spring","select * from kld_season_spring3"]
     season_word = ["tfidf_spring","kld_spring","spring"]
@@ -30,31 +26,30 @@ elif now.month == 12 or (now.month >= 1 and now.month <= 2) :
     sql_season = ["select * from tfidf_season_winter","select * from kld_season_winter3"]
     season_word = ["tfidf_winter","kld_winter","winter"]
 ## ====== 季節〆 ======
-type_all = ["一人","カップル・夫婦","家族","友達同士","その他"]
+
 ## ====== タイプ ======
+form = cgi.FieldStorage()
+type1 = form.getvalue('type1')
+
+cnt_type_all = 1
+type_id = int(type1)
+
 if type_id  == 1 :
     type_word = ["tfidf_alone","kld_alone","一人"]
     sql_type = ["select * from tfidf_type_alone","select * from kld_type_alone3"]
 elif type_id == 2 :
     type_word = ["tfidf_couple","kld_couple","カップル・夫婦"]
-    sql_type = ["select * from tfidf_type_couple","select * from kld_type_couple3"]
+    sql_type = ["select * from tfidf_type_couple","select * from kld_type_couple"]
 elif type_id == 3 :
     type_word = ["tfidf_family","kld_family","家族"]
-    sql_type = ["select * from tfidf_type_family","select * from kld_type_family3"]
+    sql_type = ["select * from tfidf_type_family","select * from kld_type_family"]
 elif type_id == 4 :
     type_word = ["tfidf_friend","kld_friend","友達同士"]
-    sql_type = ["select * from tfidf_type_friend","select * from kld_type_friend3"]
+    sql_type = ["select * from tfidf_type_friend","select * from kld_type_friend"]
 elif type_id == 5 :
     type_word = ["tfidf_other","kld_other","その他"]
-    sql_type = ["select * from tfidf_type_other","select * from kld_type_other3"]
+    sql_type = ["select * from tfidf_type_other","select * from kld_type_other"]
 ## ====== タイプ〆 ======
-
-sql_insert = "insert into jiken2(user_id, type, season, keyword1, keyword2, keyword3, access_order, start_datetime) values(%s,%s,%s,%s,%s,%s,%s,%s);"
-c.execute(sql_insert,(user_id,type_word[2],season_word[2],keyword[0],keyword[1],keyword[2],"1",start_datetime))
-connect.commit()
-
-c.execute("select max(id) from jiken2 where user_id='" + str(user_id) + "';")
-record_id = c.fetchone()[0]
 
 ## ====== 関東スポットリスト ======
 name = "select distinct name from spot_area_kantou where name != '';"
@@ -90,38 +85,35 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='/data/stylesheet.css' rel='stylesheet' type='text/css' />
 <title>レビュー選択</title>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script>
-$(function () {
-    $('.button1').click(function() {
-        /* 画面を隠す */
-        var h = $(window).height();
-        $('#wrap').css('display','none');
-        $('#loader-bg ,#loader').height(h).css('display','block');
 
-        /* 画面n秒後を表示 */
-        var min = 30000 ; //30秒
-        var max = 60000 ; //60秒
-        var a = Math.floor( Math.random() * (max + 1 - min) ) + min ;
-        $('#loader-bg').delay(a).fadeOut(1000);
-        //$('#loader').delay(30000).fadeOut(1000);
-        $('#wrap').css('display', 'block');
+<script>
+$(function() {
+    inputCheck();
+    $(':radio').change(function(){
+        inputCheck();
     });
 });
-</script>
-</head>
 
+function inputCheck() {
+    if($('#input-check').is(':checked')) {
+        $('.button1').prop('disabled', false);
+    } else {
+        $('.button1').prop('disabled', true);
+    }
+}
+</script>
+
+</head>
 <body>
-<div id="loader-bg">
-  <div id="loader">
-    <h2>Now Loading...</br>次のページが開くまでしばらく時間</br>(約30秒~90秒)がかかります．<br>更新せずにお待ちして下さい．</h2>
-  </div>
-</div>
-<div id='wrap'>
-<header><h1 class='title'>観光スポット検索(A)</h1></header>
+<div class='box1'>
+<header>
+<h1>観光スポット検索(A)</h1>
+</header>
+
 """
+
 print(html_body)
 
 for i in range(len(review_all)):
@@ -133,10 +125,9 @@ for i in range(len(review_all)):
     print("</p>")
     cnt += 1
 
-print("<h2 style='text-align:center;'>==== レビューを３つを選択してください ====</h2>")
-print("<p style='text-align:center;'>入力した要求に対する一番近いレビューを3つ選択してください．</p>")
+print("<h3>==== レビューを３つを選択してください ====</h3>")
 pulldown = """
-<table class='choice_table'>
+<table class='imagetable'>
 <tr>
 <td>レビュー1：<select name='input1' form='example' style='width: 44px;height: 24px;font-size:14px;'>
 <option value='1'>1</option>
@@ -210,7 +201,8 @@ pulldown = """
 print("<div class='review'>")
 print(pulldown)
 
-print("<form method='post' action='jiken2_review1_step2.py' id='example'>")
+print("<form method='post' action='review1_step3.py' id='example'>")
+print("<h4><input type='hidden' name='type1' value='" + type1 + "'></h4>")
 print("<input type='hidden' name='sql_season0' value='" + sql_season[0] + "'>")
 print("<input type='hidden' name='sql_season1' value='" + sql_season[1] + "'>")
 print("<input type='hidden' name='season_word0' value='" + season_word[0] + "'>")
@@ -224,17 +216,23 @@ print("<input type='hidden' name='type_word2' value='" + type_word[2] + "'>")
 
 print("<input type='hidden' name='review_num[]' value='"+review_all[0][0]+","+review_all[1][0]+","+review_all[2][0]+","+review_all[3][0]+","+review_all[4][0]+","+review_all[5][0]+","+review_all[6][0]+","+review_all[7][0]+","+review_all[8][0]+","+review_all[9][0]+","+review_all[10][0]+","+review_all[11][0]+","+review_all[12][0]+","+review_all[13][0]+","+review_all[14][0]+","+review_all[15][0]+","+review_all[16][0]+","+review_all[17][0]+","+review_all[18][0]+","+review_all[19][0]+"'>")
 
+print("<h3 style='text-align:center;'>CrowdWorks ID：<input type='text' name='user_id' id='user_id' maxlength='40' style='width: 200px;height: 24px;font-size:16px;'/></h3>")
+
+print("<p style='text-align:center;'>選択したレビューの中から重要と思うキーワードを抜き出し，</br>3つ入力してください．</p>")
+
+print("<h4 style='text-align:center;'>キーワード1：<input type='text' name='keyword1' style='width: 250px;height: 24px;font-size:16px;'></h4>")
+print("<h4 style='text-align:center;'>キーワード2：<input type='text' name='keyword2' style='width: 250px;height: 24px;font-size:16px;'></h4>")
+print("<h4 style='text-align:center;'>キーワード3：<input type='text' name='keyword3' style='width: 250px;height: 24px;font-size:16px;'></h4>")
+
+
 print("<div style='text-align:center;'>")
-print("<input type='hidden' name='record_id' value='" + str(record_id) + "'>")
-print("<input type='hidden' name='type_id' value='" + str(type_id) + "'>")
-print("<input type='hidden' name='keyword1' value='" + str(keyword[0]) + "'>")
-print("<input type='hidden' name='keyword2' value='" + str(keyword[1]) + "'>")
-print("<input type='hidden' name='keyword3' value='" + str(keyword[2]) + "'>")
-print("<p>※ 次のページが開くまでしばらく時間(約30秒~90秒)がかかります．</p>")
-print("<input type='submit' class='button1' value='次へ'/>")
+print("<p style='text-align:center;color:#ff0000'><input type='radio' name='user' id='input-check' />項目の入力し終えたら，チェックしてください．</p>")
+print("<input type='submit' class='button1' value='送信'/>")
+# print("</br><p>※ 次のページが開くまでしばらく時間(約10秒~1分)がかかります．</p>")
 print("<div>")
+
 print("</form>")
-print("</div></div></br>")
+print("</div></div>")
 print("</body></html>")
 
 c.close

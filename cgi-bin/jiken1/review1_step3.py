@@ -5,8 +5,8 @@ import MySQLdb
 import sys
 import math
 from tqdm import tqdm
-import mypackage.spot_def as myp_spot
-import mypackage.other_def as myp_other
+import spot_def as myp_spot
+import other_def as myp_other
 
 # DBに接続しカーソルを取得する
 connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
@@ -15,7 +15,7 @@ c = connect.cursor()
 print("<!DOCTYPE html>")
 print("<head>")
 print("Content-type:text/html; charset=UTF-8\r\n")
-print("<link href='../data/stylesheet.css' rel='stylesheet' type='text/css' />")
+print("<link href='/data/stylesheet.css' rel='stylesheet' type='text/css' />")
 print("<title>観光スポット</title>")
 print("</head>")
 print("<body>")
@@ -210,7 +210,7 @@ print("<div class='top10' style='text-align: center;'>")
 print("<p>以下の観光スポットを押すとじゃらんの紹介ページが開きます．</br>内容を確認した上でいくつか選択してください．</br></br> 「キーワード」:キーワードに満たしているならチェックしてください．</br>「既知」:既知の観光スポットならチェックしてください </p>")
 print("<p>キーワード1：" + str(keyword[0]) + "</br>キーワード2：" + str(keyword[1]) + "</br>キーワード3：" + str(keyword[2]) + "</p>")
 print("<div style='text-align:center;'>")
-print("<form action='jiken1_review1_step4.py' method='post'>")
+print("<form action='review1_step4.py' method='post'>")
 myp_other.Average122(kantou_tfidf_all,season_kld_all,type_kld_all,user_max_id)
 
 print("<input type='hidden' name='user_max_id' value='"+str(user_max_id)+"'>")

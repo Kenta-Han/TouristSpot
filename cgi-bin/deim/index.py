@@ -9,14 +9,14 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../data/stylesheet_deim.css' rel='stylesheet' type='text/css' />
+<link href='/data/stylesheet_deim.css' rel='stylesheet' type='text/css' />
 <title>観光スポット検索</title>
 </head>
 <body>
 <header>
 <h1 class='title'>観光スポット検索</h1>
 </header>
-<form method='post' action='deim_review1.py'>
+<form method='post' action='review1.py'>
 <br><br>
 <h2 class='subtitle'>== タイプを選択してください ==</h2>
 <ol class='type_choice'>

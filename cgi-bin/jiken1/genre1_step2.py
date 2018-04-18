@@ -7,7 +7,7 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../data/stylesheet_onlytype.css' rel='stylesheet' type='text/css' />
+<link href='/data/stylesheet_onlytype.css' rel='stylesheet' type='text/css' />
 <title>ジャンル選択2</title>
 
 <script>
@@ -38,7 +38,7 @@ category_id = int(form.getvalue('genre')) ## only_type1_1.pyのgenreを受け取
 
 print(html_body)
 
-print("<form action='jiken1_genre1_step3.py' method='post' onsubmit='check(this);return false;'>")
+print("<form action='genre1_step3.py' method='post' onsubmit='check(this);return false;'>")
 print("<input type='hidden' name='category' value='" + category[category_id-1] + "'>")
 
 print("<br/><h2 style='text-align:center;'>==== タイプを選んでください ====</h2>")

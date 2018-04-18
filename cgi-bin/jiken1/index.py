@@ -18,8 +18,8 @@ function open_win(url) {
 function RandomLink() {
   var a;
   a = 1 + Math.round(Math.random()*2);
-  if (a==1) open_win('jiken1_review1_step1.py');
-  if (a==2) open_win('jiken1_genre0_step1.py');
+  if (a==1) open_win('review1_step1.py');
+  if (a==2) open_win('genre0_step1.py');
 }
 </script>
 

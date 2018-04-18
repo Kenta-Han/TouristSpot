@@ -6,7 +6,7 @@ html_body = u"""
 <!DOCTYPE html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href='../data/stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='/data/stylesheet.css' rel='stylesheet' type='text/css' />
 <title>タイプ選択</title>
 </head>
 <body>
@@ -14,7 +14,7 @@ html_body = u"""
 <header>
 <h1>観光スポット検索(A)</h1>
 </header>
-<form action='jiken1_review0_step2.py' method='post' onsubmit='check(this);return false;'>
+<form action='review0_step2.py' method='post' onsubmit='check(this);return false;'>
 
 <h3>==== タイプを選択してください ====</h3>
 <div class='review'>
