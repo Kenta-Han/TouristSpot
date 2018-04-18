@@ -181,7 +181,7 @@ pulldown = """
 print("<div class='review'>")
 print(pulldown)
 
-print("<form method='post' action='yobijiken_step3.py' id='example'>")
+print("<form method='post' action='step2.py' id='example'>")
 print("<h4><input type='hidden' name='type1' value='"+type1+"'></h4>")
 print("<input type='hidden' name='sql_season0' value='"+sql_season[0]+"'>")
 print("<input type='hidden' name='sql_season1' value='"+sql_season[1]+"'>")

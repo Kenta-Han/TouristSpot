@@ -5,8 +5,8 @@ import MySQLdb
 import sys
 import math
 from tqdm import tqdm
-import spot_def as myp_spot
-import other_def as myp_other
+import mypackage.spot_def as myp_spot
+import mypackage.other_def as myp_other
 
 # DBに接続しカーソルを取得する
 connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')

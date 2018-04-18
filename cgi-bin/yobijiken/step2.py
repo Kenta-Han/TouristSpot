@@ -217,7 +217,7 @@ myp_other.Average122_yobi(kantou_tfidf_all,season_kld_all,type_kld_all)
 print("</div>")
 
 print("<div style='text-align:center;'>")
-print("<form action='yobijiken_step1.py' method='post'>")
+print("<form action='index.py' method='post'>")
 print("<input type='submit' value='タイプ選択へ' class='button1'/>")
 print("</form>")
 print("</div>")

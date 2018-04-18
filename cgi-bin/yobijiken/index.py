@@ -14,7 +14,7 @@ html_body = u"""
 <header>
 <h1>観光スポット推薦</h1>
 </header>
-<form action='yobijiken_step2.py' method='post' onsubmit='check(this);return false;'>
+<form action='step1.py' method='post' onsubmit='check(this);return false;'>
 
 <h3>==== タイプを選択してください ====</h3>
 <div class='review'>

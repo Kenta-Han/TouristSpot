@@ -1,7 +1,7 @@
 import MySQLdb
 import math
 from tqdm import tqdm
-import cos_sim_class as myp_cos
+import mypackage.cos_sim_class as myp_cos
 from gensim import corpora
 from gensim import models
 
@@ -114,9 +114,6 @@ def Check(check1,check2,check3,count):
 		count = len(count)
 
 	return check1,check2,check3,count,count_list
-
-
-
 
 
 #############################################
@@ -247,7 +244,7 @@ def Top10_soc(average,record_id):
 		# print(str(result[i][2])) ## 類似度
 		print("</a></th><td><input type='checkbox' name='review_check1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_count' value='"+result[i][1]+"'></td></tr>")
 
-		c.execute("update jiken2 set " + column + "='" + result[i][1] + "' where id=" + str(record_id) + ";")
+		c.execute("update soc2018 set " + column + "='" + result[i][1] + "' where id=" + str(record_id) + ";")
 		connect.commit()
 	print("</table>")
 

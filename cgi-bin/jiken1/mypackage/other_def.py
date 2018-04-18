@@ -82,42 +82,6 @@ def Recommend_All(spot_all,spot_list):
 	return recommend_spot_list
 
 
-## チェックしているかどうかを判断
-def Check(check1,check2,check3,count):
-	if check1 == None:
-		check1 = 0
-	elif type(check1) == str:
-		check1 = ','.join([check1])
-	else:
-		check1 = ','.join(check1)
-
-	if check2 == None:
-		check2 = 0
-	elif type(check2) == str:
-		check2 = ','.join([check2])
-	else:
-		check2 = ','.join(check2)
-
-	if check3 == None:
-		check3 = 0
-	elif type(check3) == str:
-		check3 = ','.join([check3])
-	else:
-		check3 = ','.join(check3)
-
-	if count == None:
-		count_list = []
-		count = 0
-	elif type(count) == str:
-		count_list = ','.join([count])
-		count = len([count])
-	else:
-		count_list = ','.join(count)
-		count = len(count)
-
-	return check1,check2,check3,count,count_list
-
-
 #############################################
 ##### jiken1用
 #############################################

@@ -4,7 +4,7 @@ import cgi,cgitb
 import MySQLdb
 import datetime
 import sys
-import other_def as myp_other
+import mypackage.other_def as myp_other
 
 # DBに接続しカーソルを取得する
 connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
