@@ -64,13 +64,13 @@ $('.button1').click(function() {
         link= "review_all1.py";
     }
     if(a==2){
-        link= "review_all1.py";
+        link= "review_only1.py";
     }
     if(a==3){
-        link= "review_all1.py";
+        link= "review_and_season1.py";
     }
     if(a==4){
-        link= "review_all1.py";
+        link= "review_and_type1.py";
     }
 
     $(this).parents('form').attr('action', link);
