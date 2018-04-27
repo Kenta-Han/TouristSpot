@@ -28,12 +28,12 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='/data/new_stylesheet.css' rel='stylesheet' type='text/css' />
-<title>観光スポット(R)</title>
+<link href='../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<title>観光スポット</title>
 </head>
 <body>
 <div id='wrap'>
-<header><h1 class='title'>観光スポット検索(R)</h1></header>
+<header><h1 class='title'>観光スポット検索</h1></header>
 """
 print(html_body)
 
@@ -143,7 +143,7 @@ kantou_tfidf_all = myp_other.Recommend_All(spot_all_kantou_tfidf,spot_list)
 
 ######################### KLD #########################
 print("<div class='top10' style='text-align: center;'>")
-print("<p>以下の観光スポットを押すとじゃらんの紹介ページが開きます．</br>内容を確認した上でいくつか選択してください．</br>「要求」:要求に満たしているならチェックしてください．</br>「既知」:既知の観光スポットならチェックしてください </p>")
+print("<p>以下の観光スポットを押すとじゃらんの紹介ページが開きます．</br>内容を確認した上でいくつか選択してください．</br>「要求」:要求に満たしているならチェックしてください．</br>「既知」:既知の観光スポットならチェックしてください．</br>「行ってみたい」:自身が行きたい観光スポットならチェックしてください．</p>")
 print("<p>要求1：" + str(keyword[0]) + "，要求2：" + str(keyword[1]) + "，要求3：" + str(keyword[2]) + "</p>")
 
 print("<div style='text-align:center;'>")

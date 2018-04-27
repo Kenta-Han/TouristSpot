@@ -95,8 +95,8 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='/data/new_stylesheet.css' rel='stylesheet' type='text/css' />
-<title>レビュー選択(R)</title>
+<link href='../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<title>レビュー選択</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
 $(function () {
@@ -125,7 +125,7 @@ $(function () {
   </div>
 </div>
 <div id='wrap'>
-<header><h1 class='title'>観光スポット検索(R)</h1></header>
+<header><h1 class='title'>観光スポット検索</h1></header>
 """
 print(html_body)
 

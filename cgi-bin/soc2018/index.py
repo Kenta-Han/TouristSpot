@@ -9,7 +9,7 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='/data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>観光スポット検索</title>
 </head>
 <body>
@@ -23,7 +23,7 @@ html_body = u"""
 <h4 class='keyword'>要求1：<input type='text' name='keyword1' style='width: 250px;height: 24px;font-size:16px;'/></h4>
 <h4 class='keyword'>要求2：<input type='text' name='keyword2' style='width: 250px;height: 24px;font-size:16px;'/></h4>
 <h4 class='keyword'>要求3：<input type='text' name='keyword3' style='width: 250px;height: 24px;font-size:16px;'/></h4>
-<h2 class='subtitle'>== タイプを選択してください ==</h2>
+<h2 class='subtitle'>== 旅行の同行者を選択してください ==</h2>
 <ol class='type_choice'>
 <li class='type_choice_li'><input type='radio' name='type1' value='1'>&nbsp一人</li>
 <li class='type_choice_li'><input type='radio' name='type1' value='2'>&nbspカップル・夫婦</li>
@@ -31,7 +31,7 @@ html_body = u"""
 <li class='type_choice_li'><input type='radio' name='type1' value='4'>&nbsp友達同士</li>
 <li class='type_choice_li'><input type='radio' name='type1' value='5'>&nbspその他</li>
 </ol>
-<h2 class='subtitle'>== 季節を選択してください ==</h2>
+<h2 class='subtitle'>== 旅行に行きたい季節を選択してください ==</h2>
 <ol class='type_choice'>
 <li class='type_choice_li'><input type='radio' name='season1' value='1'>&nbsp春</li>
 <li class='type_choice_li'><input type='radio' name='season1' value='2'>&nbsp夏</li>
@@ -46,7 +46,7 @@ html_body = u"""
 <div class='right'>
 <h2 style='color:red;'>注意事項！！</h2>
 <h3>== CrowdWorksIDについて ==</h3>
-<div class='image'><img src='/data/crowdworks_id_img.png'></div>
+<div class='image'><img src='../../data/crowdworks_id_img.png'></div>
 <h3>== 要求について ==</h3>
 <ol class='setumei'>
 <p>悪い例</p>
@@ -59,18 +59,21 @@ html_body = u"""
 <script>
 $('.button1').click(function() {
     var a;
-    a = 1 + Math.round(Math.random()*2);
+    a = 1 + Math.floor(Math.random()*4);
     if(a==1){
-        link= "review_all1.py";
+        link= "review_only1.py";
     }
     if(a==2){
-        link= "review_only1.py";
+        link= "review_and_season1.py";
     }
     if(a==3){
         link= "review_and_season1.py";
     }
     if(a==4){
-        link= "review_and_type1.py";
+        link= "review_only1.py";
+    }
+    if(a==5){
+        link= "review_all1.py";
     }
 
     $(this).parents('form').attr('action', link);

@@ -81,7 +81,7 @@ def Recommend_All(spot_all,spot_list):
 	return recommend_spot_list
 
 ## チェックしているかどうかを判断
-def Check(check1,check2,check3,count):
+def Check(check1,check2,check3,count,go):
 	if check1 == None:
 		check1 = 0
 	elif type(check1) == str:
@@ -113,7 +113,17 @@ def Check(check1,check2,check3,count):
 		count_list = ','.join(count)
 		count = len(count)
 
-	return check1,check2,check3,count,count_list
+	if go == None:
+		go_list = []
+		go = 0
+	elif type(go) == str:
+		go_list = ','.join([go])
+		go = len([go])
+	else:
+		go_list = ','.join(go)
+		go = len(go)
+
+	return check1,check2,check3,count_list,count,go_list,go
 
 
 #############################################
@@ -130,7 +140,7 @@ def Top10_review_only(average,record_id):
 	column_list = ["review_spot01","review_spot02","review_spot03","review_spot04","review_spot05","review_spot06","review_spot07","review_spot08","review_spot09","review_spot10"]
 
 	print("<table class='review_table'>")
-	print("<tr><th>観光スポット</th><th>要求1</th><th>要求2</th><th>要求3</th><th>既知</th></tr>")
+	print("<tr><th>観光スポット</th><th>要求1</th><th>要求2</th><th>要求3</th><th>既知</th><th>行ってみたい</th></tr>")
 	for i,column in zip(range(len(result)),column_list): ## トップ10を表示
 		if i >= 10:
 			continue
@@ -139,7 +149,7 @@ def Top10_review_only(average,record_id):
 		print("/' target='_blank'>")
 		print(result[i][1])
 		# print(str(result[i][2])) ## 類似度
-		print("</a></th><td><input type='checkbox' name='review_check1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_count' value='"+result[i][1]+"'></td></tr>")
+		print("</a></th><td><input type='checkbox' name='review_check1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_count' value='"+result[i][1]+"'></td><td><input type='checkbox' name='go_count' value='"+result[i][1]+"'></td></tr>")
 
 		c.execute("update soc2018 set " + column + "='" + result[i][1] + "' where id=" + str(record_id) + ";")
 		connect.commit()
@@ -157,7 +167,7 @@ def Top10_review_season(average,record_id):
 	column_list = ["review_spot01","review_spot02","review_spot03","review_spot04","review_spot05","review_spot06","review_spot07","review_spot08","review_spot09","review_spot10"]
 
 	print("<table class='review_table'>")
-	print("<tr><th>観光スポット</th><th>要求1</th><th>要求2</th><th>要求3</th><th>既知</th></tr>")
+	print("<tr><th>観光スポット</th><th>要求1</th><th>要求2</th><th>要求3</th><th>既知</th><th>行ってみたい</th></tr>")
 	for i,column in zip(range(len(result)),column_list): ## トップ10を表示
 		if i >= 10:
 			continue
@@ -166,7 +176,7 @@ def Top10_review_season(average,record_id):
 		print("/' target='_blank'>")
 		print(result[i][1])
 		# print(str(result[i][2])) ## 類似度
-		print("</a></th><td><input type='checkbox' name='review_check1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_count' value='"+result[i][1]+"'></td></tr>")
+		print("</a></th><td><input type='checkbox' name='review_check1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_count' value='"+result[i][1]+"'></td><td><input type='checkbox' name='go_count' value='"+result[i][1]+"'></td></tr>")
 
 		c.execute("update soc2018 set " + column + "='" + result[i][1] + "' where id=" + str(record_id) + ";")
 		connect.commit()
@@ -195,7 +205,7 @@ def Top10_review_type(average,record_id):
 	column_list = ["review_spot01","review_spot02","review_spot03","review_spot04","review_spot05","review_spot06","review_spot07","review_spot08","review_spot09","review_spot10"]
 
 	print("<table class='review_table'>")
-	print("<tr><th>観光スポット</th><th>要求1</th><th>要求2</th><th>要求3</th><th>既知</th></tr>")
+	print("<tr><th>観光スポット</th><th>要求1</th><th>要求2</th><th>要求3</th><th>既知</th><th>行ってみたい</th></tr>")
 	for i,column in zip(range(len(result)),column_list): ## トップ10を表示
 		if i >= 10:
 			continue
@@ -204,7 +214,7 @@ def Top10_review_type(average,record_id):
 		print("/' target='_blank'>")
 		print(result[i][1])
 		# print(str(result[i][2])) ## 類似度
-		print("</a></th><td><input type='checkbox' name='review_check1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_count' value='"+result[i][1]+"'></td></tr>")
+		print("</a></th><td><input type='checkbox' name='review_check1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_count' value='"+result[i][1]+"'></td><td><input type='checkbox' name='go_count' value='"+result[i][1]+"'></td></tr>")
 
 		c.execute("update soc2018 set " + column + "='" + result[i][1] + "' where id=" + str(record_id) + ";")
 		connect.commit()
@@ -233,7 +243,7 @@ def Top10_soc(average,record_id):
 	column_list = ["review_spot01","review_spot02","review_spot03","review_spot04","review_spot05","review_spot06","review_spot07","review_spot08","review_spot09","review_spot10"]
 
 	print("<table class='review_table'>")
-	print("<tr><th>観光スポット</th><th>要求1</th><th>要求2</th><th>要求3</th><th>既知</th></tr>")
+	print("<tr><th>観光スポット</th><th>要求1</th><th>要求2</th><th>要求3</th><th>既知</th><th>行ってみたい</th></tr>")
 	for i,column in zip(range(len(result)),column_list): ## トップ10を表示
 		if i >= 10:
 			continue
@@ -242,7 +252,7 @@ def Top10_soc(average,record_id):
 		print("/' target='_blank'>")
 		print(result[i][1])
 		# print(str(result[i][2])) ## 類似度
-		print("</a></th><td><input type='checkbox' name='review_check1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_count' value='"+result[i][1]+"'></td></tr>")
+		print("</a></th><td><input type='checkbox' name='review_check1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_check3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='review_count' value='"+result[i][1]+"'></td><td><input type='checkbox' name='go_count' value='"+result[i][1]+"'></td></tr>")
 
 		c.execute("update soc2018 set " + column + "='" + result[i][1] + "' where id=" + str(record_id) + ";")
 		connect.commit()
