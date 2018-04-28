@@ -6,7 +6,7 @@ html_body = u"""
 <!DOCTYPE html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href='/data/stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='../../data/stylesheet.css' rel='stylesheet' type='text/css' />
 <title>タイプ選択</title>
 </head>
 <body>

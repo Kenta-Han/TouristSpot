@@ -19,7 +19,7 @@ print("<head>")
 print("Content-type:text/html; charset=UTF-8\r\n")
 print("<meta http-equiv='content-type' content='text/html; />")
 print("<script src='https://code.jquery.com/jquery-3.0.0.min.js'></script>")
-print("<link href='/data/stylesheet_onlytype.css' rel='stylesheet' type='text/css' />")
+print("<link href='../../data/stylesheet_onlytype.css' rel='stylesheet' type='text/css' />")
 print("<title>観光スポット</title>")
 print("</head>")
 

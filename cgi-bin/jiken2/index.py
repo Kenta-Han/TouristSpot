@@ -9,7 +9,7 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>観光スポット検索</title>
 </head>
 <body>
@@ -38,7 +38,7 @@ html_body = u"""
 <div class='right'>
 <h2 style='color:red;'>注意事項！！</h2>
 <h3>== CrowdWorksIDについて ==</h3>
-<div class='image'><img src='../data/crowdworks_id_img.png'></div>
+<div class='image'><img src='../../data/crowdworks_id_img.png'></div>
 <h3>== 要求について ==</h3>
 <ol class='setumei'>
 <p>悪い例</p>
@@ -53,10 +53,10 @@ $('.button1').click(function() {
     var a;
     a = 1 + Math.round(Math.random()*2);
     if(a==1){
-        link= "jiken2_review1_step1.py";
+        link= "review1_step1.py";
     }
     if(a==2){
-        link= "jiken2_genre0_step1.py";
+        link= "genre0_step1.py";
     }
 
     $(this).parents('form').attr('action', link);

@@ -42,12 +42,12 @@ html_body = u"""
 <head>
 <meta http-equiv='content-type' content='text/html; charset=utf-8' />
 <script src='https://code.jquery.com/jquery-3.0.0.min.js'></script>
-<link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>ジャンル選択</title>
 </head>
 <body>
 <header><h1 class='title'>観光スポット検索(B)</h1></header>
-<form action='jiken2_genre0_step2.py' method='post'>
+<form action='genre0_step2.py' method='post'>
 <table class='genre_table'>
 <tr>
 <th colspan=4><h2>　ジャンルを選んでください　</h2></th>

@@ -7,7 +7,7 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='/data/stylesheet_onlytype.css' rel='stylesheet' type='text/css' />
+<link href='../../data/stylesheet_onlytype.css' rel='stylesheet' type='text/css' />
 <title>ジャンル選択</title>
 
 <script>

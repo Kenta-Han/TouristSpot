@@ -22,7 +22,7 @@ sql_season = [form.getvalue('sql_season0'),form.getvalue('sql_season1')]
 season_word = [form.getvalue('season_word0'),form.getvalue('season_word1'),form.getvalue('season_word2')]
 sql_type = [form.getvalue('sql_type0'),form.getvalue('sql_type1')]
 type_word = [form.getvalue('type_word0'),form.getvalue('type_word1'),form.getvalue('type_word2')]
-review_num = form.getvalue('review_num')
+review_num = form.getvalue('review_num[]')
 review_num = review_num.split(",")
 
 id_data = [int(input_data[0])-1,int(input_data[1])-1,int(input_data[2])-1]
@@ -32,7 +32,7 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>観光スポット</title>
 </head>
 <body>
@@ -52,7 +52,6 @@ for i in id_data:
 # ====== 選択レビュー(insert) ======
 sql_update = "update jiken2 set {column1} ='{r_user1}',{column2}='{r_user2}',{column3}='{r_user3}' where id = {record_id};"
 c.execute(sql_update.format(column1=selected_column_list[0],r_user1=review_user[0][2],column2=selected_column_list[1],r_user2=review_user[1][2],column3=selected_column_list[2],r_user3=review_user[2][2],record_id=str(record_id)))
-
 # ====== 選択レビュー(insert) 〆 ======
 
 # ====== レビュー(分かち書き) ======
@@ -196,13 +195,18 @@ print("<p>以下の観光スポットを押すとじゃらんの紹介ページ�
 print("<p>要求1：" + str(keyword[0]) + "，要求2：" + str(keyword[1]) + "，要求3：" + str(keyword[2]) + "</p>")
 
 print("<div style='text-align:center;'>")
-print("<form action='jiken2_review0_step3.py' method='post'>")
+print("<form action='genre1_step1.py' method='post'>")
 myp_other.Average122_jiken2(kantou_tfidf_all,season_kld_all,type_kld_all,record_id)
 
 print("<h2>意見：</h2>")
 print("<textarea name='review_msg' cols=70 rows=7 /></textarea>")
+print("<p>「ジャンルによる観光スポット検索へ」をクリックして次の実験をお願いします．</p>")
 print("<input type='hidden' name='record_id' value='" + str(record_id) + "'>")
-print("</br><input type='submit' value='次へ' class='button1'/>")
+print("<input type='hidden' name='type_id' value='" + str(type_id) + "'>")
+print("<input type='hidden' name='keyword1' value='" + str(keyword[0]) + "'>")
+print("<input type='hidden' name='keyword2' value='" + str(keyword[1]) + "'>")
+print("<input type='hidden' name='keyword3' value='" + str(keyword[2]) + "'>")
+print("<input type='submit' value='ジャンルによる観光スポット検索へ' class='button1'/>")
 print("</form>")
 
 print("</div>")

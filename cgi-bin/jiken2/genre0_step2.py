@@ -42,7 +42,7 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>観光スポット</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
@@ -96,7 +96,7 @@ print("</table>")
 sql_select = "select distinct name,spot_id,review from unity_kantou_add_category where category1 = '" + category[category_id-1] + "' and season4 = '" + season + "'and companion = '" + type_all[type_id-1] + "' order by review desc limit 10;"
 c.execute(sql_select)
 
-print("<form action='jiken2_genre1_step3.py' method='post'>")
+print("<form action='review0_step1.py' method='post'>")
 print("<p>以下の観光スポットを押すとじゃらんの紹介ページが開きます．</br>内容を確認した上でいくつか選択してください．</br>「要求」:要求に満たしているならチェックしてください．</br>「既知」:既知の観光スポットならチェックしてください </p>")
 print("<p>要求1：" + str(keyword[0]) + "，要求2：" + str(keyword[1]) + "，要求3：" + str(keyword[2]) + "</p>")
 
@@ -118,12 +118,13 @@ print("</table>")
 
 print("<h2>意見：</h2>")
 print("<textarea name='genre_msg' cols=70 rows=7 /></textarea>")
+print("<p>「レビューによる観光スポット検索へ」をクリックして次の実験をお願いします．</p>")
 print("<input type='hidden' name='type_id' value='" + str(type_id) + "'>")
 print("<input type='hidden' name='keyword1' value='" + str(keyword[0]) + "'>")
 print("<input type='hidden' name='keyword2' value='" + str(keyword[1]) + "'>")
 print("<input type='hidden' name='keyword3' value='" + str(keyword[2]) + "'>")
 print("<input type='hidden' name='record_id' value='" + str(record_id) + "'>")
-print("</br><input type='submit' value='次へ' class='button1'/>")
+print("<input type='submit' value='レビューによる観光スポット検索へ' class='button1'/>")
 print("</form>")
 
 print("</div></br></body></html>")

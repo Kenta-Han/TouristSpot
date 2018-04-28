@@ -10,22 +10,11 @@ connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jal
 c = connect.cursor()
 
 form = cgi.FieldStorage()
-record_id = form.getvalue('record_id')
-type_id = int(form.getvalue('type_id')) ##タイプ
+user_id = form.getvalue('user_id') ##CrowdWorksID
+type_id = int(form.getvalue('type1')) ##タイプ
 keyword = [form.getvalue('keyword1'),form.getvalue('keyword2'),form.getvalue('keyword3')] ##要求3つ
 
-genre_check1 = form.getvalue('genre_check1')
-genre_check2 = form.getvalue('genre_check2')
-genre_check3 = form.getvalue('genre_check3')
-genre_count = form.getvalue('genre_count')
-genre_msg = form.getvalue('genre_msg')
-
-list_by_check = myp_other.Check(genre_check1,genre_check2,genre_check3,genre_count)
-
-c.execute("update jiken2 set genre_selected_spot1='" + str(list_by_check[0]) + "', genre_selected_spot2='" + str(list_by_check[1]) + "', genre_selected_spot3='" + str(list_by_check[2]) + "', genre_msg ='" + str(genre_msg) + "',genre_count = '" + str(list_by_check[3]) + "',genre_count_list = '" + str(list_by_check[4]) + "' where id=" + str(record_id) + ";")
-connect.commit()
-
-### レビュー ###
+start_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 ## ====== 季節 ======
 now = datetime.datetime.today() ## 現在の日付を取得
 if now.month >= 3 and now.month <= 5 :
@@ -41,7 +30,7 @@ elif now.month == 12 or (now.month >= 1 and now.month <= 2) :
     sql_season = ["select * from tfidf_season_winter","select * from kld_season_winter3"]
     season_word = ["tfidf_winter","kld_winter","winter"]
 ## ====== 季節〆 ======
-
+type_all = ["一人","カップル・夫婦","家族","友達同士","その他"]
 ## ====== タイプ ======
 if type_id  == 1 :
     type_word = ["tfidf_alone","kld_alone","一人"]
@@ -59,6 +48,13 @@ elif type_id == 5 :
     type_word = ["tfidf_other","kld_other","その他"]
     sql_type = ["select * from tfidf_type_other","select * from kld_type_other3"]
 ## ====== タイプ〆 ======
+
+sql_insert = "insert into jiken2(user_id, type, season, keyword1, keyword2, keyword3, access_order, start_datetime) values(%s,%s,%s,%s,%s,%s,%s,%s);"
+c.execute(sql_insert,(user_id,type_word[2],season_word[2],keyword[0],keyword[1],keyword[2],"1",start_datetime))
+connect.commit()
+
+c.execute("select max(id) from jiken2 where user_id='" + str(user_id) + "';")
+record_id = c.fetchone()[0]
 
 ## ====== 関東スポットリスト ======
 name = "select distinct name from spot_area_kantou where name != '';"
@@ -94,7 +90,7 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>レビュー選択</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
@@ -214,7 +210,7 @@ pulldown = """
 print("<div class='review'>")
 print(pulldown)
 
-print("<form action='jiken2_review0_step2.py' method='post' id='example' name='form1'>")
+print("<form method='post' action='review1_step2.py' id='example'>")
 print("<input type='hidden' name='sql_season0' value='" + sql_season[0] + "'>")
 print("<input type='hidden' name='sql_season1' value='" + sql_season[1] + "'>")
 print("<input type='hidden' name='season_word0' value='" + season_word[0] + "'>")
@@ -226,14 +222,14 @@ print("<input type='hidden' name='type_word0' value='" + type_word[0] + "'>")
 print("<input type='hidden' name='type_word1' value='" + type_word[1] + "'>")
 print("<input type='hidden' name='type_word2' value='" + type_word[2] + "'>")
 
-print("<input type='hidden' name='review_num' value='"+review_all[0][0]+","+review_all[1][0]+","+review_all[2][0]+","+review_all[3][0]+","+review_all[4][0]+","+review_all[5][0]+","+review_all[6][0]+","+review_all[7][0]+","+review_all[8][0]+","+review_all[9][0]+","+review_all[10][0]+","+review_all[11][0]+","+review_all[12][0]+","+review_all[13][0]+","+review_all[14][0]+","+review_all[15][0]+","+review_all[16][0]+","+review_all[17][0]+","+review_all[18][0]+","+review_all[19][0]+"'>")
+print("<input type='hidden' name='review_num[]' value='"+review_all[0][0]+","+review_all[1][0]+","+review_all[2][0]+","+review_all[3][0]+","+review_all[4][0]+","+review_all[5][0]+","+review_all[6][0]+","+review_all[7][0]+","+review_all[8][0]+","+review_all[9][0]+","+review_all[10][0]+","+review_all[11][0]+","+review_all[12][0]+","+review_all[13][0]+","+review_all[14][0]+","+review_all[15][0]+","+review_all[16][0]+","+review_all[17][0]+","+review_all[18][0]+","+review_all[19][0]+"'>")
 
 print("<div style='text-align:center;'>")
+print("<input type='hidden' name='record_id' value='" + str(record_id) + "'>")
 print("<input type='hidden' name='type_id' value='" + str(type_id) + "'>")
 print("<input type='hidden' name='keyword1' value='" + str(keyword[0]) + "'>")
 print("<input type='hidden' name='keyword2' value='" + str(keyword[1]) + "'>")
 print("<input type='hidden' name='keyword3' value='" + str(keyword[2]) + "'>")
-print("<input type='hidden' name='record_id' value='" + str(record_id) + "'>")
 print("<p>※ 次のページが開くまでしばらく時間(約30秒~90秒)がかかります．</p>")
 print("<input type='submit' class='button1' value='次へ'/>")
 print("<div>")
