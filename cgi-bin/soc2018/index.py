@@ -58,22 +58,19 @@ html_body = u"""
 </div>
 <script>
 $('.button1').click(function() {
-    var a;
-    a = 1 + Math.floor(Math.random()*4);
+    var a = 4; /* 6,12,18から*/
+    /* a = 1 + Math.floor(Math.random()*4); */
     if(a==1){
         link= "review_only1.py";
     }
     if(a==2){
-        link= "review_and_season1.py";
+        link= "review_only1.py";
     }
     if(a==3){
-        link= "review_and_season1.py";
+        link= "review_only1.py";
     }
     if(a==4){
         link= "review_only1.py";
-    }
-    if(a==5){
-        link= "review_all1.py";
     }
 
     $(this).parents('form').attr('action', link);

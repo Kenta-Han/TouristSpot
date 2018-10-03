@@ -74,7 +74,9 @@ spot_kantou_list = spot_kantou_list + spot_kantou_list1 + spot_kantou_list2 + sp
 ## ====== 関東スポットリスト〆 ======
 
 ## ====== レビュー(ランダム表示) ======
-c.execute("select cast(num as char),review_text from unity_kantou where companion='" + type_word[2] +"' and season4='"+ season_word[2] +"' order by rand() limit 20")
+# c.execute("select cast(num as char),review_text from unity_kantou where companion='" + type_word[2] +"' and season4='"+ season_word[2] +"' order by rand() limit 20")
+
+c.execute("select cast(num as char),review_text from unity_kantou where num in(199080,209584,217353,347699,467702,403309,432750,370639,539668,292808,509899,488993,1455332,470323,255990,461007,239594,480869,427163,364742)")
 
 cnt_review = 1
 review_all = []
