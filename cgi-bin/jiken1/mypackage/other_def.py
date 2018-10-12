@@ -2,14 +2,15 @@ import MySQLdb
 import math
 from tqdm import tqdm
 import mypackage.cos_sim_class as myp_cos
+sc = myp_cos.SimCalculator()
 from gensim import corpora
 from gensim import models
 
-# DBに接続しカーソルを取得する
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
-
-sc = myp_cos.SimCalculator()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
 
 ## TFIDFを求める
 def Tfidf(review_all):
@@ -42,8 +43,8 @@ def Tfidf(review_all):
 ## スポットリスト作成
 def Spot_Kantou_List(spot):
 	spot_kantou_list = []
-	c.execute(spot)
-	for i in c:
+	cur.execute(spot)
+	for i in cur:
 		spot_kantou_list.append(i[0])
 	# print(spot_kantou_list)
 	return spot_kantou_list
@@ -76,8 +77,8 @@ def Recommend_All(spot_all,spot_list):
 		a = []
 		if i >= len(result):
 			continue
-		c.execute("select spot_id from unity_kantou where name ='" + result[i][0] + "';")
-		spot_id = c.fetchone()
+		cur.execute("select spot_id from unity_kantou where name ='" + result[i][0] + "';")
+		spot_id = cur.fetchone()
 		recommend_spot_list.append([spot_id[0],result[i][0],result[i][1]])
 	return recommend_spot_list
 
@@ -104,8 +105,8 @@ def Top10(average,user_max_id):
 		# print(str(result[i][2])) ## 類似度
 		print("</a></th><td><input type='checkbox' name='check_1' value='"+result[i][1]+"'></td><td><input type='checkbox' name='check_2' value='"+result[i][1]+"'></td><td><input type='checkbox' name='check_3' value='"+result[i][1]+"'></td><td><input type='checkbox' name='count' value='"+result[i][1]+"'></td></tr>")
 
-		c.execute("update exp_data_proposal_test set " + column + "='" + result[i][1] + "' where id=" + str(user_max_id) + ";")
-		connect.commit()
+		cur.execute("update exp_data_proposal_test set " + column + "='" + result[i][1] + "' where id=" + str(user_max_id) + ";")
+		conn.commit()
 	print("</table>")
 
 ## 関東1 : 季節1 : タイプ1

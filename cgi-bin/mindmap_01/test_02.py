@@ -5,11 +5,12 @@ import MySQLdb
 import datetime
 from tqdm import tqdm
 import mypackage.other_def as myp_other
+# import pandas as pd
+
 import os, sys # 全フォルダ参照
 path = os.path.join(os.path.dirname(__file__), '../')
 sys.path.append(path)
 from mysql_connect import jalan_mindmap
-
 conn,cur = jalan_mindmap.main()
 
 ## ====== ユーザ入力とDBヘ書き込む ======
@@ -42,13 +43,17 @@ html_body = u"""
 
 """
 print(html_body)
-
 ## ====== ユーザ履歴を使って各スポットの特徴を出す ======
-print("<h2>ユーザ履歴情報</h2>")
-# 東京23区 BETWEEN 17698 AND 18516
-select_user_spot = "SELECT id,name,lat,lng,area_id,review FROM spot_mst WHERE area_id BETWEEN 17698 AND 18516 ORDER BY RAND() LIMIT 10;"
+print("<h1>ユーザ履歴情報</h1>")
+# df = pd.read_sql("SELECT id,name,lat,lng,area_id,review FROM spot_mst WHERE area_id BETWEEN 17698 AND 18516 AND review != 0 ORDER BY RAND() LIMIT 5;",conn)
+# # print("<h4>ユーザ履歴スポット(Spot_id, Name, Lat, Lng, Area_id, Review)：</h4>\n{lat}".format(lat = df[["lat"]]))
+
+## 東京23区 BETWEEN 17698 AND 18516
+select_user_spot = "SELECT id,name,lat,lng,area_id,review FROM spot_mst WHERE area_id BETWEEN 17698 AND 18516 AND review != 0 ORDER BY RAND() LIMIT 5;"
 user_spot_list = myp_other.SpotORReview_List(select_user_spot)
-print("<h4>ユーザの履歴スポット(Spot_id, Name, Lat, Lng, Area_id, Review)：</h4>\n{spot}".format(spot = user_spot_list))
+print("<h4>ユーザ履歴スポット(Spot_id, Name, Lat, Lng, Area_id, Review)：</h4>\n{spot}".format(spot = user_spot_list))
+print("<h4>ユーザ履歴スポット数：\t{num}</h4>".format(num = len(user_spot_list)))
+
 ## ====== レビューリスト ======
 user_spot_id_list = []
 for i in range(len(user_spot_list)):
@@ -57,21 +62,41 @@ select_user_review = "SELECT spot_id,wakachi2_text FROM review_wkt2 WHERE spot_i
 user_review_list = myp_other.SpotORReview_List(select_user_review)
 print("<h4>レビューの数：\t{num}</h4>".format(num = len(user_review_list)))
 ## ====== レビューリスト〆 ======
+
 ## ====== スポット毎のレビュー(ユーザ履歴で各スポットの特徴を出す) ======
 user_review_wkt_group_by = myp_other.EverySpot_Review(user_review_list)
-## ====== エリア内のスポットの全レビュー(ユーザ履歴で各スポットの特徴を出す) ======
+## ==== ユーザ履歴のスポットの全レビュー(ユーザ履歴で各スポットの特徴を出す) ====
 user_review_wkt_all = myp_other.AllSpot_Review(user_review_list)
-## ====== 単語に重み付け(TFIDF) ======
-user_review_wkt_all.insert(0,user_review_wkt_group_by[0])
-user_words = myp_other.Tfidf(user_review_wkt_all)
-## ====== ユーザ履歴から代表的なスポットとそれを表す特徴語を出す ======
 
+## ====== 単語に重み付け(TFIDF) ======
+tfidf_list = []
+for i in tqdm(range(len(user_review_wkt_group_by))):
+    user_review_wkt_all.insert(0,user_review_wkt_group_by[i])
+    user_words = myp_other.Tfidf(user_review_wkt_all)
+    tfidf_list.append(user_words[0])
+    user_words = 0
+user_words_all = myp_other.Change_To_Dic(tfidf_list)
+
+## ====== スポットリスト ======
+spot_list = []
+for i in range(len(user_spot_list)):
+    spot_list.append(user_spot_list[i][1])
+
+## ====== スポット間の類似度算出 ======
+print("<h2>類似度</h2>")
+for i in range(len(user_words_all[0])):
+    temp = [user_words_all[0][i]] + user_words_all[0]
+    print("<h3>= 「" + spot_list[i] + "」と履歴中のスポット類似度 =</h3>")
+    cos_result = myp_other.Recommend_All(temp,spot_list)
+    temp = 0
+
+## ====== ユーザ履歴から代表的なスポットとそれを表す特徴語を出す ======
 
 ## ====== ユーザ履歴を使って各スポットの特徴を出す〆 ======
 
 
 ## ====== エリア内で各スポットの特徴を出す ======
-print("<h2>エリア内情報</h2>")
+print("<br><h1>エリア内情報</h1>")
 ## ====== エリアIDリスト ======
 select_area_id = "SELECT DISTINCT id FROM area_mst WHERE area1 LIKE '%{pre}%' AND (area2 LIKE '%{area}%' OR area3 LIKE '%{area}%') AND id < 30435;".format(pre = prefecture, area = area)
 area_id_list = myp_other.Area_id_List(select_area_id)
@@ -103,7 +128,7 @@ review_wkt_all.insert(0,review_wkt_group_by[0])
 words = myp_other.Tfidf(review_wkt_all)
 ## ====== エリア内で各スポットの特徴を出す〆 ======
 
-print("<h1>マップエリア</h1>")
+print("<br><h1>マップエリア</h1>")
 print("<iframe width='700' height='550' frameborder='1' scrolling='no' marginheight='0' marginwidth='0' src='http://maps.google.co.jp/maps?ll=36.578268,136.648035&q=金沢駅&output=embed&t=m&z=13'></iframe>")
 
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")

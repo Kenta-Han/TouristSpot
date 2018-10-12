@@ -4,8 +4,12 @@ import cgi,cgitb
 import MySQLdb
 import datetime
 
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
+
 
 form = cgi.FieldStorage()
 category = form.getvalue('category')
@@ -45,14 +49,14 @@ print("<tr><th>季節：</th><td>" + season + "</tr></td>")
 print("</table>")
 
 sql_insert = "insert into exp_data_category_test(category, type, season, user_id,keyword01,keyword02,keyword03) values(%s,%s,%s,%s,%s,%s,%s);"
-c.execute(sql_insert, (category,type_all[type_id-1],season,user_id,keyword[0],keyword[1],keyword[2]))
-connect.commit()
+cur.execute(sql_insert, (category,type_all[type_id-1],season,user_id,keyword[0],keyword[1],keyword[2]))
+conn.commit()
 
-c.execute("select max(id) from exp_data_category_test where user_id='" + str(user_id) + "';")
-user_max_id = c.fetchone()[0]
+cur.execute("select max(id) from exp_data_category_test where user_id='" + str(user_id) + "';")
+user_max_id = cur.fetchone()[0]
 
 sql_select = "select distinct name,spot_id,review from unity_kantou_add_category where category1 = '" + category + "' and season4 = '" + season + "'and companion = '" + type_all[type_id-1] + "' order by review desc limit 10;"
-c.execute(sql_select)
+cur.execute(sql_select)
 
 print("<form action='genre0_step4.py' method='post'>")
 
@@ -64,7 +68,7 @@ column_list = ["spot01","spot02","spot03","spot04","spot05","spot06","spot07","s
 
 
 print("<tr><th>観光スポット</th><th>キーワード1</th><th>キーワード2</th><th>キーワード3</th><th>既知</th></tr>")
-for spot,column in zip(c,column_list):
+for spot,column in zip(cur,column_list):
     print("<tr><th><a href='http://www.jalan.net/kankou/" + str(spot[1]) + "/'  target='_blank'>")
     print(spot[0] + "</a></th>")
     # print("<td style='text-align:center;'>" + str(spot[2]) + "</td>")
@@ -73,8 +77,8 @@ for spot,column in zip(c,column_list):
     print("<td style='text-align:center;'><input type='checkbox' name='check_3' value='" + spot[0] + "'></td>")
     print("<td style='text-align:center;'><input type='checkbox' name='count' value='" + spot[0] + "'></td></tr>")
 
-    c.execute("update exp_data_category_test set " + column + "='" + spot[0] + "' where id=" + str(user_max_id) + ";")
-    connect.commit()
+    cur.execute("update exp_data_category_test set " + column + "='" + spot[0] + "' where id=" + str(user_max_id) + ";")
+    conn.commit()
 print("</table>")
 
 print("<h3>意見<span style='font-size: 14px;'>(※ご自由にどうぞ)：</span></h3>")
@@ -87,5 +91,5 @@ print("</form>")
 
 print("</body></html>")
 
-c.close
-connect.close
+cur.close
+conn.close

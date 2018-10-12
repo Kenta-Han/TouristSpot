@@ -3,12 +3,13 @@
 import cgi,cgitb
 import MySQLdb
 import datetime
-import sys
 import mypackage.other_def as myp_other
 
-# DBに接続しカーソルを取得する
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
 
 ## ====== 季節 ======
 now = datetime.datetime.today() ## 現在の日付を取得
@@ -64,11 +65,11 @@ spot_kantou_list = spot_kantou_list + spot_kantou_list1 + spot_kantou_list2 + sp
 ## ====== 関東スポットリスト〆 ======
 
 ## ====== レビュー(ランダム表示) ======
-c.execute("select cast(num as char),review_text from unity_kantou where companion='" + type_word[2] +"' and season4='"+ season_word[2] +"' order by rand() limit 20")
+cur.execute("select cast(num as char),review_text from unity_kantou where companion='" + type_word[2] +"' and season4='"+ season_word[2] +"' order by rand() limit 20")
 
 cnt_review = 1
 review_all = []
-for row in c: ## 1行ずつ読み込
+for row in cur: ## 1行ずつ読み込
     review_all.append(list(row))
     cnt_review += 1
 ## ====== レビュー(ランダム表示)〆 ======
@@ -235,5 +236,5 @@ print("</form>")
 print("</div></div>")
 print("</body></html>")
 
-c.close
+cur.close
 connect.close

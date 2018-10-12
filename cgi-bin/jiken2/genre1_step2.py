@@ -6,8 +6,11 @@ import datetime
 import random
 from time import sleep
 
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
 
 # sleep_time = random.randint(30,120)
 # sleep(sleep_time)
@@ -21,8 +24,8 @@ category_id = int(form.getvalue('genre')) ## only_type1_0.pyのgenreを受け取
 category = ["アウトドア","ウォータースポーツ・マリンスポーツ","雪・スノースポーツ","その他スポーツ・フィットネス","エンタメ・アミューズメント","レジャー・体験","クラフト・工芸","果物・野菜狩り","ミュージアム・ギャラリー","神社・神宮・寺院","伝統文化・日本文化","自然景観・絶景","乗り物","動・植物","風呂・スパ・サロン","ショッピング","観光施設・名所巡り","祭り・イベント"]
 
 sql_update = "update jiken2 set genre ='" + category[category_id-1] + "'where id = " + record_id + ";"
-c.execute(sql_update)
-connect.commit()
+cur.execute(sql_update)
+conn.commit()
 
 ## ====== 季節 ======
 now = datetime.datetime.today() ## 現在の日付を取得
@@ -41,7 +44,7 @@ html_body = u"""
 <!DOCTYPE html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<script src="../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href="../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
 <title>観光スポット</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
@@ -93,7 +96,7 @@ print("</table>")
 
 
 sql_select = "select distinct name,spot_id,review from unity_kantou_add_category where category1 = '" + category[category_id-1] + "' and season4 = '" + season + "'and companion = '" + type_all[type_id-1] + "' order by review desc limit 10;"
-c.execute(sql_select)
+cur.execute(sql_select)
 
 print("<form action='genre1_step3.py' method='post'>")
 print("<p>以下の観光スポットを押すとじゃらんの紹介ページが開きます．</br>内容を確認した上でいくつか選択してください．</br>「要求」:要求に満たしているならチェックしてください．</br>「既知」:既知の観光スポットならチェックしてください </p>")
@@ -103,7 +106,7 @@ column_list = ["genre_spot01","genre_spot02","genre_spot03","genre_spot04","genr
 
 print("<table class='genre_table'>")
 print("<tr><th>観光スポット</th><th>要求1</th><th>要求2</th><th>要求3</th><th>既知</th></tr>")
-for spot,column in zip(c,column_list):
+for spot,column in zip(cur,column_list):
     print("<tr><th><a href='http://www.jalan.net/kankou/" + str(spot[1]) + "/'  target='_blank'>")
     print(spot[0] + "</a></th>")
     # print("<td style='text-align:center;'>" + str(spot[2]) + "</td>")
@@ -111,8 +114,8 @@ for spot,column in zip(c,column_list):
     print("<td style='text-align:center;'><input type='checkbox' name='genre_check2' value='" + spot[0] + "'></td>")
     print("<td style='text-align:center;'><input type='checkbox' name='genre_check3' value='" + spot[0] + "'></td>")
     print("<td style='text-align:center;'><input type='checkbox' name='genre_count' value='" + spot[0] + "'></td></tr>")
-    c.execute("update jiken2 set " + column + "='" + spot[0] + "' where id=" + str(record_id) + ";")
-    connect.commit()
+    cur.execute("update jiken2 set " + column + "='" + spot[0] + "' where id=" + str(record_id) + ";")
+    conn.commit()
 print("</table>")
 
 print("<h2>意見：</h2>")
@@ -127,5 +130,5 @@ print("</form>")
 
 print("</div></br></body></html>")
 
-c.close
-connect.close
+cur.close
+conn.close

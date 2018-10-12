@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import cgi,cgitb
-import MySQLdb
-import sys
 
 html_body = u"""
 <!DOCTYPE html>

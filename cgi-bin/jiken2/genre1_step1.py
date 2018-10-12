@@ -3,12 +3,13 @@
 import cgi,cgitb
 import MySQLdb
 import datetime
-import sys
-import mypackage.other_def as myp_other
 
-# DBに接続しカーソルを取得する
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
+import mypackage.other_def as myp_other
 
 form = cgi.FieldStorage()
 record_id = form.getvalue('record_id')
@@ -74,8 +75,8 @@ print(html_body)
 
 list_by_check = myp_other.Check(review_check1,review_check2,review_check3,review_count)
 
-c.execute("update jiken2 set review_selected_spot1='" + str(list_by_check[0]) + "', review_selected_spot2='" + str(list_by_check[1]) + "', review_selected_spot3='" + str(list_by_check[2]) + "', review_msg ='" + str(review_msg) + "',review_count = '" + str(list_by_check[3]) +  "',review_count_list ='" + str(list_by_check[4]) + "' where id=" + str(record_id) + ";")
-connect.commit()
+cur.execute("update jiken2 set review_selected_spot1='" + str(list_by_check[0]) + "', review_selected_spot2='" + str(list_by_check[1]) + "', review_selected_spot3='" + str(list_by_check[2]) + "', review_msg ='" + str(review_msg) + "',review_count = '" + str(list_by_check[3]) +  "',review_count_list ='" + str(list_by_check[4]) + "' where id=" + str(record_id) + ";")
+conn.commit()
 
 print("<input type='hidden' name='type_id' value='" + str(type_id) + "'>")
 print("<input type='hidden' name='keyword1' value='" + str(keyword[0]) + "'>")
@@ -86,5 +87,5 @@ print("<input type='submit' class='button1' value='次へ'/>")
 print("</form>")
 print("</body></html>")
 
-c.close
-connect.close
+cur.close
+conn.close

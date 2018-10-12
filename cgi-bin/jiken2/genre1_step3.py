@@ -3,10 +3,13 @@
 import cgi,cgitb
 import MySQLdb
 import datetime
-import mypackage.other_def as myp_other
 
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
+import mypackage.other_def as myp_other
 
 form = cgi.FieldStorage()
 record_id = form.getvalue('record_id')
@@ -20,8 +23,8 @@ finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
 list_by_check = myp_other.Check(genre_check1,genre_check2,genre_check3,genre_count)
 
-c.execute("update jiken2 set genre_selected_spot1='" + str(list_by_check[0]) + "', genre_selected_spot2='" + str(list_by_check[1]) + "', genre_selected_spot3='" + str(list_by_check[2]) + "', genre_msg ='" + str(genre_msg) + "',genre_count = '" + str(list_by_check[3]) + "',genre_count_list = '" + str(list_by_check[4]) + "',finish_datetime = '" + finish_datetime + "' where id=" + str(record_id) + ";")
-connect.commit()
+cur.execute("update jiken2 set genre_selected_spot1='" + str(list_by_check[0]) + "', genre_selected_spot2='" + str(list_by_check[1]) + "', genre_selected_spot3='" + str(list_by_check[2]) + "', genre_msg ='" + str(genre_msg) + "',genre_count = '" + str(list_by_check[3]) + "',genre_count_list = '" + str(list_by_check[4]) + "',finish_datetime = '" + finish_datetime + "' where id=" + str(record_id) + ";")
+conn.commit()
 
 html_body = u"""
 <!DOCTYPE html>
@@ -38,5 +41,5 @@ html_body = u"""
 """
 print(html_body)
 
-c.close
-connect.close
+cur.close
+conn.close

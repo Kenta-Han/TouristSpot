@@ -3,12 +3,13 @@
 import cgi,cgitb
 import MySQLdb
 import datetime
-import sys
-import mypackage.other_def as myp_other
 
-# DBに接続しカーソルを取得する
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
+import mypackage.other_def as myp_other
 
 form = cgi.FieldStorage()
 user_id = form.getvalue('user_id') ##CrowdWorksID
@@ -31,11 +32,11 @@ type_all = ["一人","カップル・夫婦","家族","友達同士","その他"
 start_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
 sql_insert = "insert into jiken2(user_id, type, season, keyword1, keyword2, keyword3, access_order, start_datetime) values(%s,%s,%s,%s,%s,%s,%s,%s);"
-c.execute(sql_insert,(user_id,type_all[type_id-1],season,keyword[0],keyword[1],keyword[2],"0",start_datetime))
-connect.commit()
+cur.execute(sql_insert,(user_id,type_all[type_id-1],season,keyword[0],keyword[1],keyword[2],"0",start_datetime))
+conn.commit()
 
-c.execute("select max(id) from jiken2 where user_id='" + str(user_id) + "';")
-record_id = c.fetchone()[0]
+cur.execute("select max(id) from jiken2 where user_id='" + str(user_id) + "';")
+record_id = cur.fetchone()[0]
 
 html_body = u"""
 <!DOCTYPE html>
@@ -95,5 +96,5 @@ print("<input type='submit' class='button1' value='次へ'/>")
 print("</form>")
 print("</body></html>")
 
-c.close
-connect.close
+cur.close
+conn.close

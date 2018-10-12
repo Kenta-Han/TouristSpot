@@ -87,10 +87,8 @@ for i in range(len(review_nouser)):
     review_wkt_nouser.append(a)
     a = []
 # ====== レビュー　ユーザの選択以外 〆 ======
-
 review_wkt_nouser.insert(0,review_wkt_user)
 words_kantou = myp_other.Tfidf(review_wkt_nouser)
-
 ## ====== レビュー 全部 (分かち書きの単語をリストに入れる) 季節・タイプ ======
 word = []
 for i in range(len(review_wakati)) :

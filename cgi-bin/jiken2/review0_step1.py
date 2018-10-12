@@ -3,11 +3,13 @@
 import cgi,cgitb
 import MySQLdb
 import datetime
-import sys
-import mypackage.other_def as myp_other
 
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
+import mypackage.other_def as myp_other
 
 form = cgi.FieldStorage()
 record_id = form.getvalue('record_id')
@@ -22,8 +24,8 @@ genre_msg = form.getvalue('genre_msg')
 
 list_by_check = myp_other.Check(genre_check1,genre_check2,genre_check3,genre_count)
 
-c.execute("update jiken2 set genre_selected_spot1='" + str(list_by_check[0]) + "', genre_selected_spot2='" + str(list_by_check[1]) + "', genre_selected_spot3='" + str(list_by_check[2]) + "', genre_msg ='" + str(genre_msg) + "',genre_count = '" + str(list_by_check[3]) + "',genre_count_list = '" + str(list_by_check[4]) + "' where id=" + str(record_id) + ";")
-connect.commit()
+cur.execute("update jiken2 set genre_selected_spot1='" + str(list_by_check[0]) + "', genre_selected_spot2='" + str(list_by_check[1]) + "', genre_selected_spot3='" + str(list_by_check[2]) + "', genre_msg ='" + str(genre_msg) + "',genre_count = '" + str(list_by_check[3]) + "',genre_count_list = '" + str(list_by_check[4]) + "' where id=" + str(record_id) + ";")
+conn.commit()
 
 ### レビュー ###
 ## ====== 季節 ======
@@ -73,11 +75,11 @@ spot_kantou_list = spot_kantou_list + spot_kantou_list1 + spot_kantou_list2 + sp
 ## ====== 関東スポットリスト〆 ======
 
 ## ====== レビュー(ランダム表示) ======
-c.execute("select cast(num as char),review_text from unity_kantou where companion='" + type_word[2] +"' and season4='"+ season_word[2] +"' order by rand() limit 20")
+cur.execute("select cast(num as char),review_text from unity_kantou where companion='" + type_word[2] +"' and season4='"+ season_word[2] +"' order by rand() limit 20")
 
 cnt_review = 1
 review_all = []
-for row in c: ## 1行ずつ読み込
+for row in cur: ## 1行ずつ読み込
     review_all.append(list(row))
     cnt_review += 1
 ## ====== レビュー(ランダム表示)〆 ======
@@ -241,5 +243,5 @@ print("</form>")
 print("</div></div></br>")
 print("</body></html>")
 
-c.close
-connect.close
+cur.close
+conn.close

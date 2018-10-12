@@ -3,11 +3,13 @@
 import cgi,cgitb
 import MySQLdb
 import datetime
-import sys
-import mypackage.other_def as myp_other
 
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
+import mypackage.other_def as myp_other
 
 form = cgi.FieldStorage()
 user_id = form.getvalue('user_id') ##CrowdWorksID
@@ -50,11 +52,11 @@ elif type_id == 5 :
 ## ====== タイプ〆 ======
 
 sql_insert = "insert into jiken2(user_id, type, season, keyword1, keyword2, keyword3, access_order, start_datetime) values(%s,%s,%s,%s,%s,%s,%s,%s);"
-c.execute(sql_insert,(user_id,type_word[2],season_word[2],keyword[0],keyword[1],keyword[2],"1",start_datetime))
-connect.commit()
+cur.execute(sql_insert,(user_id,type_word[2],season_word[2],keyword[0],keyword[1],keyword[2],"1",start_datetime))
+conn.commit()
 
-c.execute("select max(id) from jiken2 where user_id='" + str(user_id) + "';")
-record_id = c.fetchone()[0]
+cur.execute("select max(id) from jiken2 where user_id='" + str(user_id) + "';")
+record_id = cur.fetchone()[0]
 
 ## ====== 関東スポットリスト ======
 name = "select distinct name from spot_area_kantou where name != '';"
@@ -69,11 +71,11 @@ spot_kantou_list = spot_kantou_list + spot_kantou_list1 + spot_kantou_list2 + sp
 ## ====== 関東スポットリスト〆 ======
 
 ## ====== レビュー(ランダム表示) ======
-c.execute("select cast(num as char),review_text from unity_kantou where companion='" + type_word[2] +"' and season4='"+ season_word[2] +"' order by rand() limit 20")
+cur.execute("select cast(num as char),review_text from unity_kantou where companion='" + type_word[2] +"' and season4='"+ season_word[2] +"' order by rand() limit 20")
 
 cnt_review = 1
 review_all = []
-for row in c: ## 1行ずつ読み込
+for row in cur: ## 1行ずつ読み込
     review_all.append(list(row))
     cnt_review += 1
 ## ====== レビュー(ランダム表示)〆 ======
@@ -237,5 +239,5 @@ print("</form>")
 print("</div></div></br>")
 print("</body></html>")
 
-c.close
-connect.close
+cur.close
+conn.close

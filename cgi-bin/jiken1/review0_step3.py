@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 import cgi,cgitb
 import MySQLdb
-import sys
 import math
 from tqdm import tqdm
 import mypackage.spot_def as myp_spot
 import mypackage.other_def as myp_other
 
-# DBに接続しカーソルを取得する
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
 
 print("<!DOCTYPE html>")
 print("<head>")
@@ -39,30 +40,30 @@ keyword = [form.getvalue('keyword1'),form.getvalue('keyword2'),form.getvalue('ke
 id_data = [int(input_data[0])-1,int(input_data[1])-1,int(input_data[2])-1]
 
 sql_insert="insert into exp_data_proposal_test(type, season,user_id) values('{}','{}','{}');"
-c.execute(sql_insert.format(type_word[2],season_word[2],user_id))
-connect.commit()
+cur.execute(sql_insert.format(type_word[2],season_word[2],user_id))
+conn.commit()
 
-c.execute("select max(id) from exp_data_proposal_test where user_id='" + str(user_id) + "';")
-user_max_id = c.fetchone()[0]
+cur.execute("select max(id) from exp_data_proposal_test where user_id='" + str(user_id) + "';")
+user_max_id = cur.fetchone()[0]
 
 # ====== レビュー　ユーザの選択 ======
 selected_column_list=["selected_review1","selected_review2","selected_review3"]
 review_user = []
 for i in id_data:
-    c.execute("select spot_id,name,review_text,wakachi2_text from unity_kantou where num='" + review_num[i]+ "';")
-    for row,column in zip(c,selected_column_list):
+    cur.execute("select spot_id,name,review_text,wakachi2_text from unity_kantou where num='" + review_num[i]+ "';")
+    for row,column in zip(cur,selected_column_list):
         review_user.append(list(row))
 
 # ====== 選択レビュー(insert) ======
 sql_update1 = "update exp_data_proposal_test set {column1} ='{r_user1}',{column2}='{r_user2}',{column3}='{r_user3}' where id = {user_max_id};"
-c.execute(sql_update1.format(column1=selected_column_list[0],r_user1=review_user[0][2],column2=selected_column_list[1],r_user2=review_user[1][2],column3=selected_column_list[2],r_user3=review_user[2][2],user_max_id=str(user_max_id)))
+cur.execute(sql_update1.format(column1=selected_column_list[0],r_user1=review_user[0][2],column2=selected_column_list[1],r_user2=review_user[1][2],column3=selected_column_list[2],r_user3=review_user[2][2],user_max_id=str(user_max_id)))
 # ====== 選択レビュー(insert) 〆 ======
 
 # ====== 要望(insert) ======
 sql_update2 = "update exp_data_proposal_test set keyword01 ='{keyword1}',keyword02 ='{keyword2}',keyword03 ='{keyword3}' where id = {user_max_id};"
-c.execute(sql_update2.format(keyword1=keyword[0],keyword2=keyword[1],keyword3=keyword[2],user_max_id=str(user_max_id)))
+cur.execute(sql_update2.format(keyword1=keyword[0],keyword2=keyword[1],keyword3=keyword[2],user_max_id=str(user_max_id)))
 # ====== 要望(insert) 〆 ======
-connect.commit()
+conn.commit()
 
 # ====== レビュー(分かち書き) ======
 review1_wkt = review_user[0][3].split()
@@ -87,15 +88,15 @@ for num in review_num:
 
 review_nouser = []
 for i in range(len(figure)):
-    c.execute("select spot_id,name,review_text,wakachi2_text from unity_kantou where num='" + figure[i]+ "';")
-    for row in c.fetchall():
+    cur.execute("select spot_id,name,review_text,wakachi2_text from unity_kantou where num='" + figure[i]+ "';")
+    for row in cur.fetchall():
         review_nouser.append(list(row))
 
 review_column = ["review01","review02","review03","review04","review05","review06","review07","review08","review09","review10","review11","review12","review13","review14","review15","review16","review17"]
 
 for i,column in zip(range(len(review_nouser)),review_column):
-    c.execute("update exp_data_proposal_test set " + column + "='" + review_nouser[i][2] + "' where id=" + str(user_max_id) + ";")
-    connect.commit()
+    cur.execute("update exp_data_proposal_test set " + column + "='" + review_nouser[i][2] + "' where id=" + str(user_max_id) + ";")
+    conn.commit()
 
 review_wkt_nouser = []
 for i in range(len(review_nouser)):
@@ -127,30 +128,30 @@ words_review = [words_review1,words_review2,words_review3]
 
 ## ====== レビュー(単語を季節のテーブルに問い合わせる) ======
 ######################### TFIDF #########################
-c.execute(sql_season[0] + " where word in (" + str(words) +");")
+cur.execute(sql_season[0] + " where word in (" + str(words) +");")
 words_season_all_tfidf = []
-for i in c:
+for i in cur:
     words_season_all_tfidf.append(i)
 user_season_tfidf = myp_other.Change_To_Dic(words_season_all_tfidf)
 ######################### KLD #########################
-c.execute(sql_season[1] + " where word in (" + str(words) +");")
+cur.execute(sql_season[1] + " where word in (" + str(words) +");")
 words_season_all_kld = []
-for i in c:
+for i in cur:
     words_season_all_kld.append(i)
 user_season_kld = myp_other.Change_To_Dic(words_season_all_kld)
 ## ====== レビュー(単語を季節のテーブルに問い合わせる)〆 ======
 
 ## ====== レビュー(単語をタイプのテーブルに問い合わせる) ======
 ######################### TFIDF #########################
-c.execute(sql_type[0] + " where word in (" + str(words) +");")
+cur.execute(sql_type[0] + " where word in (" + str(words) +");")
 words_type_all_tfidf = []
-for i in c:
+for i in cur:
     words_type_all_tfidf.append(i)
 user_type_tfidf = myp_other.Change_To_Dic(words_type_all_tfidf)
 ######################### KLD #########################
-c.execute(sql_type[1] + " where word in (" + str(words) +");")
+cur.execute(sql_type[1] + " where word in (" + str(words) +");")
 words_type_all_kld = []
-for i in c:
+for i in cur:
     words_type_all_kld.append(i)
 user_type_kld = myp_other. Change_To_Dic(words_type_all_kld)
 ## ====== レビュー(単語をタイプのテーブルに問い合わせる)〆 ======
@@ -163,8 +164,8 @@ user_words_kantou = myp_other.Change_To_Dic(words_kantou[0])
 search_spot = []
 for i in tqdm(range(len(words_kantou[0]))) :
     sql_search_spot = "select spot from tt_unity_kantou where word = '" + str(words_kantou[0][i][0]) +"' and tfidf_kantou > " + str(words_kantou[0][i][1] - 0.001) + " and tfidf_kantou < "  + str(words_kantou[0][i][1] + 0.001)
-    c.execute(sql_search_spot)
-    for j in c:
+    cur.execute(sql_search_spot)
+    for j in cur:
         search_spot.append(j[0])
 search_spot.sort()
 spot_list = []
@@ -178,15 +179,15 @@ for i in range(len(search_spot) - 1) :
 ######################### TFIDF #########################
 spot_tfidf = []
 for i in tqdm(range(len(spot_list))) :
-    c.execute("select spot,word,tfidf_kantou," + str(season_word[0]) + "," + str(type_word[0]) + " from tt_unity_kantou where spot in ('" + str(spot_list[i]) + "')")
-    for j in c:
+    cur.execute("select spot,word,tfidf_kantou," + str(season_word[0]) + "," + str(type_word[0]) + " from tt_unity_kantou where spot in ('" + str(spot_list[i]) + "')")
+    for j in cur:
         spot_tfidf.append(list(j))
 spot_kantou_tfidf = myp_spot.Kantou(spot_tfidf)
 ######################### KLD #########################
 spot_kld = []
 for i in tqdm(range(len(spot_list))) :
-    c.execute("select spot,word,tfidf_kantou," + str(season_word[1]) + "," + str(type_word[1]) + " from tk_unity_kantou3 where spot in ('" + str(spot_list[i]) + "')")
-    for j in c:
+    cur.execute("select spot,word,tfidf_kantou," + str(season_word[1]) + "," + str(type_word[1]) + " from tk_unity_kantou3 where spot in ('" + str(spot_list[i]) + "')")
+    for j in cur:
         spot_kld.append(list(j))
 spot_season_kld = myp_spot.Season(spot_kld)
 spot_type_kld = myp_spot.Type(spot_kld)
@@ -228,5 +229,5 @@ print("</div>")
 print("</div>")
 print("</body></html>")
 
-c.close
-connect.close
+cur.close
+conn.close

@@ -3,8 +3,11 @@
 import cgi,cgitb
 import MySQLdb
 
-connect = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan', charset='utf8')
-c = connect.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan
+conn,cur = jalan.main()
 
 form = cgi.FieldStorage()
 user_max_id = form.getvalue('user_max_id')
@@ -61,11 +64,11 @@ elif type(count_list)==str:
 else:
     count = len(count_list)
 
-c.execute("update exp_data_category_test set selected_spot1='" + str(check1) + "', selected_spot2='" + str(check2) + "', selected_spot3='" + str(check3) + "', msg ='" + str(msg) + "',count = '" + str(count) +  "', access_order=0  where id=" + str(user_max_id) + ";")
+cur.execute("update exp_data_category_test set selected_spot1='" + str(check1) + "', selected_spot2='" + str(check2) + "', selected_spot3='" + str(check3) + "', msg ='" + str(msg) + "',count = '" + str(count) +  "', access_order=0  where id=" + str(user_max_id) + ";")
 
 print("</body></html>")
 
-connect.commit()
+conn.commit()
 
-c.close
-connect.close
+cur.close
+conn.close
