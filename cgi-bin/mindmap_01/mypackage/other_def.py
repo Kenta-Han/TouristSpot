@@ -9,8 +9,8 @@ sc = myp_cos.SimCalculator()
 import os, sys # 全フォルダ参照
 path = os.path.join(os.path.dirname(__file__), '../../')
 sys.path.append(path)
-from mysql_connect import jalan_mindmap
-conn,cur = jalan_mindmap.main()
+from mysql_connect import jalan_ktylab_new
+conn,cur = jalan_ktylab_new.main()
 
 ## エリアIDリスト作成
 def Area_id_List(area):

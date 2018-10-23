@@ -10,8 +10,8 @@ import mypackage.other_def as myp_other
 import os, sys # 全フォルダ参照
 path = os.path.join(os.path.dirname(__file__), '../')
 sys.path.append(path)
-from mysql_connect import jalan_mindmap
-conn,cur = jalan_mindmap.main()
+from mysql_connect import jalan_ktylab_new
+conn,cur = jalan_ktylab_new.main()
 
 ## ====== ユーザ入力とDBヘ書き込む ======
 form = cgi.FieldStorage()
@@ -20,12 +20,12 @@ prefecture = form.getvalue('prefecture_name') ##都道府県
 area = form.getvalue('area_name') ##エリア
 start_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
-sql_insert = "INSERT INTO mindmap_test(user_id, prefecture, area, start_datetime) VALUES(%s,%s,%s,%s);"
+sql_insert = "INSERT INTO map_test(user_id, prefecture, area, start_datetime) VALUES(%s,%s,%s,%s);"
 cur.execute(sql_insert,(user_id, prefecture, area, start_datetime))
 conn.commit()
 
 ## ユーザの最新情報
-cur.execute("select max(id) from mindmap_test where user_id='{user}';".format(user = user_id))
+cur.execute("SELECT max(id) FROM map_test WHERE user_id='{user}';".format(user = user_id))
 record_id = cur.fetchone()[0]
 ## ====== ユーザ入力とDBヘ書き込む〆 ======
 
@@ -58,7 +58,7 @@ print("<h4>ユーザ履歴スポット数：\t{num}</h4>".format(num = len(user_
 user_spot_id_list = []
 for i in range(len(user_spot_list)):
     user_spot_id_list.append(user_spot_list[i][0])
-select_user_review = "SELECT spot_id,wakachi2_text FROM review_wkt2 WHERE spot_id IN {spotid} ORDER BY spot_id ASC;".format(spotid = tuple(user_spot_id_list))
+select_user_review = "SELECT spot_id,wakachi2 FROM review_all WHERE spot_id IN {spotid} ORDER BY spot_id ASC;".format(spotid = tuple(user_spot_id_list))
 user_review_list = myp_other.SpotORReview_List(select_user_review)
 print("<h4>レビューの数：\t{num}</h4>".format(num = len(user_review_list)))
 ## ====== レビューリスト〆 ======
@@ -114,7 +114,7 @@ print("<h4>エリア内のレビューありスポットリスト数：\t{num}</
 spot_id_list = []
 for i in range(len(spot_list)):
     spot_id_list.append(spot_list[i][0])
-select_review = "SELECT spot_id,wakachi2_text FROM review_wkt2 WHERE spot_id IN {spotid} ORDER BY spot_id ASC;".format(spotid = tuple(spot_id_list))
+select_review = "SELECT spot_id,wakachi2 FROM review_all WHERE spot_id IN {spotid} ORDER BY spot_id ASC;".format(spotid = tuple(spot_id_list))
 review_list = myp_other.SpotORReview_List(select_review)
 print("<h4>レビューの数：\t{num}</h4>".format(num = len(review_list)))
 ## ====== レビューリスト〆 ======
@@ -132,7 +132,7 @@ print("<br><h1>マップエリア</h1>")
 print("<iframe width='700' height='550' frameborder='1' scrolling='no' marginheight='0' marginwidth='0' src='http://maps.google.co.jp/maps?ll=36.578268,136.648035&q=金沢駅&output=embed&t=m&z=13'></iframe>")
 
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-sql_update = "UPDATE mindmap_test SET finish_datetime='{finish}' where id = {record_id};".format(finish = finish_datetime,record_id = record_id)
+sql_update = "UPDATE map_test SET finish_datetime='{finish}' where id = {record_id};".format(finish = finish_datetime,record_id = record_id)
 cur.execute(sql_update)
 conn.commit()
 
