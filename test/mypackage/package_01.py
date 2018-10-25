@@ -19,12 +19,12 @@ def Doc2Cec_Feature(spot_vectors):
     result_list = []
     for i in range(len(spot_vectors)):
         x = copy.deepcopy(spot_vectors)
-        target = list(x[i][1:301])
-        name = x[i][0]
+        target = list(x[i][2:302])
+        name = x[i][1]
         x.pop(i)
         temp = []
         for j in range(len(x)):
-            temp.append(list(x[j][1:301]))
+            temp.append(list(x[j][2:302]))
         temp = np.array(temp)
         result = np.round((target-sum(temp)/len(temp)),3)
         # print(name)

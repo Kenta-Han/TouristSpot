@@ -7,36 +7,16 @@ from pprint import pprint
 from sklearn.decomposition import PCA ## scikit-learnのPCAクラス
 import pandas as pd ## 便利なDataFrameを使うためのライブラリ
 import matplotlib.pyplot as plt
-import mypackage.test_01_pk as myp_pk01
+import mypackage.package_01 as myp_pk01
 
 conn = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan_ktylab_new', charset='utf8')
 cur = conn.cursor()
 
-# history_prefecture = "神奈川"
-# history_area = "鎌倉"
-#
-# history_prefecture = "京都"
-# history_area = "京都"
-#
-# select_area_id = "SELECT DISTINCT id FROM area_mst WHERE area1 LIKE '%{pre}%' AND (area2 LIKE '%{area}%' OR area3 LIKE '%{area}%') AND id < 30435;".format(pre = history_prefecture, area = history_area)
-# area_id_list = []
-# cur.execute(select_area_id)
-# for i in cur:
-#     area_id_list.append(i[0])
-# print(area_id_list)
-#
-# select_history_spot = "SELECT DISTINCT id,name,area_id FROM spot_mst WHERE area_id IN {} AND review != 0;".format(tuple(area_id_list))
-# history_spot_list = myp_pk01.Spot_List(select_history_spot)
-# pprint(history_spot_list)
-#
-# print("\n指定エリアid(東京都)")
-# select_spot = "SELECT id,name,area_id FROM spot_mst WHERE area_id BETWEEN 17698 AND 18516 AND review != 0;"
-# spot_list = myp_pk01.Spot_List(select_spot)
-# pprint(spot_list)
-
 ##########################
 # ## [建長寺,高徳院（鎌倉大仏）,長谷寺（長谷観音）,鶴岡八幡宮,龍口寺]
-history_spot_id_list = ['spt_14204ag2130011936','spt_14204ag2130009759','spt_14204ag2130009778','spt_14204ag2130012949','spt_14205ag2130009779']
+history_spot_id_list = ['spt_14204ag2130011936','spt_14204ag2130009759','spt_14204ag2130009778','spt_14204ag2130012949','spt_14205ag2130015243']
+
+## spt_14205ag2130015243 江島神社
 
 ## [建長寺,高徳院（鎌倉大仏）,長谷寺（長谷観音）,鶴岡八幡宮,]
 # history_spot_id_list = ['spt_26109ag2130015470','spt_26101ag2130014551','spt_26108ag2130015438','spt_26105ag2130012063','spt_26105ag2130010617']
@@ -68,7 +48,7 @@ pprint(season_duration)
 
 ##########################
 print("\n既訪問スポットベクトル")
-select_history_spot_vectors = "SELECT * FROM spot_vectors WHERE id IN {};".format(tuple(history_spot_id_list))
+select_history_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(history_spot_id_list))
 history_spot_vectors = myp_pk01.Spot_List(select_history_spot_vectors)
 # print(history_spot_vectors)
 history_spot_vectors_doc = myp_pk01.Doc2Cec_Feature(history_spot_vectors)
@@ -85,7 +65,7 @@ history_spot_vectors_doc = myp_pk01.Doc2Cec_Feature(history_spot_vectors)
 # print(embed3.head())
 
 # print("\n未訪問スポットベクトル")
-select_spot_vectors = "SELECT * FROM spot_vectors WHERE id IN {};".format(tuple(spot_id_list))
+select_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(spot_id_list))
 spot_vectors = myp_pk01.Spot_List(select_spot_vectors)
 # print(spot_vectors)
 spot_vectors_doc = myp_pk01.Doc2Cec_Feature(spot_vectors)
