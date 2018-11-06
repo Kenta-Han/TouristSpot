@@ -49,7 +49,7 @@ var markerData = [ // マーカーを立てる場所名・緯度・経度
 ];
 
 // データを受け取る
-function getdata(){
+function getdata() {
   var marker = document.getElementById('num').value;
   numx = parseInt(x);
   numx = numx + 1;
