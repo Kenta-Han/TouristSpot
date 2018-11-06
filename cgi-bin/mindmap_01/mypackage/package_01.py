@@ -8,8 +8,38 @@ from pprint import pprint
 from tqdm import tqdm
 sc = myp_cos.SimCalculator()
 
-conn = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan_ktylab_new', charset='utf8')
-cur = conn.cursor()
+import os, sys # 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../../')
+sys.path.append(path)
+from mysql_connect import jalan_ktylab_new
+conn,cur = jalan_ktylab_new.main()
+
+########################################################
+########################################################
+## 履歴スポットリスト作成(DBでLIKE検索するため)
+def Make_History_List(history):
+	history_list = []
+	for i in range(len(history)):
+		temp = "%"+ history[i] +"%"
+		history_list.append(temp)
+		temp = 0
+	return history_list
+
+## スポット，レビューリスト作成
+def SpotORReview_List(spot):
+	spot_list = []
+	cur.execute(spot)
+	for i in cur:
+		spot_list.append([i])
+	return spot_list
+
+## エリアIDリスト作成
+def Area_id_List(area):
+	area_id_list = []
+	cur.execute(area)
+	for i in cur:
+		area_id_list.append(i[0])
+	return area_id_list
 
 ########################################################
 ########################################################
@@ -159,7 +189,7 @@ def Sort_TFIDF_VtoU(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
                 ## 同じ単語，値は共に平均以上
                 if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=visited_mean[i] and set[1][i][k][1]>=unvisited_mean[i]:
                 # if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=0.01 and set[1][i][k][1]>=0.01:
-                    temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1]))
+                    temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1])])
                     # ,set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)
@@ -172,7 +202,7 @@ def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
     for i in range(len(vis_spot_name)):
         vis_spot.append([vis_spot_name[i],vis_tfidf[i],vis_mean[i]])
     for i in range(len(unvis_spot_name)):
-        unvis_spot.append([unvis_spot_name[i],unvis_tfidf[i,unvis_mean[i]]])
+        unvis_spot.append([unvis_spot_name[i],unvis_tfidf[i],unvis_mean[i]])
     ## 一番類似するスポットを関連付ける
     visited,unvisited,set = [],[],[]
     visited_mean,unvisited_mean = [],[]
@@ -196,13 +226,16 @@ def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
                 ## 同じ単語，値は共に平均以上
                 if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=unvisited_mean[i] and set[1][i][k][1]>=visited_mean[i]:
                 # if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=0.01 and set[1][i][k][1]>=0.01:
-                    temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1]))
+                    temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1])])
                     # ,set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)
         top10.append([result[i][0],result[i][1][0],all[i][:10]])
     return top10
 
+
+########################################################
+########################################################
 ## 調和平均
 def Sort_TFIDF_VtoU_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean,unvis_mean,result):
     ## TFIDFの結果にスポット名を追加
@@ -230,7 +263,7 @@ def Sort_TFIDF_VtoU_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
             for k in range(len(set[1][i])):
                 ## 同じ単語，値は共に平均以上
                 if set[0][i][j][0]==set[1][i][k][0]:
-                    temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]+1/set[1][i][k][1])))
+                    temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]+1/set[1][i][k][1]))])
                     # ,set[0][i][j][1],set[1][i][k][1]])
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)
@@ -263,7 +296,7 @@ def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
             for k in range(len(set[1][i])):
                 ## 同じ単語，値は共に平均以上
                 if set[0][i][j][0]==set[1][i][k][0]:
-                    temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]-1/set[1][i][k][1])))
+                    temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]-1/set[1][i][k][1]))])
                     # ,set[0][i][j][1],set[1][i][k][1]])
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)

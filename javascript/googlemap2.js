@@ -56,8 +56,7 @@ function getdata(){
   document.getElementById('answer').innerHTML = numx;
 }
 
-
-function initMap() {
+function initMap(){
   // 地図の作成
   var mapLatLng = new google.maps.LatLng({
     lat: markerData[0]['lat'],

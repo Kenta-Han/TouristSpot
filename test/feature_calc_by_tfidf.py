@@ -48,40 +48,40 @@ pprint(season_duration)
 
 ##########################
 print("\n既訪問スポットベクトル")
-select_history_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(history_spot_id_list))
-history_spot_vectors = myp_pk01.Spot_List(select_history_spot_vectors)
-# print(history_spot_vectors)
-history_spot_vectors_doc = myp_pk01.Doc2Cec_Feature(history_spot_vectors)
+select_history_spot_vectors = "SELECT * FROM tfidf_by_wakachi2 WHERE spot_id IN {};".format(tuple(history_spot_id_list))
+history_spot_vectors = myp_pk01.Spot_List_TFIDF(select_history_spot_vectors)
+print(history_spot_vectors)
+history_spot_vectors_doc = myp_pk01.TFIDF_Feature(history_spot_vectors)
 # print(history_spot_vectors_doc)
 
-# data = []
+# # data = []
+# # for i in range(len(history_spot_vectors_doc)):
+# #     data.append(history_spot_vectors_doc[i][1])
+# # df = pd.DataFrame(data)
+# # print(df)
+# # ## n次元に圧縮するPCAインスタンスを作成，データをPCAで次元圧縮
+# # X = PCA(n_components=3).fit_transform(df.iloc[:,:].values)
+# # embed3 = pd.DataFrame(X) ## 可視化のためにデータフレームに変換
+# # print(embed3.head())
+#
+# # print("\n未訪問スポットベクトル")
+# select_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(spot_id_list))
+# spot_vectors = myp_pk01.Spot_List(select_spot_vectors)
+# # print(spot_vectors)
+# spot_vectors_doc = myp_pk01.Doc2Cec_Feature(spot_vectors)
+# # print(spot_vectors_doc)
+#
+# print("\n既訪問と未訪問スポットベクトルの差の類似度")
+# his_spot_id_all,spot_id_all = [],[]
+# his_spot_review_all,spot_review_all = [],[]
 # for i in range(len(history_spot_vectors_doc)):
-#     data.append(history_spot_vectors_doc[i][1])
-# df = pd.DataFrame(data)
-# print(df)
-# ## n次元に圧縮するPCAインスタンスを作成，データをPCAで次元圧縮
-# X = PCA(n_components=3).fit_transform(df.iloc[:,:].values)
-# embed3 = pd.DataFrame(X) ## 可視化のためにデータフレームに変換
-# print(embed3.head())
-
-# print("\n未訪問スポットベクトル")
-select_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(spot_id_list))
-spot_vectors = myp_pk01.Spot_List(select_spot_vectors)
-# print(spot_vectors)
-spot_vectors_doc = myp_pk01.Doc2Cec_Feature(spot_vectors)
-# print(spot_vectors_doc)
-
-print("\n既訪問と未訪問スポットベクトルの差の類似度")
-his_spot_id_all,spot_id_all = [],[]
-his_spot_review_all,spot_review_all = [],[]
-for i in range(len(history_spot_vectors_doc)):
-    his_spot_id_all.append(history_spot_vectors_doc[i][0])
-    spot_id_all.append(spot_vectors_doc[i][0])
-    his_spot_review_all.append(history_spot_vectors_doc[i][1])
-    spot_review_all.append(spot_vectors_doc[i][1])
-result_HtoA,result_AtoH = myp_pk01.Recommend_All(his_spot_id_all,spot_id_all,his_spot_review_all,spot_review_all)
-print("\nHistory to Area")
-pprint(result_HtoA)
-
-print("\nArea to Histosy")
-pprint(result_AtoH)
+#     his_spot_id_all.append(history_spot_vectors_doc[i][0])
+#     spot_id_all.append(spot_vectors_doc[i][0])
+#     his_spot_review_all.append(history_spot_vectors_doc[i][1])
+#     spot_review_all.append(spot_vectors_doc[i][1])
+# result_HtoA,result_AtoH = myp_pk01.Recommend_All(his_spot_id_all,spot_id_all,his_spot_review_all,spot_review_all)
+# print("\nHistory to Area")
+# pprint(result_HtoA)
+#
+# print("\nArea to Histosy")
+# pprint(result_AtoH)

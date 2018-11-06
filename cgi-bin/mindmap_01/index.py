@@ -39,7 +39,7 @@ html_body = u"""
 </div>
 <script>
 $('.button1').click(function() {
-    link= "test_02_medoid.py";
+    link= "test_new.py";
     $(this).parents('form').attr('action', link);
     $(this).parents('form').submit();
 });

@@ -9,11 +9,14 @@ import mypackage.package_01 as myp_pk01
 conn = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan_ktylab_new', charset='utf8')
 cur = conn.cursor()
 
-history_prefecture = "神奈川"
-history_area = "鎌倉"
+# history_prefecture = "神奈川"
+# history_area = "鎌倉"
 
 # history_prefecture = "京都"
 # history_area = "京都"
+
+history_prefecture = "大阪"
+history_area = "大阪"
 
 select_area_id = "SELECT DISTINCT id FROM area_mst WHERE area1 LIKE '%{pre}%' AND (area2 LIKE '%{area}%' OR area3 LIKE '%{area}%') AND id < 30435;".format(pre = history_prefecture, area = history_area)
 area_id_list = []

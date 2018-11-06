@@ -22,11 +22,11 @@ def Spot_List(select_spot):
 
 try:
 	## レビュー全体：各スポットで1文書と見なす(1個目の空白の前は場所を示している)
-	select_wakachi2 = "SELECT name,group_concat(wakachi2 separator '') FROM review_all GROUP BY name;"
+	select_wakachi2 = "SELECT spot_id,name,group_concat(wakachi2 separator '') FROM review_all GROUP BY spot_id,name"
 	spot_list = Spot_List(select_wakachi2)
 	docs = []
 	for i in range(len(spot_list)):
-		line = spot_list[i][1]
+		line = spot_list[i][2]
 		docs.append(line.split())
 	dictionary = corpora.Dictionary(docs) ## 単語にidを振る
 
@@ -67,13 +67,13 @@ try:
 		for w in word:
 			w[1] = str(w[1])
 			copyw[i] = '：'.join(w)
-			copyw[i] = '：'.join([copyw[i],spot_list[k][0]])
+			copyw[i] = '：'.join([copyw[i],spot_list[k][0],spot_list[k][1]])
 			i+=1
 		k+=1
 		# print(copyw)
 		for i in range(len(copyw)):
 			count_kigo = copyw[i].count('：') ## 1行中の：の数
-			if count_kigo >= 3:
+			if count_kigo >= 4:
 				continue
 			else:
 				copyw[i] = copyw[i].split("：")
@@ -81,7 +81,8 @@ try:
 				e = re.search('^\d', copyw[i][1])
 				if (d != None) or (e == None) :
 					continue
-				insert_tfidf = "INSERT INTO tfidf_by_wakachi2 VALUES('{}',{},'{}')".format(copyw[i][0],copyw[i][1],copyw[i][2])
+				## word,value,spot_id,spot_name
+				insert_tfidf = "INSERT INTO tfidf_by_wakachi2 VALUES('{}',{},'{}','{}')".format(copyw[i][0],copyw[i][1],copyw[i][2],copyw[i][3])
 				cur.execute(insert_tfidf)
 				conn.commit()
 
