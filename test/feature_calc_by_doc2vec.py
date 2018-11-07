@@ -101,13 +101,13 @@ unvisited_spot_reviews = myp_pk01.Spot_List_TFIDF(select_unvisited_spot_reviews)
 unvisited_tfidf,unvisited_mean = myp_pk01.Tfidf(unvisited_spot_reviews)
 print("未訪問毎平均：\n" + str(unvisited_spot_name_all) + "\n" + str(unvisited_mean))
 
-VtoU_top10 = myp_pk01.Sort_TFIDF_VtoU(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
+VtoU_top10 = myp_pk01.Sort_TFIDF_VtoU_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
 print("\n既訪問，未訪問，特徴語，2つの値の差(絶対値)，既値，未値")
 pprint(VtoU_top10)
 
-UtoV_top10 = myp_pk01.Sort_TFIDF_UtoV(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
-print("\n未訪問，既訪問，特徴語，2つの値の差(絶対値)，未値，既値")
-pprint(UtoV_top10)
+# UtoV_top10 = myp_pk01.Sort_TFIDF_UtoV(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
+# print("\n未訪問，既訪問，特徴語，2つの値の差(絶対値)，未値，既値")
+# pprint(UtoV_top10)
 
 
 ##########################

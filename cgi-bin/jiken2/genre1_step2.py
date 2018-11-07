@@ -44,7 +44,7 @@ html_body = u"""
 <!DOCTYPE html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href="../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href="../../data/stylesheet_jiken2.css' rel='stylesheet' type='text/css' />
 <title>観光スポット</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>

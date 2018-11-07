@@ -34,7 +34,7 @@ html_body = u"""
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<link href='../../data/new_stylesheet.css' rel='stylesheet' type='text/css' />
+<link href='../../data/stylesheet_analogy_test.css' rel='stylesheet' type='text/css' />
 <title>観光体験マップ選択</title>
 </head>
 

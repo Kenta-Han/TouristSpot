@@ -1,0 +1,67 @@
+body{
+  width: 90%;
+  margin: auto;
+}
+
+#wrap{
+  width: 80%;
+  margin: auto;
+}
+
+p{
+  font-size: 16px;
+}
+
+.left{
+  float:left;
+  width: 60%;
+  margin: auto;
+}
+
+.right{
+  float:right;
+  width: 35%;
+  margin: auto;
+  text-align: center;
+}
+
+.title,.crowdworks_id,.keyword,.subtitle{
+  text-align: center;
+}
+
+span{
+  font-size: 14px;
+  font-weight: 900;
+}
+.image{
+  margin: auto;
+}
+
+.image img{
+  width: 150px;
+}
+
+.button1 {
+  display: inline-block;
+  border-radius: 5%;          /* 角丸       */
+  font-size: 16px;        /* 文字サイズ */
+  text-align: center;      /* 文字位置   */
+  cursor: pointer;     /* カーソル   */
+  padding: 12px 20px;   /* 余白       */
+  background: #000066;     /* 背景色     */
+  color: #ffffff;     /* 文字色     */
+  line-height: 1em;         /* 1行の高さ  */
+  transition: .3s;         /* なめらか変化 */
+  box-shadow: 6px 6px 3px #666666;  /* 影の設定 */
+  border: 2px solid #000066;    /* 枠の指定 */
+  margin: 1% auto;
+}
+.button1:hover {
+  box-shadow: none;        /* カーソル時の影消去 */
+  color: #000066;     /* 背景色     */
+  background: #ffffff;     /* 文字色     */
+}
+
+form{
+  text-align: center;
+}
