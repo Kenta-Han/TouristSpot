@@ -91,3 +91,9 @@ form {
 .window{
   width: 250px;
 }
+
+.category{
+  width: 100%;
+  margin: 1% auto;
+  text-align: center;
+}

@@ -15,18 +15,20 @@
   <div class="left">
     <form id="form">
       <h3 class="crowdworks_id">ユーザ名：
-        <input type="text" name="user_id" id="user_id" maxlength="40" style="width: 200px;height: 24px;font-size:16px;" />
+        <input type="text" id="user_id" maxlength="40" style="width: 200px;height: 24px;font-size:16px;" placeholder="CrowdWorksID"/>
       </h3>
-      <p style="text-align:center;">既訪問スポット名の入力をお願いします</p>
+      <p style="text-align:center;">既訪問スポット名を3つ以上入力してください</p>
+      <p style="color:#ff0000">入力方式：スポット名，都道府県名，スポット名，..</p>
+      <p><a href="https://www.jalan.net/travel/?screenId=OUW1701&influxKbn=0" target="_blank">じゃらん</a>に存在するスポット名でお願い致します</p>
       <h3 class="keyword">
-        <textarea name="visited_name" style="width:350px; height:150px; font-size:14px;" /></textarea>
+        <textarea id="visited_name" style="width:400px; height:80px; font-size:14px;" placeholder="清水寺，京都，金閣寺，京都，新宿御苑，東京，海遊館，大阪"/></textarea>
       </h3>
       <p style="text-align:center;">観光エリアの入力をお願いします</p>
       <h3 class="keyword">都道府県：
-        <input type="text" id="prefecture_name" style="width:250px; height:24px; font-size:16px;" />
+        <input type="text" id="prefecture_name" style="width:250px; height:24px; font-size:16px;" placeholder="石川"/>
       </h3>
       <h3 class="keyword">エリア：
-        <input type="text" id="area_name" style="width:250px; height:24px; font-size:16px;" />
+        <input type="text" id="area_name" style="width:250px; height:24px; font-size:16px;" placeholder="金沢"/>
       </h3>
       <p style="color:#ff0000">全ての項目の入力し終えたら，「実験開始」をクリックしてください</p>
       <input type="submit" class="button1" value="実験開始" />
@@ -42,9 +44,16 @@
     <p>×悪い例：東京都，大阪府，京都府，神奈川県</p>
   </div>
 
+  <div class="category" style="clear:both;">
+    <h1 style="text-align:center;">絶対的な特徴</h1>
+  </div>
+
   <div class="result" style="clear:both;">
-    <div id="map"></div>
+    <h1 style="text-align:center;">結果表示マップ</h1>
+    <p style="text-align:center;">「実験開始」をクリックしてから，結果を表示するまで数十秒がかかる場合があるため，ご了承ください．</p>
+    <div id="map"><iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="750" frameborder="0" style="border:0" allowfullscreen></iframe></div>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
+    <h2>承認コード：<span class="code" style="font-size:24px;"></span></h2>
   </div>
 
   <script type="text/javascript">
@@ -77,7 +86,7 @@
       }); // 緯度経度の中心座標データ作成(座標の平均)
       map = new google.maps.Map(document.getElementById("map"), { // #mapに地図を埋め込む
         center: mapLatLng, // 地図の中心を指定
-        zoom: 10 // 地図のズームを指定
+        zoom: 12 // 地図のズームを指定
       });
 
       // マーカー毎の処理
@@ -117,7 +126,7 @@
             dataType: "text",
             data: {
               user_id: $("#user_id").val(),
-              history_name: $("#history_name").val(),
+              visited_name: $("#visited_name").val(),
               prefecture_name: $("#prefecture_name").val(),
               area_name: $("#area_name").val()
             },
@@ -126,6 +135,7 @@
             var res = $.parseJSON(response) //受信したデータをjson形式に変更
             console.log(res)
             initMap(res)
+            $(".code").html(res[0]['randomname']);
           })
           .fail(function() {
             $(".result").html("Failed.");

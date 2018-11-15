@@ -6,10 +6,16 @@ from gensim import models
 import mypackage.cossim as myp_cos
 from pprint import pprint
 from tqdm import tqdm
+import re
 sc = myp_cos.SimCalculator()
 
 conn = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan_ktylab_new', charset='utf8')
 cur = conn.cursor()
+
+bytesymbols = re.compile("[!-/:-@[-`{-~\d]") ## 半角記号，数字\d
+
+def CosSim(x, y):
+    return np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))
 
 ########################################################
 ########################################################
@@ -43,26 +49,36 @@ def Recommend_All(visited_name,unvisited_name,visited_review,unvisited_review):
     for i in range(len(visited_name)):
         temp_VtoU = []
         for j in range(len(unvisited_name)):
-            visited_to_unvisited = sc.sim_cos(visited_review[i],unvisited_review[j])
+            # visited_to_unvisited = sc.sim_cos(visited_review[i],unvisited_review[j])
+            visited_to_unvisited = CosSim(visited_review[i],unvisited_review[j])
             temp_VtoU.append([unvisited_name[j],visited_to_unvisited])
         value_VtoU.append(temp_VtoU)
     list_VtoU = list(zip(visited_name,value_VtoU)) ## リスト作成(スポット名,類似度)
     list_VtoU_top = [] ## スポットから類似度一番高いスポットを取り出す
     for i in range(len(list_VtoU)):
         list_VtoU[i][1].sort(key=lambda x:x[1],reverse=True) ## 降順ソート
-        list_VtoU_top.append([list_VtoU[i][0],list_VtoU[i][1][0]])
+        # list_VtoU_top.append([list_VtoU[i][0],list_VtoU[i][1][0]])
+        ## 0.1以上
+        if list_VtoU[i][1][0][1] > 0.125:
+            list_VtoU_top.append([list_VtoU[i][0],list_VtoU[i][1][0]])
+        else:
+            continue
 
     for i in range(len(unvisited_name)):
         temp_UtoV = []
         for j in range(len(visited_name)):
-            unvisited_to_visited = sc.sim_cos(unvisited_review[i],visited_review[j])
+            # unvisited_to_visited = sc.sim_cos(unvisited_review[i],visited_review[j])
+            unvisited_to_visited = CosSim(unvisited_review[i],visited_review[j])
             temp_UtoV.append([visited_name[j],unvisited_to_visited])
         value_UtoV.append(temp_UtoV)
     list_UtoV = list(zip(unvisited_name,value_UtoV))
     list_UtoV_top = []
     for i in range(len(list_UtoV)):
         list_UtoV[i][1].sort(key=lambda x:x[1],reverse=True)
-        list_UtoV_top.append([list_UtoV[i][0],list_UtoV[i][1][0]])
+        if list_UtoV[i][1][0][1] > 0.125:
+            list_UtoV_top.append([list_UtoV[i][0],list_UtoV[i][1][0]])
+        else:
+            continue
     # pprint(list_VtoU)
     # print("VtoU　↑\nUtoV　↓")
     # pprint(list_UtoV)
@@ -159,8 +175,7 @@ def Sort_TFIDF_VtoU(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
                 ## 同じ単語，値は共に平均以上
                 if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=visited_mean[i] and set[1][i][k][1]>=unvisited_mean[i]:
                 # if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=0.01 and set[1][i][k][1]>=0.01:
-                    temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1])])
-                    # ,set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
+                    temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1]),set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)
         top10.append([result[i][0],result[i][1][0],all[i][:10]])
@@ -196,8 +211,7 @@ def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
                 ## 同じ単語，値は共に平均以上
                 if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=unvisited_mean[i] and set[1][i][k][1]>=visited_mean[i]:
                 # if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=0.01 and set[1][i][k][1]>=0.01:
-                    temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1])])
-                    # ,set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
+                    temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1]),set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)
         top10.append([result[i][0],result[i][1][0],all[i][:10]])
@@ -228,12 +242,11 @@ def Sort_TFIDF_VtoU_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
         temp = []
         for j in tqdm(range(len(set[0][i]))):
             for k in range(len(set[1][i])):
-                if set[0][i][j][0]==set[1][i][k][0]:
-                    temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]+1/set[1][i][k][1]))])
-                    # ,set[0][i][j][1],set[1][i][k][1]])
+                if set[0][i][j][0]==set[1][i][k][0] and len(set[0][i][j][0])>1 and re.search(bytesymbols,set[0][i][j][0])==None:
+                    temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]+1/set[1][i][k][1])),set[0][i][j][1],set[1][i][k][1]])
         all.append(temp)
-        all[i].sort(key=lambda x:x[1]) ## 昇順ソート
-        top10.append([result[i][0],result[i][1][0],all[i][-10:]])
+        all[i].sort(key=lambda x:x[1],reverse=True) ## 昇順ソート
+        top10.append([result[i][0],result[i][1][0],all[i][:10]])
     return top10
 
 def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean,unvis_mean,result):
@@ -260,10 +273,9 @@ def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
         temp = []
         for j in tqdm(range(len(set[0][i]))):
             for k in range(len(set[1][i])):
-                if set[0][i][j][0]==set[1][i][k][0]:
-                    temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]+1/set[1][i][k][1]))])
-                    # ,set[0][i][j][1],set[1][i][k][1]])
+                if set[0][i][j][0]==set[1][i][k][0] and len(set[0][i][j][0])>1 and re.search(bytesymbols,set[0][i][j][0])==None:
+                    temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]+1/set[1][i][k][1])),set[0][i][j][1],set[1][i][k][1]])
         all.append(temp)
-        all[i].sort(key=lambda x:x[1]) ## 昇順ソート
-        top10.append([result[i][0],result[i][1][0],all[i][-10:]])
+        all[i].sort(key=lambda x:x[1],reverse=True)
+        top10.append([result[i][0],result[i][1][0],all[i][:10]])
     return top10

@@ -6,6 +6,7 @@ from gensim import models
 import mypackage.cossim as myp_cos
 from pprint import pprint
 from tqdm import tqdm
+import re
 sc = myp_cos.SimCalculator()
 
 import os, sys # 全フォルダ参照
@@ -14,32 +15,33 @@ sys.path.append(path)
 from mysql_connect import jalan_ktylab_new
 conn,cur = jalan_ktylab_new.main()
 
+bytesymbols = re.compile("[!-/:-@[-`{-~\d]") ## 半角記号，数字\d
 ########################################################
 ########################################################
 ## 履歴スポットリスト作成(DBでLIKE検索するため)
 def Make_History_List(history):
-	history_list = []
-	for i in range(len(history)):
-		temp = "%"+ history[i] +"%"
-		history_list.append(temp)
-		temp = 0
-	return history_list
+    history_list = []
+    for i in range(len(history)):
+        temp = "%"+ history[i] +"%"
+        history_list.append(temp)
+        temp = 0
+    return history_list
 
 ## スポット，レビューリスト作成
 def SpotORReview_List(spot):
-	spot_list = []
-	cur.execute(spot)
-	for i in cur:
-		spot_list.append([i])
-	return spot_list
+    spot_list = []
+    cur.execute(spot)
+    for i in cur:
+        spot_list.append([i])
+    return spot_list
 
 ## エリアIDリスト作成
 def Area_id_List(area):
-	area_id_list = []
-	cur.execute(area)
-	for i in cur:
-		area_id_list.append(i[0])
-	return area_id_list
+    area_id_list = []
+    cur.execute(area)
+    for i in cur:
+        area_id_list.append(i[0])
+    return area_id_list
 
 ########################################################
 ########################################################
@@ -79,7 +81,7 @@ def Recommend_All(visited_name,unvisited_name,visited_review,unvisited_review):
     list_VtoU = list(zip(visited_name,value_VtoU)) ## リスト作成(スポット名,類似度)
     list_VtoU_top = [] ## スポットから類似度一番高いスポットを取り出す
     for i in range(len(list_VtoU)):
-        list_VtoU[i][1].sort(key=lambda x:x[1],reverse=True) ## 降順ソート
+        list_VtoU[i][1].sort(key=lambda x:x[1],reverse=True)
         list_VtoU_top.append([list_VtoU[i][0],list_VtoU[i][1][0]])
 
     for i in range(len(unvisited_name)):
@@ -92,10 +94,10 @@ def Recommend_All(visited_name,unvisited_name,visited_review,unvisited_review):
     list_UtoV_top = []
     for i in range(len(list_UtoV)):
         list_UtoV[i][1].sort(key=lambda x:x[1],reverse=True)
-        list_UtoV_top.append([list_UtoV[i][0],list_UtoV[i][1][0]])
-    # pprint(list_VtoU)
-    # print("VtoU　↑\nUtoV　↓")
-    # pprint(list_UtoV)
+        if list_UtoV[i][1][0][1] > 0.1:
+            list_UtoV_top.append([list_UtoV[i][0],list_UtoV[i][1][0]])
+        else:
+            continue
     return list_VtoU_top,list_UtoV_top
 
 
@@ -159,6 +161,9 @@ def Tfidf(review_all):
         sum = 0
     return doc2,mean
 
+########################################################
+########################################################
+## 平均以上 or 0.01以上
 def Sort_TFIDF_VtoU(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean,unvis_mean,result):
     ## TFIDFの結果にスポット名を追加
     vis_spot,unvis_spot = [],[]
@@ -233,7 +238,6 @@ def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
         top10.append([result[i][0],result[i][1][0],all[i][:10]])
     return top10
 
-
 ########################################################
 ########################################################
 ## 調和平均 差が小値が大，差が大値が小 → 値が大の方が良い(昇順後ろから10個)
@@ -264,7 +268,6 @@ def Sort_TFIDF_VtoU_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
                 ## 同じ単語，値は共に平均以上
                 if set[0][i][j][0]==set[1][i][k][0]:
                     temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]+1/set[1][i][k][1]))])
-                    # ,set[0][i][j][1],set[1][i][k][1]])
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート
         top10.append([result[i][0],result[i][1][0],all[i][-10:]])
@@ -295,9 +298,8 @@ def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
         for j in tqdm(range(len(set[0][i]))):
             for k in range(len(set[1][i])):
                 ## 同じ単語，値は共に平均以上
-                if set[0][i][j][0]==set[1][i][k][0]:
+                if set[0][i][j][0]==set[1][i][k][0] and len(set[0][i][j][0])>1 and re.search(bytesymbols,set[0][i][j][0])==None:
                     temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]+1/set[1][i][k][1]))])
-                    # ,set[0][i][j][1],set[1][i][k][1]])
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート
         top10.append([result[i][0],result[i][1][0],all[i][-10:]])

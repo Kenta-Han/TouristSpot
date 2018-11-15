@@ -5,12 +5,12 @@ import MySQLdb
 import datetime
 from tqdm import tqdm
 import numpy as np
+from pprint import pprint
 import re ## 区切り文字を複数指定
 
 from pprint import pprint
 import matplotlib.pyplot as plt
 import mypackage.package_01 as myp_pk01
-import mypackage.other_def_medoid as myp_other_m
 
 import os, sys ## 全フォルダ参照
 path = os.path.join(os.path.dirname(__file__), '../')
@@ -55,17 +55,25 @@ print("<h2>既訪問スポット情報</h2>")
 visited_spot_id_list = ['spt_26109ag2130015470','spt_26101ag2130014551','spt_26108ag2130015438','spt_26105ag2130012063','spt_26105ag2130010617']
 
 ## 既訪問を利用
-# like_history_list = myp_other_m.Make_History_List(history_list)
-# IN と LIKEを同時にやりたい
-# select_user_history = "SELECT id,name,lat,lng,area_id,review FROM spot_mst WHERE name IN {} ORDER BY id AND review != 0;".format(tuple(history_list))
-# user_spot_list2 = myp_other_m.SpotORReview_List(select_user_history)
-# print("<h4>履歴スポット(Spot_id, Name, Lat, Lng, Area_id, Review)：</h4>\n{}".format(user_spot_list2))
+# history_list = []
+# user_spot = []
+# history_list = re.split("[,，]", history)
+# like_spot_list,like_area_list = myp_pk01.Make_History_List(history_list)
+# for i in range(len(like_area_list[0])):
+#     select_user_history = "SELECT id,name,lat,lng,area_id from spot_mst where name like '{spot}' AND address like '{area}' AND review=(SELECT max(review) FROM spot_mst WHERE name like '{spot}' AND address like '{area}' AND review != 0);".format(spot=like_spot_list[0][i],area=like_area_list[0][i])
+#     cur.execute(select_user_history)
+#     user_spot.append(cur.fetchone())
+# print("<h4>履歴スポット(Spot_id, Name, Lat, Lng, Area_id)：</h4>\n{}".format(user_spot))
+# visited_spot_id_list = []
+# for i in range(len(user_spot)):
+#     visited_spot_id_list.append(user_spot[i][0])
+# print(visited_spot_id_list)
 
 print("<h2>未訪問エリア情報</h2>")
 ## 未訪問エリアIDリスト
 select_unvisited_area_id = "SELECT DISTINCT id FROM area_mst WHERE area1 LIKE '%{pre}%' AND (area2 LIKE '%{area}%' OR area3 LIKE '%{area}%') AND id < 30435;".format(pre = prefecture, area = area)
 unvisited_area_id_list = myp_pk01.Area_id_List(select_unvisited_area_id)
-# print("<h4>エリアIDの数：\t{}</h4>".format(len(unvisited_area_id_list)))
+print("<h4>エリアIDの数：\t{}</h4>".format(len(unvisited_area_id_list)))
 
 ## 未訪問エリア内(レビュー and [lat or lng])ありスポット
 select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review FROM spot_mst WHERE area_id IN {} AND review!=0 AND(lat!=0 or lng!=0) ORDER BY RAND() LIMIT 8;".format(tuple(unvisited_area_id_list))
@@ -94,12 +102,12 @@ for i in range(len(unvisited_spot_list)):
         else:
             continue
 print(name,lat,lng)
-## [東京都庁舎展望室,浅草寺,明治神宮,新宿御苑,皇居東御苑]
-# unvisited_spot_id_list = ['spt_13104aj2200025349','spt_13106ag2130012302','spt_13113ag2130014473','spt_13104ah2140016473','spt_13101ah2140016178']
+# [東京都庁舎展望室,浅草寺,明治神宮,新宿御苑,皇居東御苑]
+unvisited_spot_id_list = ['spt_13104aj2200025349','spt_13106ag2130012302','spt_13113ag2130014473','spt_13104ah2140016473','spt_13101ah2140016178']
 
 
-############################################################
-############################################################
+###########################################################
+###########################################################
 # print("<h4>既訪問スポットベクトル</h4>")
 select_visited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(visited_spot_id_list))
 visited_spot_vectors = myp_pk01.Spot_List(select_visited_spot_vectors)
@@ -195,7 +203,7 @@ print("</ol>")
 
 ## DBにスポット名，座標を挿入
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-sql_update = "UPDATE map_test SET finish_datetime='{finish}', spot_name='{spot_name}', lat='{lat}', lng='{lng}' where id = {record_id};".format(finish=finish_datetime, spot_name=','.join(name), lat=','.join(lat), lng=','.join(lng), record_id=record_id)
+sql_update = "UPDATE map_test SET finish_datetime='{finish}', unvisited='{spot_name}', lat='{lat}', lng='{lng}' where id = {record_id};".format(finish=finish_datetime, spot_name=','.join(name), lat=','.join(lat), lng=','.join(lng), record_id=record_id)
 cur.execute(sql_update)
 conn.commit()
 
