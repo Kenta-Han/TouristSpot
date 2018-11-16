@@ -1,10 +1,13 @@
 body {
   width: 90%;
-  margin: 2% auto;
+  margin: 3% auto;
 }
 
-p {
-  font-size: 16px;
+h1{text-align: center;}
+
+form {
+  text-align: center;
+  margin: 4% auto;
 }
 
 .left {
@@ -14,20 +17,13 @@ p {
 }
 
 .right {
-  /* float:right;
-  width: 50%; */
-  margin: 4% auto;
+  float: right;
+  width: 50%;
+  margin: auto;
   text-align: center;
 }
 
-.title, .crowdworks_id, .keyword, .subtitle {
-  text-align: center;
-}
 
-span {
-  font-size: 14px;
-  font-weight: 900;
-}
 
 .image {
   margin: auto;
@@ -37,7 +33,7 @@ span {
   width: 150px;
 }
 
-.button1 {
+#start {
   display: inline-block;
   border-radius: 5%;
   /* 角丸       */
@@ -61,16 +57,39 @@ span {
   /* 影の設定 */
   border: 2px solid #000066;
   /* 枠の指定 */
-  margin: 1% auto;
+  margin: 3% auto;
 }
 
-.button1:hover {
+#start:hover {
   box-shadow: none;
   /* カーソル時の影消去 */
   color: #000066;
   /* 背景色     */
   background: #ffffff;
   /* 文字色     */
+}
+
+.category{
+  width: 100%;
+}
+
+.cate_result {
+  width: 100%;
+}
+
+table{
+  width: 100%;
+  margin: auto;
+}
+
+th,td{
+  border: solid 1px #000000;
+  padding : 7px 10px;
+}
+
+th{
+  color:white; /*文字色*/
+  background-color: #2196f3;
 }
 
 .result {
@@ -84,16 +103,6 @@ span {
   margin: 0 8px 0 8px;
 }
 
-form {
-  text-align: center;
-}
-
-.window{
-  width: 250px;
-}
-
-.category{
+#window{
   width: 100%;
-  margin: 1% auto;
-  text-align: center;
 }

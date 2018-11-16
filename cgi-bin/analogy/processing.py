@@ -4,8 +4,10 @@ import cgi,cgitb
 from tqdm import tqdm
 import datetime
 import re
+import json
 # import mypackage.package_01 as myp_pk01
 import mypackage.other as myp_other
+import mypackage.category as myp_cate
 import mypackage.doc2vec_recommend as myp_doc_rec
 import mypackage.tfidf as myp_tfidf
 import mypackage.mean as myp_mean
@@ -39,20 +41,20 @@ record_id = cur.fetchone()[0]
 
 # print("<h2>既訪問スポット情報</h2>")
 ## [伏見稲荷大社,鹿苑寺（金閣寺）,龍安寺,清水寺,八坂神社]
-# visited_spot_id_list = ['spt_26109ag2130015470','spt_26101ag2130014551','spt_26108ag2130015438','spt_26105ag2130012063','spt_26105ag2130010617']
+visited_spot_id_list = ['spt_26109ag2130015470','spt_26101ag2130014551','spt_26108ag2130015438','spt_26105ag2130012063','spt_26105ag2130010617']
 
 ## 既訪問を利用
-history_list = []
-user_spot = [] ## 履歴スポット
-history_list = re.split("[,，、]", history)
-like_spot_list,like_area_list = myp_other.Make_History_List(history_list)
-for i in range(len(like_spot_list[0])):
-    select_user_history = "SELECT id,name,lat,lng,area_id from spot_mst where name like '{spot}' AND address like '{area}' AND review=(SELECT max(review) FROM spot_mst WHERE name like '{spot}' AND address like '{area}' AND review != 0);".format(spot=like_spot_list[0][i],area=like_area_list[0][i])
-    cur.execute(select_user_history)
-    user_spot.append(cur.fetchone())
-visited_spot_id_list = []
-for i in range(len(user_spot)):
-    visited_spot_id_list.append(user_spot[i][0])
+# history_list = []
+# user_spot = [] ## 履歴スポット
+# history_list = re.split("[,，、]", history)
+# like_spot_list,like_area_list = myp_other.Make_History_List(history_list)
+# for i in range(len(like_spot_list[0])):
+#     select_user_history = "SELECT id,name,lat,lng,area_id from spot_mst where name like '{spot}' AND address like '{area}' AND review=(SELECT max(review) FROM spot_mst WHERE name like '{spot}' AND address like '{area}' AND review != 0);".format(spot=like_spot_list[0][i],area=like_area_list[0][i])
+#     cur.execute(select_user_history)
+#     user_spot.append(cur.fetchone())
+# visited_spot_id_list = []
+# for i in range(len(user_spot)):
+#     visited_spot_id_list.append(user_spot[i][0])
 
 ## 未訪問エリア情報
 ## 未訪問エリアIDリスト
@@ -66,7 +68,7 @@ else:
 # print("<h4>エリアIDの数：\t{}</h4>".format(len(unvisited_area_id_list)))
 
 ## 未訪問エリア内(レビュー and [lat or lng])ありスポット
-select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review FROM spot_mst WHERE area_id IN {} AND review!=0 AND(lat!=0 or lng!=0) ORDER BY RAND() LIMIT 200;".format(tuple(unvisited_area_id_list))
+select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review FROM spot_mst WHERE area_id IN {} AND review!=0 AND(lat!=0 or lng!=0) ORDER BY RAND() LIMIT 100;".format(tuple(unvisited_area_id_list))
 unvisited_spot_list = myp_other.SpotORReview_List(select_unvisited_spot)
 
 ## 未訪問エリア内スポットIDリスト
@@ -85,6 +87,25 @@ for i in range(len(unvisited_spot_list)):
 
 # [東京都庁舎展望室,浅草寺,明治神宮,新宿御苑,皇居東御苑]
 # unvisited_spot_id_list = ['spt_13104aj2200025349','spt_13106ag2130012302','spt_13113ag2130014473','spt_13104ah2140016473','spt_13101ah2140016178']
+
+############################################################
+## 絶対的な特徴
+category_top10 = myp_cate.Category_Main(visited_spot_id_list,unvisited_spot_id_list)
+
+# all_catejson = []
+# for i in range(len(category_top10)):
+#     response_catejson = {"cate_unspot":"","cate_vispot":"","cate_word":""}
+#     response_catejson["cate_unspot"] = category_top10[i][0]
+#     response_catejson["cate_vispot"] = category_top10[i][1]
+#     word_list = []
+#     for j in range(len(category_top10[i][2])):
+#         try:
+#             word_list.append(category_top10[i][2][j][0])
+#         except TypeError:
+#             continue
+#     response_catejson["cate_word"] = word_list
+#     all_catejson.append(response_catejson)
+# print(json.dumps(all_catejson)) ## 送信
 
 ############################################################
 ## 既訪問スポットベクトル
@@ -131,10 +152,10 @@ unvisited_tfidf,unvisited_mean = myp_tfidf.Tfidf(unvisited_spot_reviews)
 # VtoU_top10 = myp_hmean.Sort_TFIDF_VtoU_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
 UtoV_top10 = myp_hmean.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
 ## レスポンス作成，mysqlに入れるためのカラム内容作成
-sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,sql_code = myp_res.Response(UtoV_top10,name,lat,lng)
+sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,sql_code,sql_cate_unvis,sql_cate_vis,sql_cate_word = myp_res.Response(UtoV_top10,name,lat,lng,category_top10)
 
 # DBに未訪問スポット名，，既訪問スポット名，類似度，特徴語，軽度，緯度を挿入
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-sql_update = "UPDATE map_test SET finish_datetime='{finish}', unvisited='{unv}', visited='{vis}', cossim='{cos}', word='{word}', lat='{lat}', lng='{lng}', code='{code}' where id = {record_id};".format(finish=finish_datetime, unv='，'.join(sql_unvis), vis='，'.join(sql_vis), cos='，'.join(sql_cossim), word=sql_word, lat='，'.join(sql_lat), lng='，'.join(sql_lng), code=sql_code, record_id=record_id)
+sql_update = "UPDATE map_test SET finish_datetime='{finish}', unvisited='{unv}', visited='{vis}', cossim='{cos}', word='{word}', lat='{lat}', lng='{lng}', code='{code}', cate_unvisited='{c_un}', cate_visited='{c_vis}', cate_word='{c_word}' where id = {record_id};".format(finish=finish_datetime, unv='，'.join(sql_unvis), vis='，'.join(sql_vis), cos='，'.join(sql_cossim), word=sql_word, lat='，'.join(sql_lat), lng='，'.join(sql_lng), code=sql_code, c_un='，'.join(sql_cate_unvis), c_vis='，'.join(sql_cate_vis), c_word=sql_cate_word, record_id=record_id)
 cur.execute(sql_update)
 conn.commit()

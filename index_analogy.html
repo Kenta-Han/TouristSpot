@@ -9,29 +9,30 @@
 
 <body>
   <header>
-    <h1 class="title">観光スポット類推情報提示</h1>
+    <h1>観光スポット類推情報提示</h1>
   </header>
 
   <div class="left">
-    <form id="form">
-      <h3 class="crowdworks_id">ユーザ名：
-        <input type="text" id="user_id" maxlength="40" style="width: 200px;height: 24px;font-size:16px;" placeholder="CrowdWorksID"/>
+    <form id="form" name="form1" onSubmit="return check()">
+      <h3>CrowdWorksID(必須)：
+        <input type="text" id="user_id" name="user_id" maxlength="40" style="width: 180px;height: 24px;font-size:16px;" placeholder="CrowdWorksID" />
       </h3>
-      <p style="text-align:center;">既訪問スポット名を3つ以上入力してください</p>
-      <p style="color:#ff0000">入力方式：スポット名，都道府県名，スポット名，..</p>
-      <p><a href="https://www.jalan.net/travel/?screenId=OUW1701&influxKbn=0" target="_blank">じゃらん</a>に存在するスポット名でお願い致します</p>
-      <h3 class="keyword">
-        <textarea id="visited_name" style="width:400px; height:80px; font-size:14px;" placeholder="清水寺，京都，金閣寺，京都，新宿御苑，東京，海遊館，大阪"/></textarea>
+
+      <h3>既訪問スポット名を3つ以上入力してください(必須)：</h3>
+      <h3>
+        <textarea id="visited" name="visited" style="width:70%; height:150px; font-size:16px;" placeholder="清水寺，京都，金閣寺，京都，新宿御苑，東京，海遊館，大阪" /></textarea>
       </h3>
-      <p style="text-align:center;">観光エリアの入力をお願いします</p>
-      <h3 class="keyword">都道府県：
-        <input type="text" id="prefecture_name" style="width:250px; height:24px; font-size:16px;" placeholder="石川"/>
+
+      <p style="text-align:center;">訪問したいエリアを入力してください</p>
+      <h3>都道府県(必須)：
+        <input type="text" id="prefecture" name="prefecture" style="width:200px; height:24px; font-size:16px;" placeholder="石川" />
       </h3>
-      <h3 class="keyword">エリア：
-        <input type="text" id="area_name" style="width:250px; height:24px; font-size:16px;" placeholder="金沢"/>
+
+      <h3>エリア：
+        <input type="text" id="area" name="area" style="width:200px; height:24px; font-size:16px;" placeholder="金沢" />
       </h3>
-      <p style="color:#ff0000">全ての項目の入力し終えたら，「実験開始」をクリックしてください</p>
-      <input type="submit" class="button1" value="実験開始" />
+
+      <input type="submit" id="start" value="実験開始" />
     </form>
   </div>
 
@@ -39,24 +40,58 @@
     <h2 style="color:red;">注意事項！！</h2>
     <h3>== CrowdWorksIDについて ==</h3>
     <div class="image"><img src="../../data/crowdworks_id_img.png"></div>
+    <h3>== 既訪問スポット名 ==</h3>
+    <p><a href="https://www.jalan.net/travel/?screenId=OUW1701&influxKbn=0" target="_blank">じゃらん</a>に存在するスポット名でお願い致します</p>
+    <p style="color:#ff0000">入力方式：スポット名，都道府県名，スポット名，..</p>
     <h3>== 都道府県の入力に関して ==</h3>
     <p style="color:red;">◯良い例：東京，大阪，京都，神奈川，北海道</p>
     <p>×悪い例：東京都，大阪府，京都府，神奈川県</p>
   </div>
 
-  <div class="category" style="clear:both;">
-    <h1 style="text-align:center;">絶対的な特徴</h1>
+  <p style="text-align:center;clear:both;font-size:16px;">「実験開始」をクリックしてから，結果を表示するまで数十秒がかかる場合があります<br><span style="color:#ff0000;">結果表示後「承認コード」をコピーしてください．</span></p>
+
+  <!-- 絶対的な特徴 -->
+  <div class="category">
+    <h1>結果1：</h1>
+    <div class="cate_result"></div>
   </div>
 
-  <div class="result" style="clear:both;">
-    <h1 style="text-align:center;">結果表示マップ</h1>
-    <p style="text-align:center;">「実験開始」をクリックしてから，結果を表示するまで数十秒がかかる場合があるため，ご了承ください．</p>
-    <div id="map"><iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="750" frameborder="0" style="border:0" allowfullscreen></iframe></div>
+  <!-- 相対的な特徴 -->
+  <div class="result">
+    <h1 style="text-align:center;">結果2：</h1>
+
+    <div id="map"><iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205"
+        width="100%" height="750" frameborder="0" style="border:0" allowfullscreen></iframe></div>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
-    <h2>承認コード：<span class="code" style="font-size:24px;"></span></h2>
+    <h1>承認コード：<span class="code"></span></h1>
   </div>
 
   <script type="text/javascript">
+    //未入力チェック
+    function check(){
+      var flag = 0;
+      if(document.form1.user_id.value == ""){flag = 1;}
+      else if(document.form1.visited.value == ""){flag = 1;}
+      else if(document.form1.prefecture.value == ""){flag = 1;}
+
+      if(flag){alert('必須項目に未入力がありました');return false;}
+      else{return true;}
+    }
+
+    // 絶対的な特徴
+    function Category(data) {
+      if (data.length == 0) {
+        return "<p style='text-align:center;'>未訪問エリア内のスポットは，既訪問スポットと類似するスポットが見つかりません．</p>"
+      } else {
+        var set = []
+        for (var i = 0; i < data.length; i++) {
+          set[i] = "<tr><td>" + data[i]["cate_unspot"] + "</td><td>" + data[i]["cate_vispot"] + "</td><td>" + data[i]["cate_word"] + "</td></tr>"
+        }
+        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>イメージ語</th></tr>" + set + "</table>"
+      }
+    }
+
+    // マップ作成 Start
     var map;
     var marker = [];
     var infoWindow = [];
@@ -102,18 +137,23 @@
 
         infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
           // 吹き出しに表示する内容
-          content: "<div class='window'>" + markerData[i]["unvis_name"] + "<br><br>" + markerData[i]["vis_name"] + "：<br>" + markerData[i]["word"] + "</div>"
+          content: "<table border='1' id='window'><tr><th>スポット名</th><td>" + markerData[i]["unvis_name"] + "</td></tr><tr><th>既訪問スポット名</th><td>" + markerData[i]["vis_name"] + "</td</tr><tr><th>イメージ語</th><td>" + markerData[i]["word"] + "</td></tr></table>"
         });
         markerEvent(i); // マーカーにクリックイベントを追加
       }
     }
-
     // マーカーにクリックイベントを追加
+    var currentInfoWindow = null;
     function markerEvent(i) {
       marker[i].addListener("click", function() { // マーカーをクリックしたとき
+        if(currentInfoWindow){
+          currentInfoWindow.close();
+        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
         infoWindow[i].open(map, marker[i]); // 吹き出しの表示
+        currentInfoWindow = infoWindow[i]
       });
     }
+    // マップ作成 Finish
 
     // データの送信Ajax
     $(document).ready(function() {
@@ -126,16 +166,23 @@
             dataType: "text",
             data: {
               user_id: $("#user_id").val(),
-              visited_name: $("#visited_name").val(),
-              prefecture_name: $("#prefecture_name").val(),
-              area_name: $("#area_name").val()
+              visited_name: $("#visited").val(),
+              prefecture_name: $("#prefecture").val(),
+              area_name: $("#area").val(),
             },
           })
           .done(function(response) { //データを受信
-            var res = $.parseJSON(response) //受信したデータをjson形式に変更
-            console.log(res)
-            initMap(res)
-            $(".code").html(res[0]['randomname']);
+            var res = $.parseJSON(response); //受信したデータをjson形式に変更
+            // res[0]は提案手法，res[1]は絶対的な特徴，res[2]はrandom
+            console.log(res[1]);
+            var category = Category(res[1]);
+            $(".cate_result").html(category);
+
+            console.log(res[0]);
+            initMap(res[0]);
+
+            console.log(res[2]);
+            $(".code").html(res[2]["randomname"]);
           })
           .fail(function() {
             $(".result").html("Failed.");
