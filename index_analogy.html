@@ -50,21 +50,32 @@
 
   <p style="text-align:center;clear:both;font-size:16px;">「実験開始」をクリックしてから，結果を表示するまで数十秒がかかる場合があります<br><span style="color:#ff0000;">結果表示後「承認コード」をコピーしてください．</span></p>
 
-  <!-- 絶対的な特徴 -->
+  <form id="form_result" name="form_result" >
+  <!-- 絶対的な特徴（カテゴリ） -->
   <div class="category">
-    <h1>結果1：</h1>
-    <div class="cate_result"></div>
+    <h1>絶対的（カテゴリー）</h1>
+    <div class="category_result"></div>
+  </div>
+
+  <!-- 絶対的な特徴（特徴ベクトル） -->
+  <div class="feature">
+    <h1>絶対的（特徴ベクトル）</h1>
+    <div class="feature_result"></div>
   </div>
 
   <!-- 相対的な特徴 -->
   <div class="result">
-    <h1 style="text-align:center;">結果2：</h1>
+    <h1>相対的な特徴（差分ベクトル）</h1>
 
-    <div id="map"><iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205"
+    <!-- <div id="map"><iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205"
         width="100%" height="750" frameborder="0" style="border:0" allowfullscreen></iframe></div>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script> -->
+    <div class="vector_result"></div>
     <h1>承認コード：<span class="code"></span></h1>
+    <input type="submit" id="finish" value="結果送信" />
   </div>
+
+  </form>
 
   <script type="text/javascript">
     //未入力チェック
@@ -78,21 +89,8 @@
       else{return true;}
     }
 
-    // 絶対的な特徴
-    function Category(data) {
-      if (data.length == 0) {
-        return "<p style='text-align:center;'>未訪問エリア内のスポットは，既訪問スポットと類似するスポットが見つかりません．</p>"
-      } else {
-        var set = []
-        for (var i = 0; i < data.length; i++) {
-          set[i] = "<tr><td>" + data[i]["cate_unspot"] + "</td><td>" + data[i]["cate_vispot"] + "</td><td>" + data[i]["cate_word"] + "</td></tr>"
-        }
-        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>イメージ語</th></tr>" + set + "</table>"
-      }
-    }
-
     // マップ作成 Start
-    var map;
+    /*var map;
     var marker = [];
     var infoWindow = [];
     // データを受け取る
@@ -111,8 +109,8 @@
         sum_lat = 0,
         sum_lng = 0;
       for (var i = 0; i < markerData.length; i++) {
-        sum_lat = sum_lat + Number(markerData[i]["unvis_lat"]);
-        sum_lng = sum_lng + Number(markerData[i]["unvis_lng"]);
+        sum_lat = sum_lat + Number(markerData[i]["unvis_lat_v"]);
+        sum_lng = sum_lng + Number(markerData[i]["unvis_lng_v"]);
         cnt += 1;
       }
       var mapLatLng = new google.maps.LatLng({
@@ -127,8 +125,8 @@
       // マーカー毎の処理
       for (var i = 0; i < markerData.length; i++) {
         markerLatLng = new google.maps.LatLng({
-          lat: Number(markerData[i]["unvis_lat"]),
-          lng: Number(markerData[i]["unvis_lng"])
+          lat: Number(markerData[i]["unvis_lat_v"]),
+          lng: Number(markerData[i]["unvis_lng_v"])
         }); // 緯度経度のデータ作成
         marker[i] = new google.maps.Marker({ // マーカーの追加
           position: markerLatLng, // マーカーを立てる位置を指定
@@ -137,10 +135,14 @@
 
         infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
           // 吹き出しに表示する内容
-          content: "<table border='1' id='window'><tr><th>スポット名</th><td>" + markerData[i]["unvis_name"] + "</td></tr><tr><th>既訪問スポット名</th><td>" + markerData[i]["vis_name"] + "</td</tr><tr><th>イメージ語</th><td>" + markerData[i]["word"] + "</td></tr></table>"
+          infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+          // 吹き出しに表示する内容
+          content: "<table border='1' id='window'><tr><th>スポット名</th><td>" + markerData[i]["unvis_name_v"] + "</td></tr><tr><th>既訪問スポット名</th><td>" + markerData[i]["vis_name_v"] + "</td</tr><tr><th>イメージ語</th><td>" + markerData[i]["word_v"] + "</td></tr></table>"
+        });
         });
         markerEvent(i); // マーカーにクリックイベントを追加
       }
+      return infoWindow;
     }
     // マーカーにクリックイベントを追加
     var currentInfoWindow = null;
@@ -152,16 +154,63 @@
         infoWindow[i].open(map, marker[i]); // 吹き出しの表示
         currentInfoWindow = infoWindow[i]
       });
-    }
+    }*/
     // マップ作成 Finish
 
+    // 絶対的な特徴(カテゴリー)
+    function Category(data) {
+      if (data.length == 0) {
+        return "<p style='text-align:center;'>未訪問エリア内のスポットは，既訪問スポットと類似するスポットが見つかりません．</p>"
+      } else {
+        var set = []
+        var all = []
+        for (var i = 0; i < data.length; i++) {
+          set[i] = "<tr><td class='unv'>" + data[i]["unvis_name_c"] + "</td><td class='vis'>" + data[i]["vis_name_c"] + "</td><td class='hyouka_name'>悪い　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='5'>　良い</td><td class= 'word'>" + data[i]["word_c"] + "</td><td class='hyouka_word'>悪い　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='5'>　良い</td></tr>"
+          all.push(set[i])
+        }
+        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>評価</th><th>イメージ語</th><th>評価</th></tr>" + set.join("") + "</table>"
+      }
+    }
+
+    // 絶対的な特徴(特徴ベクトル)
+    function Feature(data) {
+      if (data.length == 0) {
+        return "<p style='text-align:center;'>未訪問エリア内のスポットは，既訪問スポットと類似するスポットが見つかりません．</p>"
+      } else {
+        var set = []
+        for (var i = 0; i < data.length; i++) {
+          set[i] = "<tr><td class='unv'>" + data[i]["unvis_name_f"] + "</td><td class='vis'>" + data[i]["vis_name_f"] + "</td><td class='hyouka_name'>悪い　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='5'>　良い</td><td class='word'>" + data[i]["word_f"] + "</td><td class='hyouka_word'>悪い　<input type='radio' name='" + data[i]["unvis_name_f"] + "_res：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "_res：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_f"] +  "_res：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "_res：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "_res：' value='5'>　良い</td></tr>"
+        }
+        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>評価</th><th>イメージ語</th><th>評価</th></tr>" + set.join("") + "</table>"
+      }
+    }
+
+    function Vector(data) {
+      if (data.length == 0) {
+        return "<p style='text-align:center;'>未訪問エリア内のスポットは，既訪問スポットと類似するスポットが見つかりません．</p>"
+      } else {
+        var set = []
+        var all = []
+        for (var i = 0; i < data.length; i++) {
+          set[i] = "<tr><td class='unv'>" + data[i]["unvis_name_v"] + "</td><td class='vis'>" + data[i]["vis_name_v"] + "</td><td class='hyouka_name'>悪い　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='5'>　良い</td><td class= 'word'>" + data[i]["word_v"] + "</td><td class='hyouka_word'>悪い　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='5'>　良い</td></tr>"
+          all.push(set[i])
+        }
+        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>評価</th><th>イメージ語</th><th>評価</th></tr>" + set.join("") + "</table>"
+      }
+    }
+
+    var res = 0;
+    var category = 0;
+    var feature = 0;
+    var info = 0;
+    var record_id = 0;
     // データの送信Ajax
-    $(document).ready(function() {
+    var foo = $(document).ready(function() {
       $("#form").submit(function() {
         event.preventDefault();
         var $form = $(this);
         $.ajax({
-            url: "http://127.0.0.1:8000/cgi-bin/analogy/processing.py",
+            url: "./cgi-bin/analogy/processing.py",
             type: "post",
             dataType: "text",
             data: {
@@ -172,17 +221,90 @@
             },
           })
           .done(function(response) { //データを受信
-            var res = $.parseJSON(response); //受信したデータをjson形式に変更
-            // res[0]は提案手法，res[1]は絶対的な特徴，res[2]はrandom
-            console.log(res[1]);
-            var category = Category(res[1]);
-            $(".cate_result").html(category);
-
+            // console.log(response);
+            res = $.parseJSON(response); //受信したデータをjson形式に変更
+            // res[0]は絶対(カテゴリー)，res[1]は絶対(特徴)，res[2]は相対(差分)，res[3]はrandom，res[4]はrecord_id
             console.log(res[0]);
-            initMap(res[0]);
+            category = Category(res[0]);
+            $(".category_result").html(category);
+
+            console.log(res[1]);
+            feature = Feature(res[1]);
+            $(".feature_result").html(feature);
 
             console.log(res[2]);
-            $(".code").html(res[2]["randomname"]);
+            vector = Vector(res[2]);
+            $(".vector_result").html(vector);
+
+            console.log(res[3]);
+            $(".code").html(res[3]["randomname"]);
+
+            console.log(res[4]);
+            record_id = res[4]
+
+            // initMap(res[2]);
+          })
+          .fail(function() {
+            $(".result").html("Failed.");
+          });
+      });
+    });
+
+    function Insert_Data(data){
+      var hyouka = [];
+      var result = [];
+      if(data.length==0 || data.length==1){
+        return [0,0]
+      }
+      for (var i = 0; i < data.length; i++) {
+        if(i==0){
+          continue
+        }
+        name1 = data.eq(i).find("input:checked").eq(0).attr("name");
+        val1 = data.eq(i).find("input:checked").eq(0).val();
+        name2 = data.eq(i).find("input:checked").eq(1).attr("name");
+        val2 = data.eq(i).find("input:checked").eq(1).val();
+        hyouka.push(name1 + val1);
+        result.push(name2 + val2);
+      }
+      console.log(hyouka);
+      console.log(result);
+      return [hyouka,result]
+    }
+
+    // データの送信Ajax
+    $(document).ready(function() {
+      $("#form_result").submit(function() {
+        event.preventDefault();
+        var $form = $(this);
+
+        temp = $(".category_result").find("tr");
+        category = Insert_Data(temp)
+
+        temp = $(".feature_result").find("tr");
+        feature = Insert_Data(temp)
+
+        temp = $(".vector_result").find("tr");
+        vector = Insert_Data(temp)
+
+        $.ajax({
+            url: "./cgi-bin/analogy/insert_mysql.py",
+            type: "post",
+            dataType: "text",
+            data: {
+              record_id: record_id["record_id"],
+              hyouka_name_category: category[0],
+              hyouka_word_category: category[1],
+              hyouka_name_feature: feature[0],
+              hyouka_word_feature: feature[1],
+              hyouka_name_vector: vector[0],
+              hyouka_word_vector: vector[1],
+            },
+          })
+          .done(function(response) { //データを受信
+            // console.log(response);
+            // res = $.parseJSON(response);
+            // console.log(res);
           })
           .fail(function() {
             $(".result").html("Failed.");

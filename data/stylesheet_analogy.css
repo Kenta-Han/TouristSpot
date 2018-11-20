@@ -5,7 +5,7 @@ body {
 
 h1{text-align: center;}
 
-form {
+form{
   text-align: center;
   margin: 4% auto;
 }
@@ -22,8 +22,6 @@ form {
   margin: auto;
   text-align: center;
 }
-
-
 
 .image {
   margin: auto;
@@ -69,6 +67,42 @@ form {
   /* 文字色     */
 }
 
+#finish{
+  display: inline-block;
+  border-radius: 5%;
+  /* 角丸       */
+  font-size: 16px;
+  /* 文字サイズ */
+  text-align: center;
+  /* 文字位置   */
+  cursor: pointer;
+  /* カーソル   */
+  padding: 12px 20px;
+  /* 余白       */
+  background: #000066;
+  /* 背景色     */
+  color: #ffffff;
+  /* 文字色     */
+  line-height: 1em;
+  /* 1行の高さ  */
+  transition: .3s;
+  /* なめらか変化 */
+  box-shadow: 6px 6px 3px #666666;
+  /* 影の設定 */
+  border: 2px solid #000066;
+  /* 枠の指定 */
+  margin: 1% auto;
+}
+
+#finish:hover {
+  box-shadow: none;
+  /* カーソル時の影消去 */
+  color: #000066;
+  /* 背景色     */
+  background: #ffffff;
+  /* 文字色     */
+}
+
 .category{
   width: 100%;
 }
@@ -105,4 +139,24 @@ th{
 
 #window{
   width: 100%;
+}
+
+/* table 設定*/
+.unv{
+  width: 12%;
+}
+.vis{
+  width: 12%;
+}
+.hyouka_name{
+  width: 250px;
+  text-align: center;
+}
+.hyouka_word{
+  width: 250px;
+  text-align: center;
+}
+.word{
+  /* width: 30%; */
+  text-align: left;
 }
