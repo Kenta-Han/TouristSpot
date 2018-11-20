@@ -113,7 +113,7 @@ def Count_word(data):
         result.append(temp)
     return result
 
-## 絶対的な特徴(カテゴリーと呼ぶ)
+## 絶対的な特徴(カテゴリー)
 def Category_Main(visited_spot_id_list,unvisited_spot_id_list):
     cate_vispot = Category_Data(visited_spot_id_list)
     cate_unspot = Category_Data(unvisited_spot_id_list)
