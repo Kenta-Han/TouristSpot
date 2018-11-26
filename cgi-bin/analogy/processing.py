@@ -45,6 +45,7 @@ record_id = cur.fetchone()[0]
 ## [伏見稲荷大社,鹿苑寺（金閣寺）,龍安寺,清水寺,八坂神社]
 visited_spot_id_list = ['spt_26109ag2130015470','spt_26101ag2130014551','spt_26108ag2130015438','spt_26105ag2130012063','spt_26105ag2130010617']
 
+
 ## 既訪問を利用
 # history_list = []
 # user_spot = [] ## 履歴スポット
@@ -125,16 +126,19 @@ for i in range(len(visited_spot_vectors)):
     visited_spot_review_all.append(list(visited_spot_vectors[i][2:-1]))
     unvisited_spot_review_all.append(list(unvisited_spot_vectors[i][2:-1]))
 result_VtoU_top,result_UtoV_top = myp_doc_rec.Recommend_All(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
+## 類似度高い順でソート
+result_VtoU_top.sort(key=lambda x:x[1][1],reverse=True)
+result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 
 ## 既訪問スポットの単語に重みつけ
-select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd2 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd2".format(tuple(visited_spot_id_list))
+select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd2 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd2;".format(tuple(visited_spot_id_list))
 ## TFIDFを実行するための整理
 visited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_visited_spot_reviews)
 ## TFIDF計算，平均計算
 visited_tfidf,visited_mean = myp_tfidf.Tfidf(visited_spot_reviews)
 
 ## 未訪問スポットの単語に重みつけ
-select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd2 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd2".format(tuple(unvisited_spot_id_list))
+select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd2 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd2;".format(tuple(unvisited_spot_id_list))
 unvisited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_unvisited_spot_reviews)
 unvisited_tfidf,unvisited_mean = myp_tfidf.Tfidf(unvisited_spot_reviews)
 
@@ -160,6 +164,9 @@ for i in range(len(unvisited_spot_vectors_doc)):
     unvisited_spot_name_all.append(unvisited_spot_vectors_doc[i][0])
     unvisited_spot_review_all.append(unvisited_spot_vectors_doc[i][1])
 result_VtoU_top,result_UtoV_top = myp_doc_rec.Recommend_All(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
+## 類似度高い順でソート
+result_VtoU_top.sort(key=lambda x:x[1][1],reverse=True)
+result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 
 ## 既訪問スポットの単語に重みつけ
 select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd2 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd2".format(tuple(visited_spot_id_list))
@@ -174,31 +181,33 @@ unvisited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_unvisited_spot_reviews
 unvisited_tfidf,unvisited_mean = myp_tfidf.Tfidf(unvisited_spot_reviews)
 
 ## 既訪問と未訪問スポット特徴語TOP10(相加平均)
-# VtoU_top10 = myp_mean.Sort_TFIDF_VtoU(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
-# UtoV_top10 = myp_mean.Sort_TFIDF_UtoV(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
+# VtoU_top10_mean = myp_mean.Sort_TFIDF_VtoU(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
+UtoV_top10_mean = myp_mean.Sort_TFIDF_UtoV(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
 
 ## 既訪問と未訪問スポット特徴語TOP10(調和平均)
-# VtoU_top10 = myp_hmean.Sort_TFIDF_VtoU_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
-UtoV_top10 = myp_hmean.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
+# VtoU_top10_harmonic = myp_hmean.Sort_TFIDF_VtoU_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
+UtoV_top10_harmonic = myp_hmean.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
 
 
 ############################################################
 ## レスポンス作成，mysqlに入れるためのカラム内容作成
 ############################################################
-sql_cate_unvis,sql_cate_vis,sql_cate_word,json_category = myp_res.Response_Category(category_top10)
+sql_cate_unvis,sql_cate_vis,sql_cate_word,json_category = myp_res.Response_Category(category_top10[:15])
 
-sql_unvis_f,sql_vis_f,sql_cossim_f,sql_lat_f,sql_lng_f,sql_word_f,json_vector_f = myp_res.Response_Vector_Feature(UtoV_top10_Feature,name,lat,lng)
+sql_unvis_f,sql_vis_f,sql_cossim_f,sql_lat_f,sql_lng_f,sql_word_f,json_vector_f = myp_res.Response_Feature(UtoV_top10_Feature[:15],name,lat,lng)
 
-sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_vector = myp_res.Response_Vector(UtoV_top10,name,lat,lng)
+sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_vector = myp_res.Response_Vector_Harmonic(UtoV_top10_harmonic[:15],name,lat,lng)
+
+sql_word_m,json_vector_m = myp_res.Response_Vector_Mean(UtoV_top10_mean[:15])
 
 random,json_random = myp_res.Response_Random()
 
-myp_res.Response(json_category,json_vector_f,json_vector,json_random,record_id)
+myp_res.Response(json_category,json_vector_f,json_vector,json_vector_m,json_random,record_id)
 
 
 ############################################################
 ## DBにデータ挿入
 ############################################################
-sql_update = "UPDATE map_test SET code='{code}', unvis_name_c='{c_un}', vis_name_c='{c_vis}', word_c='{c_word}', unvis_name_f='{unv_f}', vis_name_f='{vis_f}', cossim_f='{cos_f}', word_f='{word_f}', unvis_lat_f='{lat_f}', unvis_lng_f='{lng_f}', unvis_name_v='{unv}', vis_name_v='{vis}', cossim_v='{cos}', word_v='{word}', unvis_lat_v='{lat}', unvis_lng_v='{lng}' WHERE id = {record_id};".format(code=random, c_un='，'.join(sql_cate_unvis), c_vis='，'.join(sql_cate_vis), c_word=sql_cate_word, unv_f='，'.join(sql_unvis_f), vis_f='，'.join(sql_vis_f), cos_f='，'.join(sql_cossim_f), word_f=sql_word_f, lat_f='，'.join(sql_lat_f), lng_f='，'.join(sql_lng_f), unv='，'.join(sql_unvis), vis='，'.join(sql_vis), cos='，'.join(sql_cossim), word=sql_word, lat='，'.join(sql_lat), lng='，'.join(sql_lng), record_id=record_id)
+sql_update = "UPDATE map_test SET code='{code}', unvis_name_c='{c_un}', vis_name_c='{c_vis}', word_c='{c_word}', unvis_name_f='{unv_f}', vis_name_f='{vis_f}', cossim_f='{cos_f}', word_f='{word_f}', unvis_lat_f='{lat_f}', unvis_lng_f='{lng_f}', unvis_name_v='{unv}', vis_name_v='{vis}', cossim_v='{cos}', word_v='{word}', unvis_lat_v='{lat}', unvis_lng_v='{lng}', word_v_m='{word_m}'  WHERE id = {record_id};".format(code=random, c_un='，'.join(sql_cate_unvis), c_vis='，'.join(sql_cate_vis), c_word=sql_cate_word, unv_f='，'.join(sql_unvis_f), vis_f='，'.join(sql_vis_f), cos_f='，'.join(sql_cossim_f), word_f=sql_word_f, lat_f='，'.join(sql_lat_f), lng_f='，'.join(sql_lng_f), unv='，'.join(sql_unvis), vis='，'.join(sql_vis), cos='，'.join(sql_cossim), word=sql_word, lat='，'.join(sql_lat), lng='，'.join(sql_lng), word_m=sql_word_m, record_id=record_id)
 cur.execute(sql_update)
 conn.commit()

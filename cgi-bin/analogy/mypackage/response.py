@@ -45,7 +45,7 @@ def Response_Category(cate):
     return sql_unvis,sql_vis,sql_word,json_category
 
 ##　絶対的な特徴（特徴ベクトル）のjson形式整理
-def Response_Vector_Feature(data,name,lat,lng):
+def Response_Feature(data,name,lat,lng):
     json_feature = []
     temp_sql_word = []
     sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = [],[],[],[],[],""
@@ -89,9 +89,8 @@ def Response_Vector_Feature(data,name,lat,lng):
 
     return sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_feature
 
-
-##　相対的な特徴（差分ベクトル）のjson形式整理
-def Response_Vector(data,name,lat,lng):
+##　相対的な特徴（差分ベクトルー調和平均）のjson形式整理
+def Response_Vector_Harmonic(data,name,lat,lng):
     json_vector = []
     temp_sql_word = []
     sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = [],[],[],[],[],""
@@ -135,9 +134,43 @@ def Response_Vector(data,name,lat,lng):
 
     return sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_vector
 
-def Response(category,feature,vector,random,record_id):
+##　相対的な特徴（差分ベクトルー相加平均）のjson形式整理
+def Response_Vector_Mean(data):
+    json_vector = []
+    temp_sql_word = []
+    sql_word = ""
+
+    for i in range(len(data)):
+        response_json = {"unvis_name_v_m":"","vis_name_v_m":"","cossim_v_m":"","word_v_m":""}
+
+        response_json["unvis_name_v_m"] = data[i][0]
+        response_json["vis_name_v_m"] = data[i][1]
+        response_json["cossim_v_m"] = data[i][2]
+
+        word_list = []
+        temp = []
+        for j in range(len(data[i][3])):
+            try:
+                word_list.append(data[i][3][j][0])
+                temp.append(data[i][3][j][0])
+            except TypeError:
+                continue
+        response_json["word_v_m"] = word_list
+        temp_sql_word.append(temp)
+
+        json_vector.append(response_json)
+
+    for l in range(len(temp_sql_word)):
+        tmp = "，".join(temp_sql_word[l]) + " -- "
+        sql_word += tmp
+    sql_word = sql_word[:-4]
+
+    return sql_word,json_vector
+
+
+def Response(category,feature,vector,vector_mean,random,record_id):
     json_record = {"record_id":""}
     json_record["record_id"] = record_id
     all_json = []
-    all_json = [category] + [feature] + [vector] + [random] + [json_record]
+    all_json = [category] + [feature] + [vector] + [vector_mean] + [random] + [json_record]
     print(json.dumps(all_json)) ## 送信

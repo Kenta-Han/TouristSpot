@@ -72,5 +72,6 @@ def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
                     # ,set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)
-        top10.append([result[i][0],result[i][1][0],all[i][:10]])
+        ## 未訪問，既訪問，類似度，単語
+        top10.append([result[i][0],result[i][1][0],result[i][1][1],all[i][:10]])
     return top10
