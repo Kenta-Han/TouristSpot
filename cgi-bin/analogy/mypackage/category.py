@@ -88,7 +88,7 @@ def Level(level1,level2,level3):
                 review_by_spot = Select_Review(level1)
                 level = level1
             else:
-                review_by_spot = 0
+                review_by_spot = []
                 level = 0
     return level,review_by_spot
 

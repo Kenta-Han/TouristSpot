@@ -194,22 +194,22 @@ UtoV_top10_harmonic = myp_hmean.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited
 ############################################################
 ## レスポンス作成，mysqlに入れるためのカラム内容作成
 ############################################################
-sql_cate_unvis,sql_cate_vis,sql_cate_word,json_category = myp_res.Response_Category(category_top10[:10])
+sql_unvis_c,sql_vis_c,sql_word_c,json_category = myp_res.Response_Category(category_top10[:3])
 
-sql_unvis_f,sql_vis_f,sql_cossim_f,sql_lat_f,sql_lng_f,sql_word_f,json_vector_f = myp_res.Response_Feature(UtoV_top10_Feature[:10],name,lat,lng)
+sql_unvis_f,sql_vis_f,sql_cossim_f,sql_lat_f,sql_lng_f,sql_word_f,json_feature = myp_res.Response_Feature(UtoV_top10_Feature[:3],name,lat,lng)
 
-sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_vector = myp_res.Response_Vector_Harmonic(UtoV_top10_harmonic[:10],name,lat,lng)
+sql_unvis_h,sql_vis_h,sql_cossim_h,sql_lat_h,sql_lng_h,sql_word_h,json_harmonic = myp_res.Response_Harmonic(UtoV_top10_harmonic[:3],name,lat,lng)
 
-sql_word_m,json_vector_m = myp_res.Response_Vector_Mean(UtoV_top10_mean[:10])
+sql_word_m,json_mean = myp_res.Response_Mean(UtoV_top10_mean[:3])
 
 random,json_random = myp_res.Response_Random()
 
-myp_res.Response(json_category,json_vector_f,json_vector,json_vector_m,json_random,record_id)
+myp_res.Response(json_category,json_feature,json_harmonic,json_mean,json_random,record_id)
 
 
 ############################################################
 ## DBにデータ挿入
 ############################################################
-sql_update = "UPDATE map_test SET code='{code}', unvis_name_c='{c_un}', vis_name_c='{c_vis}', word_c='{c_word}', unvis_name_f='{unv_f}', vis_name_f='{vis_f}', cossim_f='{cos_f}', word_f='{word_f}', unvis_lat_f='{lat_f}', unvis_lng_f='{lng_f}', unvis_name_v='{unv}', vis_name_v='{vis}', cossim_v='{cos}', word_v='{word}', unvis_lat_v='{lat}', unvis_lng_v='{lng}', word_v_m='{word_m}'  WHERE id = {record_id};".format(code=random, c_un='，'.join(sql_cate_unvis), c_vis='，'.join(sql_cate_vis), c_word=sql_cate_word, unv_f='，'.join(sql_unvis_f), vis_f='，'.join(sql_vis_f), cos_f='，'.join(sql_cossim_f), word_f=sql_word_f, lat_f='，'.join(sql_lat_f), lng_f='，'.join(sql_lng_f), unv='，'.join(sql_unvis), vis='，'.join(sql_vis), cos='，'.join(sql_cossim), word=sql_word, lat='，'.join(sql_lat), lng='，'.join(sql_lng), word_m=sql_word_m, record_id=record_id)
+sql_update = "UPDATE map_test SET code='{code}', unvis_name_c='{unv_c}', vis_name_c='{vis_c}', word_c='{word_c}', unvis_name_f='{unv_f}', vis_name_f='{vis_f}', cossim_f='{cos_f}', word_f='{word_f}', unvis_lat_f='{lat_f}', unvis_lng_f='{lng_f}', unvis_name_h='{unv_h}', vis_name_h='{vis_h}', cossim_h='{cos_h}', word_h='{word_h}', unvis_lat_h='{lat_h}', unvis_lng_h='{lng_h}', word_m='{word_m}'  WHERE id = {record_id};".format(code=random, unv_c='，'.join(sql_unvis_c), vis_c='，'.join(sql_vis_c), word_c=sql_word_c, unv_f='，'.join(sql_unvis_f), vis_f='，'.join(sql_vis_f), cos_f='，'.join(sql_cossim_f), word_f=sql_word_f, lat_f='，'.join(sql_lat_f), lng_f='，'.join(sql_lng_f), unv_h='，'.join(sql_unvis_h), vis_h='，'.join(sql_vis_h), cos_h='，'.join(sql_cossim_h), word_h=sql_word_h, lat_h='，'.join(sql_lat_h), lng_h='，'.join(sql_lng_h), word_m=sql_word_m, record_id=record_id)
 cur.execute(sql_update)
 conn.commit()

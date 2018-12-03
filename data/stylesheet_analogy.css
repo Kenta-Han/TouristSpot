@@ -162,20 +162,15 @@ th {
 
 /* table 設定*/
 .unv {
-  width: 12%;
+  width: 18%;
 }
 
 .vis {
-  width: 12%;
-}
-
-.hyouka_name {
-  width: 250px;
-  text-align: center;
+  width: 18%;
 }
 
 .hyouka_word {
-  width: 250px;
+  width: 200px;
   text-align: center;
 }
 

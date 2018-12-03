@@ -91,28 +91,28 @@ def Response_Feature(data,name,lat,lng):
     return sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_feature
 
 ##　相対的な特徴（差分ベクトルー調和平均）のjson形式整理
-def Response_Vector_Harmonic(data,name,lat,lng):
-    json_vector = []
+def Response_Harmonic(data,name,lat,lng):
+    json_harmonic = []
     temp_sql_word = []
     sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = [],[],[],[],[],""
 
     for i in range(len(data)):
-        response_json = {"unvis_name_v":"","vis_name_v":"","cossim_v":"","unvis_lat_v":"","unvis_lng_v":"","word_v":""}
+        response_json = {"unvis_name_h":"","vis_name_h":"","cossim_h":"","unvis_lat_h":"","unvis_lng_h":"","word_h":""}
 
-        response_json["unvis_name_v"] = data[i][0]
+        response_json["unvis_name_h"] = data[i][0]
         sql_unvis.append(data[i][0])
 
-        response_json["vis_name_v"] = data[i][1]
+        response_json["vis_name_h"] = data[i][1]
         sql_vis.append(data[i][1])
 
-        response_json["cossim_v"] = data[i][2]
+        response_json["cossim_h"] = data[i][2]
         sql_cossim.append(str(data[i][2]))
 
         for k in range(len(name)):
             if data[i][0] == name[k]:
-                response_json["unvis_lat_v"] = lat[k]
+                response_json["unvis_lat_h"] = lat[k]
                 sql_lat.append(lat[k])
-                response_json["unvis_lng_v"] = lng[k]
+                response_json["unvis_lng_h"] = lng[k]
                 sql_lng.append(lng[k])
 
         word_list = []
@@ -123,30 +123,30 @@ def Response_Vector_Harmonic(data,name,lat,lng):
                 temp.append(data[i][3][j][0])
             except TypeError:
                 continue
-        response_json["word_v"] = word_list
+        response_json["word_h"] = word_list
         temp_sql_word.append(temp)
 
-        json_vector.append(response_json)
+        json_harmonic.append(response_json)
 
     for l in range(len(temp_sql_word)):
         tmp = "，".join(temp_sql_word[l]) + " -- "
         sql_word += tmp
     sql_word = sql_word[:-4]
 
-    return sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_vector
+    return sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_harmonic
 
 ##　相対的な特徴（差分ベクトルー相加平均）のjson形式整理
-def Response_Vector_Mean(data):
-    json_vector = []
+def Response_Mean(data):
+    json_mean = []
     temp_sql_word = []
     sql_word = ""
 
     for i in range(len(data)):
-        response_json = {"unvis_name_v_m":"","vis_name_v_m":"","cossim_v_m":"","word_v_m":""}
+        response_json = {"unvis_name_m":"","vis_name_m":"","cossim_m":"","word_m":""}
 
-        response_json["unvis_name_v_m"] = data[i][0]
-        response_json["vis_name_v_m"] = data[i][1]
-        response_json["cossim_v_m"] = data[i][2]
+        response_json["unvis_name_m"] = data[i][0]
+        response_json["vis_name_m"] = data[i][1]
+        response_json["cossim_m"] = data[i][2]
 
         word_list = []
         temp = []
@@ -156,22 +156,22 @@ def Response_Vector_Mean(data):
                 temp.append(data[i][3][j][0])
             except TypeError:
                 continue
-        response_json["word_v_m"] = word_list
+        response_json["word_m"] = word_list
         temp_sql_word.append(temp)
 
-        json_vector.append(response_json)
+        json_mean.append(response_json)
 
     for l in range(len(temp_sql_word)):
         tmp = "，".join(temp_sql_word[l]) + " -- "
         sql_word += tmp
     sql_word = sql_word[:-4]
 
-    return sql_word,json_vector
+    return sql_word,json_mean
 
 
-def Response(category,feature,vector,vector_mean,random,record_id):
-    json_record = {"record_id":""}
-    json_record["record_id"] = record_id
+def Response(category,feature,harmonic,mean,random,record_id):
+    record = {"record_id":""}
+    record["record_id"] = record_id
     all_json = []
-    all_json = [category] + [feature] + [vector] + [vector_mean] + [random] + [json_record]
+    all_json = [category] + [feature] + [harmonic] + [mean] + [random] + [record]
     print(json.dumps(all_json)) ## 送信
