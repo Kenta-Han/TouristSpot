@@ -1,10 +1,53 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <link href="/data/stylesheet_analogy.css" rel="stylesheet" type="text/css" />
+  <link href="./data/stylesheet_analogy.css" rel="stylesheet" type="text/css" />
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+  <script type="text/javascript" src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
   <title>観光スポット類推情報提示</title>
+  <script>
+  $(function () {
+    $.ajax({
+      url:'./data/txt/spot.txt',
+      success: function(data){
+        var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+        $('.visited').autocomplete({
+          source: datam,
+          autoFocus: true,
+          delay: 300,
+          minLength: 2
+        });
+      }
+    })
+    $.ajax({
+      url:'./data/txt/area1.txt',
+      success: function(data){
+        var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+        $('#prefecture').autocomplete({
+          source: datam,
+          // autoFocus: true,
+          delay: 300,
+          minLength: 1
+        });
+      }
+    })
+    $.ajax({
+      url:'./data/txt/area2.txt',
+      success: function(data){
+        var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+        $('#area').autocomplete({
+          source: datam,
+          // autoFocus: true,
+          delay: 300,
+          minLength: 2
+        });
+      }
+    })
+  });
+  </script>
 </head>
 
 <body>
@@ -13,86 +56,111 @@
   </header>
 
   <div class="left">
-    <form id="form" name="form1" onSubmit="return check()">
+    <form id="form" name="form1">
       <h3>CrowdWorksID(必須)：
-        <input type="text" id="user_id" name="user_id" maxlength="40" style="width: 180px;height: 24px;font-size:16px;" placeholder="CrowdWorksID" />
+        <input type="text" id="user_id" name="user_id" maxlength="40" placeholder="CrowdWorksID" />
       </h3>
 
       <h3>既訪問スポット名を3つ以上入力してください(必須)：</h3>
-      <h3>
-        <textarea id="visited" name="visited" style="width:70%; height:150px; font-size:16px;" placeholder="清水寺，京都，金閣寺，京都，新宿御苑，東京，海遊館，大阪" /></textarea>
-      </h3>
+      <ol>
+        <li><input type="text" class="visited" name="visited"/></li>
+        <li><input type="text" class="visited" name="visited"/></li>
+        <li><input type="text" class="visited" name="visited"/></li>
+        <li><input type="text" class="visited" name="visited"/></li>
+        <li><input type="text" class="visited" name="visited"/></li>
+        <li><input type="text" class="visited" name="visited"/></li>
+        <li><input type="text" class="visited" name="visited"/></li>
+        <li><input type="text" class="visited" name="visited"/></li>
+        <li><input type="text" class="visited" name="visited"/></li>
+        <li><input type="text" class="visited" name="visited"/></li>
+      </ol>
 
-      <p style="text-align:center;">訪問したいエリアを入力してください</p>
+      <h3 style="text-align:center;">訪問したいエリアを入力してください</h3>
       <h3>都道府県(必須)：
-        <input type="text" id="prefecture" name="prefecture" style="width:200px; height:24px; font-size:16px;" placeholder="石川" />
+        <input type="text" id="prefecture" name="prefecture" placeholder="石川" />
       </h3>
 
       <h3>エリア：
-        <input type="text" id="area" name="area" style="width:200px; height:24px; font-size:16px;" placeholder="金沢" />
+        <input type="text" id="area" name="area" placeholder="金沢" />
       </h3>
-
-      <input type="submit" id="start" value="実験開始" />
+      <input type="submit" id="start" value="実験開始(結果はページの下で表示)" />
     </form>
   </div>
 
   <div class="right">
     <h2 style="color:red;">注意事項！！</h2>
     <h3>== CrowdWorksIDについて ==</h3>
-    <div class="image"><img src="../../data/crowdworks_id_img.png"></div>
+    <div class="image"><img src="./data/crowdworks_id_img.png"></div>
     <h3>== 既訪問スポット名 ==</h3>
+    <p style="color:#ff0000">スポットを入れて，検索候補から選んでください<br></p>
     <p><a href="https://www.jalan.net/travel/?screenId=OUW1701&influxKbn=0" target="_blank">じゃらん</a>に存在するスポット名でお願い致します</p>
-    <p style="color:#ff0000">入力方式：スポット名，都道府県名，スポット名，..</p>
     <h3>== 都道府県の入力に関して ==</h3>
-    <p style="color:red;">◯良い例：東京，大阪，京都，神奈川，北海道</p>
-    <p>×悪い例：東京都，大阪府，京都府，神奈川県</p>
+    <p style="color:red;">都道府県名を入れて，検索候補から選択してください</p>
+    <p>それ以外の文字(都/府/県)の入力はできない</p>
+    <h3>== 結果の回答に関して ==</h3>
+    <p>結果1~3のローディングアイコン終了後回答してください</p>
+    <p><span style="color:red;">スポット名に対する評価：</span><br>スポット名のみを見る時，スポット間には関連があると思うですか</p>
+    <p><span style="color:red;">イメージ語に対する評価：</span><br>イメージ語を見た後のスポット間の関連性に対するイメージしやすくなりましたか<br>（イメージ語がなしの場合は「単語なし」を選択してください）</p>
   </div>
 
-  <p style="text-align:center;clear:both;font-size:16px;">「実験開始」をクリックしてから，結果を表示するまで数十秒がかかる場合があります<br><span style="color:#ff0000;">結果表示後「承認コード」をコピーしてください．</span></p>
+  <p style="text-align:center;clear:both;font-size:20px;"><br>「実験開始」をクリックしてから，結果を表示するまで数十秒がかかる場合があります<br><span style="color:#ff0000;">結果表示後「承認コード」をコピーして，結果を送信してください．</span></p>
 
-  <form id="form_result" name="form_result" >
-  <!-- 絶対的な特徴（カテゴリ） -->
-  <div class="category">
-    <h1>絶対的（カテゴリー）</h1>
-    <div class="category_result"></div>
-  </div>
+  <form id="form_result" name="form_result">
+    <!-- 絶対的な特徴（カテゴリ） -->
+    <div class="category">
+      <!-- <h1>絶対的（カテゴリー）</h1> -->
+      <h1>結果1：</h1>
+      <div class="category_result"></div>
+    </div>
 
-  <!-- 絶対的な特徴（特徴ベクトル） -->
-  <div class="feature">
-    <h1>絶対的（特徴ベクトル）</h1>
-    <div class="feature_result"></div>
-  </div>
+    <!-- 絶対的な特徴（特徴ベクトル） -->
+    <div class="feature">
+      <!-- <h1>絶対的（特徴ベクトル）</h1> -->
+      <h1>結果2：</h1>
+      <div class="feature_result"></div>
+    </div>
 
-  <!-- 相対的な特徴-調和平均 -->
-  <div class="result">
-    <h1>相対的な特徴（差分ベクトルー調和平均）</h1>
-    <!-- <div id="map"><iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205"
+    <!-- 相対的な特徴-調和平均 -->
+    <div class="result">
+      <!-- <h1>相対的な特徴（差分ベクトルー1.調和平均2.相加平均）</h1> -->
+      <h1>結果3：</h1>
+      <!-- <div id="map"><iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205"
         width="100%" height="750" frameborder="0" style="border:0" allowfullscreen></iframe></div>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script> -->
-    <div class="vector_result"></div>
-    <!-- <h1>承認コード：<span class="code"></span></h1> -->
-  </div>
-
-  <!-- 相対的な特徴-相加平均-->
-  <div class="result_mean">
-    <h1>相対的な特徴（差分ベクトルー相加平均）</h1>
-    <div class="vector_mean_result"></div>
-    <h1>承認コード：<span class="code"></span></h1>
-    <input type="submit" id="finish" value="結果送信" />
-  </div>
-
+      <div class="vector_result"></div>
+      <h1>承認コード：<span id="code"></span></h1>
+      <input type="submit" id="finish" value="結果送信" />
+    </div>
   </form>
 
   <script type="text/javascript">
     //未入力チェック
-    function check(){
+    function check() {
       var flag = 0;
-      if(document.form1.user_id.value == ""){flag = 1;}
-      else if(document.form1.visited.value == ""){flag = 1;}
-      else if(document.form1.prefecture.value == ""){flag = 1;}
+      var visited_list = []
+      $("input[name='visited']").each(function(){
+        if ($(this).val() != ""){
+          visited_list.push($(this).val());
+        }
+      });
 
-      if(flag){alert('必須項目に未入力がありました');return false;}
-      else{return true;}
+      if (document.form1.user_id.value == "") {
+        flag = 1;
+      }
+      else if (visited_list.filter(function(){return $("this").val()!=""}).length < 3) {
+        flag = 1;
+      }
+      else if (document.form1.prefecture.value == "") {
+        flag = 1;
+      }
+
+      if (flag == 1) {
+        // location.reload();
+        return false;
+      }
+      else {
+        return true;
+      }
     }
 
     // マップ作成 Start
@@ -171,10 +239,15 @@
         var set = []
         var all = []
         for (var i = 0; i < data.length; i++) {
-          set[i] = "<tr><td class='unv'>" + data[i]["unvis_name_c"] + "</td><td class='vis'>" + data[i]["vis_name_c"] + "</td><td class='hyouka_name'>悪い　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "：' value='5'>　良い</td><td class= 'word'>" + data[i]["word_c"] + "</td><td class='hyouka_word'>悪い　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_c"] + "_res：' value='5'>　良い</td></tr>"
+          set[i] = "<tr><td class='unv'>" + data[i]["unvis_name_c"] + "</td><td class='vis'>" + data[i]["vis_name_c"] + "</td><td class='hyouka_name'>思わない　<input type='radio' name='" + data[i]["unvis_name_c"] +
+          "_cate：' value='1'> <input type='radio' name='" + data[i]["unvis_name_c"] + "_cate：' value='2'> <input type='radio' name='" + data[i]["unvis_name_c"] + "_cate：' value='3'> <input type='radio' name='" + data[i]["unvis_name_c"] +
+          "_cate：' value='4'> <input type='radio' name='" + data[i]["unvis_name_c"] + "_cate：' value='5'>　思う</td><td class= 'word'>" + data[i]["word_c"] + "</td><td class='hyouka_word'>イメージ語なし　<input input type='radio' name='" + data[i]["unvis_name_c"] +
+          "_cate_res：' value='0'><br>悪い　<input type='radio' name='" + data[i]["unvis_name_c"] +
+          "_cate_res：' value='1'> <input type='radio' name='" + data[i]["unvis_name_c"] + "_cate_res：' value='2'> <input type='radio' name='" + data[i]["unvis_name_c"] + "_cate_res：' value='3'> <input type='radio' name='" + data[i]["unvis_name_c"] +
+          "_cate_res：' value='4'> <input type='radio' name='" + data[i]["unvis_name_c"] + "_cate_res：' value='5'>　良い</td></tr>"
           all.push(set[i])
         }
-        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>評価</th><th>イメージ語</th><th>評価</th></tr>" + set.join("") + "</table>"
+        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>スポット名に対する評価</th><th>イメージ語</th><th>イメージ語に対する評価</th></tr>" + set.join("") + "</table>"
       }
     }
 
@@ -184,38 +257,38 @@
         return "<p style='text-align:center;'>未訪問エリア内のスポットは，既訪問スポットと類似するスポットが見つかりません．</p>"
       } else {
         var set = []
+        var all = []
         for (var i = 0; i < data.length; i++) {
-          set[i] = "<tr><td class='unv'>" + data[i]["unvis_name_f"] + "</td><td class='vis'>" + data[i]["vis_name_f"] + "</td><td class='hyouka_name'>悪い　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "：' value='5'>　良い</td><td class='word'>" + data[i]["word_f"] + "</td><td class='hyouka_word'>悪い　<input type='radio' name='" + data[i]["unvis_name_f"] + "_res：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "_res：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_f"] +  "_res：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "_res：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_f"] + "_res：' value='5'>　良い</td></tr>"
+          set[i] = "<tr><td class='unv'>" + data[i]["unvis_name_f"] + "</td><td class='vis'>" + data[i]["vis_name_f"] + "</td><td class='hyouka_name'>思わない　<input type='radio' name='" + data[i]["unvis_name_f"] +
+          "_feat：' value='1'> <input type='radio' name='" + data[i]["unvis_name_f"] + "_feat：' value='2'> <input type='radio' name='" + data[i]["unvis_name_f"] + "_feat：' value='3'> <input type='radio' name='" + data[i]["unvis_name_f"] + "_feat：' value='4'> <input type='radio' name='" + data[i]["unvis_name_f"] + "_feat：' value='5'>　思う</td><td class='word'>" +
+          data[i]["word_f"] + "</td><td class='hyouka_word'>イメージ語なし　<input input type='radio' name='" + data[i]["unvis_name_f"] + "_feat_res：' value='0'><br>悪い　<input type='radio' name='" +
+          data[i]["unvis_name_f"] + "_feat_res：' value='1'> <input type='radio' name='" + data[i]["unvis_name_f"] + "_feat_res：' value='2'> <input type='radio' name='" + data[i]["unvis_name_f"] + "_feat_res：' value='3'> <input type='radio' name='" + data[i]["unvis_name_f"] + "_feat_res：' value='4'> <input type='radio' name='" + data[i]["unvis_name_f"] + "_feat_res：' value='5'>　良い</td></tr>"
+          all.push(set[i])
         }
-        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>評価</th><th>イメージ語</th><th>評価</th></tr>" + set.join("") + "</table>"
+        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>スポット名に対する評価</th><th>イメージ語</th><th>イメージ語に対する評価</th></tr>" + set.join("") + "</table>"
       }
     }
 
-    function Vector(data) {
+    //相対的な特徴
+    function Vector(data, mdata) {
       if (data.length == 0) {
         return "<p style='text-align:center;'>未訪問エリア内のスポットは，既訪問スポットと類似するスポットが見つかりません．</p>"
       } else {
         var set = []
         var all = []
         for (var i = 0; i < data.length; i++) {
-          set[i] = "<tr><td class='unv'>" + data[i]["unvis_name_v"] + "</td><td class='vis'>" + data[i]["vis_name_v"] + "</td><td class='hyouka_name'>悪い　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='5'>　良い</td><td class= 'word'>" + data[i]["word_v"] + "</td><td class='hyouka_word'>悪い　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='5'>　良い</td></tr>"
+          set[i] = "<tr class='row1'><td class='unv' rowspan='2'>" + data[i]["unvis_name_v"] + "</td><td class='vis' rowspan='2'>" + data[i]["vis_name_v"] + "</td><td class='hyouka_name' rowspan='2'>思わない　<input type='radio' name='" + data[i]["unvis_name_v"] +
+          "：' value='1'> <input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='2'> <input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='3'> <input type='radio' name='" + data[i]["unvis_name_v"] +
+          "：' value='4'> <input type='radio' name='" + data[i]["unvis_name_v"] + "：' value='5'>　思う</td><td class= 'word'>" + data[i]["word_v"] + "</td><td class='hyouka_word'>イメージ語なし　<input input type='radio' name='" + data[i]["unvis_name_v"] +
+          "_res：' value='0'><br>悪い　<input type='radio' name='" + data[i]["unvis_name_v"] +
+          "_res：' value='1'> <input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='2'> <input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='3'> <input type='radio' name='" + data[i]["unvis_name_v"] +
+          "_res：' value='4'> <input type='radio' name='" + data[i]["unvis_name_v"] + "_res：' value='5'>　良い</td></tr><tr  class='row2'><td class= 'word'>" + mdata[i]["word_v_m"] + "</td><td class='hyouka_word'>イメージ語なし　<input input type='radio' name='" + mdata[i]["unvis_name_v_m"] +
+          "_resm：' value='0'><br>悪い　<input type='radio' name='" + mdata[i]["unvis_name_v_m"] +
+          "_resm：' value='1'> <input type='radio' name='" + mdata[i]["unvis_name_v_m"] + "_resm：' value='2'> <input type='radio' name='" + mdata[i]["unvis_name_v_m"] + "_resm：' value='3'> <input type='radio' name='" + mdata[i]["unvis_name_v_m"] +
+          "_resm：' value='4'> <input type='radio' name='" + mdata[i]["unvis_name_v_m"] + "_resm：' value='5'>　良い</td></tr>"
           all.push(set[i])
         }
-        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>評価</th><th>イメージ語</th><th>評価</th></tr>" + set.join("") + "</table>"
-      }
-    }
-
-    function Vector_Mean(data) {
-      if (data.length == 0) {
-        return "<p style='text-align:center;'>未訪問エリア内のスポットは，既訪問スポットと類似するスポットが見つかりません．</p>"
-      } else {
-        var set = []
-        var all = []
-        for (var i = 0; i < data.length; i++) {
-          set[i] = "<tr><td class='unv'>" + data[i]["unvis_name_v_m"] + "</td><td class='vis'>" + data[i]["vis_name_v_m"] + "</td><td class='hyouka_name'>悪い　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "：' value='5'>　良い</td><td class= 'word'>" + data[i]["word_v_m"] + "</td><td class='hyouka_word'>悪い　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "_res：' value='1'>　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "_res：' value='2'>　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "_res：' value='3'>　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "_res：' value='4'>　<input type='radio' name='" + data[i]["unvis_name_v_m"] + "_res：' value='5'>　良い</td></tr>"
-          all.push(set[i])
-        }
-        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>評価</th><th>イメージ語</th><th>評価</th></tr>" + set.join("") + "</table>"
+        return "<table><tr><th>未訪問スポット</th><th>既訪問スポット</th><th>スポット名に対する評価</th><th>イメージ語</th><th>イメージ語に対する評価</th></tr>" + set.join("") + "</table>"
       }
     }
 
@@ -224,24 +297,37 @@
     var feature = 0;
     var info = 0;
     var record_id = 0;
+    var post_visited = [];
+    var category_len = 0;
+    var feature_len = 0;
+    var vector_len = 0;
     // データの送信Ajax
     $(document).ready(function() {
       $("#form").submit(function() {
         event.preventDefault();
-        var $form = $(this);
-        $.ajax({
+        if (check()==true) {
+          var $form = $(this);
+          $(".visited").each(function(){
+            if ($(this).val() != ""){
+              post_visited.push($(this).val());
+            }
+          });
+          $(".category_result").html("<div class='loader'>Loading...</div>");
+          $(".feature_result").html("<div class='loader'>Loading...</div>");
+          $(".vector_result").html("<div class='loader'>Loading...</div>");
+          $.ajax({
             url: "./cgi-bin/analogy/processing.py",
             type: "post",
             dataType: "text",
             data: {
               user_id: $("#user_id").val(),
-              visited_name: $("#visited").val(),
+              visited_name: post_visited,
               prefecture_name: $("#prefecture").val(),
               area_name: $("#area").val(),
             },
           })
           .done(function(response) { //データを受信
-            console.log(response);
+            // console.log(response);
             res = $.parseJSON(response); //受信したデータをjson形式に変更
             // res[0]は絶対(カテゴリー)，res[1]は絶対(特徴)，res[2]は相対(差分調和)，res[3]は相対(差分相加)，res[4]はrandom，res[5]はrecord_id
             console.log(res[0]);
@@ -253,35 +339,41 @@
             $(".feature_result").html(feature);
 
             console.log(res[2]);
-            vector = Vector(res[2]);
+            vector = Vector(res[2], res[3]);
             $(".vector_result").html(vector);
 
             console.log(res[3]);
-            vector_mean = Vector_Mean(res[3]);
-            $(".vector_mean_result").html(vector_mean);
 
             console.log(res[4]);
-            $(".code").html(res[4]["randomname"]);
+            $("#code").html(res[4]["randomname"]);
 
             console.log(res[5]);
             record_id = res[5]
+
+            category_len = res[0].length*2;
+            feature_len = res[1].length*2;
+            vector_len = res[2].length*3;
 
             // initMap(res[2]);
           })
           .fail(function() {
             $(".result").html("Failed.");
           });
+        }
+        else {
+          alert('必須項目に未入力がありました');
+        }
       });
     });
 
-    function Insert_Data(data){
+    function Insert_Data(data) {
       var hyouka = [];
       var result = [];
-      if(data.length==0 || data.length==1){
-        return [0,0]
+      if (data.length == 0 || data.length == 1) {
+        return [0, 0]
       }
       for (var i = 0; i < data.length; i++) {
-        if(i==0){
+        if (i == 0) {
           continue
         }
         name1 = data.eq(i).find("input:checked").eq(0).attr("name");
@@ -291,9 +383,39 @@
         hyouka.push(name1 + val1);
         result.push(name2 + val2);
       }
-      console.log(hyouka);
-      console.log(result);
-      return [hyouka,result]
+      // console.log(hyouka);
+      // console.log(result);
+      return [hyouka, result]
+    }
+
+    function Insert_Data_Row1(data) {
+      var hyouka = [];
+      var result = [];
+      if (data.length == 0 || data.length == 1) {
+        return [0, 0]
+      }
+      for (var i = 0; i < data.length; i++) {
+        name1 = data.eq(i).find("input:checked").eq(0).attr("name");
+        val1 = data.eq(i).find("input:checked").eq(0).val();
+        name2 = data.eq(i).find("input:checked").eq(1).attr("name");
+        val2 = data.eq(i).find("input:checked").eq(1).val();
+        hyouka.push(name1 + val1);
+        result.push(name2 + val2);
+      }
+      return [hyouka, result]
+    }
+
+    function Insert_Data_Row2(data) {
+      var result = [];
+      if (data.length == 0 || data.length == 1) {
+        return [0, 0]
+      }
+      for (var i = 0; i < data.length; i++) {
+        name = data.eq(i).find("input:checked").eq(0).attr("name");
+        val = data.eq(i).find("input:checked").eq(0).val();
+        result.push(name + val);
+      }
+      return result
     }
 
     // データの送信Ajax
@@ -302,19 +424,21 @@
         event.preventDefault();
         var $form = $(this);
 
-        temp = $(".category_result").find("tr");
-        category = Insert_Data(temp)
+        if ($(".category_result").find("input:checked").length==category_len &&  $(".feature_result").find("input:checked").length==feature_len && $(".vector_result").find("input:checked").length==vector_len){
+          temp = $(".category_result").find("tr");
+          category = Insert_Data(temp)
 
-        temp = $(".feature_result").find("tr");
-        feature = Insert_Data(temp)
+          temp = $(".feature_result").find("tr");
+          feature = Insert_Data(temp)
 
-        temp = $(".vector_result").find("tr");
-        vector = Insert_Data(temp)
+          temp = $(".vector_result").find(".row1");
+          console.log(temp)
+          vector = Insert_Data_Row1(temp)
 
-        temp = $(".vector_mean_result").find("tr");
-        vector_mean = Insert_Data(temp)
+          temp = $(".vector_result").find(".row2");
+          vector2 = Insert_Data_Row2(temp)
 
-        $.ajax({
+          $.ajax({
             url: "./cgi-bin/analogy/insert_mysql.py",
             type: "post",
             dataType: "text",
@@ -326,18 +450,22 @@
               hyouka_word_feature: feature[1],
               hyouka_name_vector: vector[0],
               hyouka_word_vector: vector[1],
-              hyouka_name_vector_m: vector_mean[0],
-              hyouka_word_vector_m: vector_mean[1],
-            },
+              hyouka_word_vector_m: vector2,
+              },
           })
           .done(function(response) { //データを受信
             // console.log(response);
             // res = $.parseJSON(response);
             // console.log(res);
+            window.location.href = "./index.html";
           })
           .fail(function() {
             $(".result").html("Failed.");
           });
+        }
+        else {
+          alert('チェックしてない内容がありました');
+        }
       });
     });
   </script>

@@ -1,6 +1,8 @@
 from tqdm import tqdm
+import re
 
-## 平均以上 or 0.01以上
+bytesymbols = re.compile("[!-/:*-@[-`{-~\d]") ## 半角記号，数字\d
+## 平均以上 or 0.01以上 or なし
 def Sort_TFIDF_VtoU(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean,unvis_mean,result):
     ## TFIDFの結果にスポット名を追加
     vis_spot,unvis_spot = [],[]
@@ -29,8 +31,8 @@ def Sort_TFIDF_VtoU(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
         for j in tqdm(range(len(set[0][i]))):
             for k in range(len(set[1][i])):
                 ## 同じ単語，値は共に平均以上
-                if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=visited_mean[i] and set[1][i][k][1]>=unvisited_mean[i]:
-                # if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=0.01 and set[1][i][k][1]>=0.01:
+                # if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=visited_mean[i] and set[1][i][k][1]>=unvisited_mean[i]:
+                if set[0][i][j][0]==set[1][i][k][0] and len(set[0][i][j][0])>1 and re.search(bytesymbols,set[0][i][j][0])==None:
                     temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1])])
                     # ,set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
         all.append(temp)
@@ -66,12 +68,13 @@ def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
         for j in tqdm(range(len(set[0][i]))):
             for k in range(len(set[1][i])):
                 ## 同じ単語，値は共に平均以上
-                if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=unvisited_mean[i] and set[1][i][k][1]>=visited_mean[i]:
-                # if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=0.01 and set[1][i][k][1]>=0.01:
+                if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=unvisited_mean[i]/2 and set[1][i][k][1]>=visited_mean[i]/2:
+                # if set[0][i][j][0]==set[1][i][k][0] and len(set[0][i][j][0])>1 and re.search(bytesymbols,set[0][i][j][0])==None:
                     temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1])])
                     # ,set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
+                    # temp.append([set[0][i][j][0],abs((set[0][i][j][1]+set[1][i][k][1])/2)])
         all.append(temp)
-        all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)
-        ## 未訪問，既訪問，類似度，単語
+        all[i].sort(key=lambda x:x[1]) ## 昇順0~1(0に近い程が良い)
+        ## 未訪問，既訪問，類似度，単語(最初の10個まで)
         top10.append([result[i][0],result[i][1][0],result[i][1][1],all[i][:10]])
     return top10

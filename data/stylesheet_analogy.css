@@ -3,11 +3,29 @@ body {
   margin: 3% auto;
 }
 
-h1{text-align: center;}
+h1 {
+  text-align: center;
+}
 
-form{
+form {
   text-align: center;
   margin: 4% auto;
+}
+
+ol {
+  width: 80%;
+  margin: auto;
+}
+
+li {
+  margin: 8px auto;
+  padding: 8px auto;
+}
+
+input[type="text"] {
+  width: 250px;
+  height: 24px;
+  font-size: 16px;
 }
 
 .left {
@@ -67,7 +85,7 @@ form{
   /* 文字色     */
 }
 
-#finish{
+#finish {
   display: inline-block;
   border-radius: 5%;
   /* 角丸       */
@@ -103,7 +121,7 @@ form{
   /* 文字色     */
 }
 
-.category{
+.category {
   width: 100%;
 }
 
@@ -111,18 +129,19 @@ form{
   width: 100%;
 }
 
-table{
+table {
   width: 100%;
   margin: auto;
 }
 
-th,td{
+th, td {
   border: solid 1px #000000;
-  padding : 7px 10px;
+  padding: 7px 10px;
 }
 
-th{
-  color:white; /*文字色*/
+th {
+  color: white;
+  /*文字色*/
   background-color: #2196f3;
 }
 
@@ -137,26 +156,79 @@ th{
   margin: 0 8px 0 8px;
 }
 
-#window{
+#window {
   width: 100%;
 }
 
 /* table 設定*/
-.unv{
+.unv {
   width: 12%;
 }
-.vis{
+
+.vis {
   width: 12%;
 }
-.hyouka_name{
+
+.hyouka_name {
   width: 250px;
   text-align: center;
 }
-.hyouka_word{
+
+.hyouka_word {
   width: 250px;
   text-align: center;
 }
-.word{
+
+.word {
   /* width: 30%; */
   text-align: left;
+}
+
+
+/* ロード表示 */
+.loader,
+.loader:after {
+  border-radius: 50%;
+  width: 10em;
+  height: 10em;
+}
+
+.loader {
+  margin: 60px auto;
+  font-size: 10px;
+  position: relative;
+  text-indent: -9999em;
+  border-top: 1.1em solid rgba(255, 53, 247, 0.2);
+  border-right: 1.1em solid rgba(255, 53, 247, 0.2);
+  border-bottom: 1.1em solid rgba(255, 53, 247, 0.2);
+  border-left: 1.1em solid #ff35f7;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation: load8 1.1s infinite linear;
+  animation: load8 1.1s infinite linear;
+}
+
+@-webkit-keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }

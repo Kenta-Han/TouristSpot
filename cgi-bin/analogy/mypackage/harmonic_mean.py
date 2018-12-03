@@ -1,7 +1,7 @@
 from tqdm import tqdm
 import re
 
-bytesymbols = re.compile("[!-/:-@[-`{-~\d]") ## 半角記号，数字\d
+bytesymbols = re.compile("[!-/:*-@[-`{-~\d]") ## 半角記号，数字\d
 ## 調和平均 差が小値が大，差が大値が小 → 値が大の方が良い(昇順後ろから10個)
 def Sort_TFIDF_VtoU_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean,unvis_mean,result):
     ## TFIDFの結果にスポット名を追加
@@ -61,7 +61,7 @@ def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
                 if set[0][i][j][0]==set[1][i][k][0] and len(set[0][i][j][0])>1 and re.search(bytesymbols,set[0][i][j][0])==None:
                     temp.append([set[0][i][j][0],abs(2/(1/set[0][i][j][1]+1/set[1][i][k][1]))])
         all.append(temp)
-        all[i].sort(key=lambda x:x[1],reverse=True) ## 降順ソート
-        ## 未訪問，既訪問，類似度，単語
+        all[i].sort(key=lambda x:x[1],reverse=True) ## 降順1~0(スコアが大きいよ良い)
+        ## 未訪問，既訪問，類似度，単語(最初の10個まで)
         top10.append([result[i][0],result[i][1][0],result[i][1][1],all[i][:10]])
     return top10

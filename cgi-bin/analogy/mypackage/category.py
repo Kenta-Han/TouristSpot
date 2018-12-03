@@ -17,6 +17,7 @@ def Category_Data(data):
     spot = []
     for i in range(len(data)):
         temp = []
+
         select_category = "SELECT category_id FROM spot_category WHERE id='{}';".format(data[i])
         cur.execute(select_category)
         try:
@@ -65,7 +66,7 @@ def Select_Review(data):
     set = []
     for i in range(len(data)):
         temp = []
-        select = "SELECT name,wakachi_neologd2 from review_all where spot_id IN {};".format(tuple(data[i]))
+        select = "SELECT name,wakachi_neologd3 FROM review_all WHERE spot_id IN {};".format(tuple(data[i]))
         cur.execute(select)
         for j in cur:
             temp.append(list(j))
@@ -75,15 +76,15 @@ def Select_Review(data):
 
 ## どのレベルまでのスポットセットを選択
 def Level(level1,level2,level3):
-    if level3 != None:
+    if level3 != []:
         review_by_spot = Select_Review(level3)
         level = level3
     else:
-        if level2 != None:
+        if level2 != []:
             review_by_spot = Select_Review(level2)
             level = level2
         else:
-            if level1 != None:
+            if level1 != []:
                 review_by_spot = Select_Review(level1)
                 level = level1
             else:
@@ -145,7 +146,7 @@ def Category_Main(visited_spot_id_list,unvisited_spot_id_list):
     all,top10 = [],[]
     for i in tqdm(range(len(cntw))):
         temp = []
-        for j in tqdm(range(len(cntw[i][0]))):
+        for j in range(len(cntw[i][0])):
             for k in range(len(cntw[i][1])):
                 ## 調和平均
                 if cntw[i][0][j][1]==cntw[i][1][k][1] and len(cntw[i][0][j][1])>1 and re.search(bytesymbols,cntw[i][0][j][1])==None:

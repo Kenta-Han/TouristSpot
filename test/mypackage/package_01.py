@@ -12,7 +12,7 @@ sc = myp_cos.SimCalculator()
 conn = MySQLdb.connect(host='localhost', user='root', passwd='mysql', db='jalan_ktylab_new', charset='utf8')
 cur = conn.cursor()
 
-bytesymbols = re.compile("[!-/:-@[-`{-~\d]") ## 半角記号，数字\d
+bytesymbols = re.compile("[!-/:-@*[-`{-~\d]") ## 半角記号，数字\d
 
 def CosSim(x, y):
     return np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))
@@ -209,11 +209,14 @@ def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
         for j in tqdm(range(len(set[0][i]))):
             for k in range(len(set[1][i])):
                 ## 同じ単語，値は共に平均以上
-                if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=unvisited_mean[i] and set[1][i][k][1]>=visited_mean[i]:
+                # if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=unvisited_mean[i] and set[1][i][k][1]>=visited_mean[i]:
                 # if set[0][i][j][0]==set[1][i][k][0] and set[0][i][j][1]>=0.01 and set[1][i][k][1]>=0.01:
+                if set[0][i][j][0]==set[1][i][k][0] and len(set[0][i][j][0])>1 and re.search(bytesymbols,set[0][i][j][0])==None and set[0][i][j][1]>=unvisited_mean[i] and set[1][i][k][1]>=visited_mean[i]:
                     temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1]),set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
+                    # temp.append([set[0][i][j][0],abs(set[0][i][j][1]-set[1][i][k][1]),set[0][i][j][1],set[1][i][k][1]]) ## 元の値をみる
         all.append(temp)
         all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)
+        # all[i].sort(key=lambda x:x[1],reverse=True)
         top10.append([result[i][0],result[i][1][0],all[i][:10]])
     return top10
 

@@ -25,10 +25,35 @@ form = cgi.FieldStorage()
 user_id = form.getvalue('user_id') ## CrowdWorksID
 prefecture = form.getvalue('prefecture_name') ## 都道府県
 area = form.getvalue('area_name') ## エリア
-history = form.getvalue('visited_name') ## 既訪問スポット名(履歴)
+# history = form.getvalue('visited_name') ## 既訪問スポット名(履歴)
+history = form.getlist('visited_name[]')
 start_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 print('Content-type: text/html\nAccess-Control-Allow-Origin: *\n')
 
+############################################################
+## 既訪問スポット情報
+############################################################
+## [伏見稲荷大社,鹿苑寺（金閣寺）,龍安寺,清水寺,八坂神社]
+# visited_spot_id_list = ['spt_26109ag2130015470','spt_26101ag2130014551','spt_26108ag2130015438','spt_26105ag2130012063','spt_26105ag2130010617']
+
+## 既訪問を利用
+history_list = []
+user_spot = [] ## 履歴スポット
+history = "---".join(history)
+history_list = re.split("---", history)
+like_spot_list,like_area_list = myp_other.Make_History_List(history_list)
+for i in range(len(like_spot_list[0])):
+    select_user_history = "SELECT id,name,lat,lng,area_id from spot_mst where name like '{spot}' AND address like '{area}' AND review=(SELECT max(review) FROM spot_mst WHERE name like '{spot}' AND address like '{area}' AND review != 0);".format(spot=like_spot_list[0][i],area=like_area_list[0][i])
+    cur.execute(select_user_history)
+    user_spot.append(cur.fetchone())
+visited_spot_id_list = []
+for i in range(len(user_spot)):
+    visited_spot_id_list.append(user_spot[i][0])
+
+
+############################################################
+## DB挿入
+############################################################
 ## ユーザ入力とDBヘ書き込む
 sql_insert = "INSERT INTO map_test(user_id, prefecture, area, start_datetime, history) VALUES(%s,%s,%s,%s,%s);"
 cur.execute(sql_insert,(user_id, prefecture, area, start_datetime, history))
@@ -37,27 +62,6 @@ conn.commit()
 ## ユーザの最新情報を得る
 cur.execute("SELECT max(id) FROM map_test WHERE user_id='{user}';".format(user = user_id))
 record_id = cur.fetchone()[0]
-
-
-############################################################
-## 既訪問スポット情報
-############################################################
-## [伏見稲荷大社,鹿苑寺（金閣寺）,龍安寺,清水寺,八坂神社]
-visited_spot_id_list = ['spt_26109ag2130015470','spt_26101ag2130014551','spt_26108ag2130015438','spt_26105ag2130012063','spt_26105ag2130010617']
-
-
-## 既訪問を利用
-# history_list = []
-# user_spot = [] ## 履歴スポット
-# history_list = re.split("[,，、]", history)
-# like_spot_list,like_area_list = myp_other.Make_History_List(history_list)
-# for i in range(len(like_spot_list[0])):
-#     select_user_history = "SELECT id,name,lat,lng,area_id from spot_mst where name like '{spot}' AND address like '{area}' AND review=(SELECT max(review) FROM spot_mst WHERE name like '{spot}' AND address like '{area}' AND review != 0);".format(spot=like_spot_list[0][i],area=like_area_list[0][i])
-#     cur.execute(select_user_history)
-#     user_spot.append(cur.fetchone())
-# visited_spot_id_list = []
-# for i in range(len(user_spot)):
-#     visited_spot_id_list.append(user_spot[i][0])
 
 
 ############################################################
@@ -74,7 +78,8 @@ else:
 # print("<h4>エリアIDの数：\t{}</h4>".format(len(unvisited_area_id_list)))
 
 ## 未訪問エリア内(レビュー and [lat or lng])ありスポット
-select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review FROM spot_mst WHERE area_id IN {} AND review!=0 AND(lat!=0 or lng!=0) ORDER BY RAND() LIMIT 100;".format(tuple(unvisited_area_id_list))
+# select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review FROM spot_mst WHERE area_id IN {} AND review!=0 AND(lat!=0 or lng!=0) ORDER BY RAND() LIMIT 100;".format(tuple(unvisited_area_id_list))
+select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review FROM spot_mst WHERE area_id IN {} AND review!=0 AND(lat!=0 or lng!=0) ORDER BY review DESC limit 30;".format(tuple(unvisited_area_id_list))
 unvisited_spot_list = myp_other.SpotORReview_List(select_unvisited_spot)
 
 ## 未訪問エリア内スポットIDリスト
@@ -122,8 +127,9 @@ visited_spot_name_all,unvisited_spot_name_all = [],[]
 visited_spot_review_all,unvisited_spot_review_all = [],[]
 for i in range(len(visited_spot_vectors)):
     visited_spot_name_all.append(visited_spot_vectors[i][1])
-    unvisited_spot_name_all.append(unvisited_spot_vectors[i][1])
     visited_spot_review_all.append(list(visited_spot_vectors[i][2:-1]))
+for i in range(len(unvisited_spot_vectors)):
+    unvisited_spot_name_all.append(unvisited_spot_vectors[i][1])
     unvisited_spot_review_all.append(list(unvisited_spot_vectors[i][2:-1]))
 result_VtoU_top,result_UtoV_top = myp_doc_rec.Recommend_All(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
 ## 類似度高い順でソート
@@ -131,14 +137,12 @@ result_VtoU_top.sort(key=lambda x:x[1][1],reverse=True)
 result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 
 ## 既訪問スポットの単語に重みつけ
-select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd2 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd2;".format(tuple(visited_spot_id_list))
-## TFIDFを実行するための整理
+select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd3 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd3;".format(tuple(visited_spot_id_list))
 visited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_visited_spot_reviews)
-## TFIDF計算，平均計算
 visited_tfidf,visited_mean = myp_tfidf.Tfidf(visited_spot_reviews)
 
 ## 未訪問スポットの単語に重みつけ
-select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd2 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd2;".format(tuple(unvisited_spot_id_list))
+select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd3 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd3;".format(tuple(unvisited_spot_id_list))
 unvisited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_unvisited_spot_reviews)
 unvisited_tfidf,unvisited_mean = myp_tfidf.Tfidf(unvisited_spot_reviews)
 
@@ -169,14 +173,12 @@ result_VtoU_top.sort(key=lambda x:x[1][1],reverse=True)
 result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 
 ## 既訪問スポットの単語に重みつけ
-select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd2 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd2".format(tuple(visited_spot_id_list))
-## TFIDFを実行するための整理
+select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd3 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd3".format(tuple(visited_spot_id_list))
 visited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_visited_spot_reviews)
-## TFIDF計算，平均計算
 visited_tfidf,visited_mean = myp_tfidf.Tfidf(visited_spot_reviews)
 
 ## 未訪問スポットの単語に重みつけ
-select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd2 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd2".format(tuple(unvisited_spot_id_list))
+select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd3 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd3".format(tuple(unvisited_spot_id_list))
 unvisited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_unvisited_spot_reviews)
 unvisited_tfidf,unvisited_mean = myp_tfidf.Tfidf(unvisited_spot_reviews)
 
@@ -192,13 +194,13 @@ UtoV_top10_harmonic = myp_hmean.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited
 ############################################################
 ## レスポンス作成，mysqlに入れるためのカラム内容作成
 ############################################################
-sql_cate_unvis,sql_cate_vis,sql_cate_word,json_category = myp_res.Response_Category(category_top10[:15])
+sql_cate_unvis,sql_cate_vis,sql_cate_word,json_category = myp_res.Response_Category(category_top10[:10])
 
-sql_unvis_f,sql_vis_f,sql_cossim_f,sql_lat_f,sql_lng_f,sql_word_f,json_vector_f = myp_res.Response_Feature(UtoV_top10_Feature[:15],name,lat,lng)
+sql_unvis_f,sql_vis_f,sql_cossim_f,sql_lat_f,sql_lng_f,sql_word_f,json_vector_f = myp_res.Response_Feature(UtoV_top10_Feature[:10],name,lat,lng)
 
-sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_vector = myp_res.Response_Vector_Harmonic(UtoV_top10_harmonic[:15],name,lat,lng)
+sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_vector = myp_res.Response_Vector_Harmonic(UtoV_top10_harmonic[:10],name,lat,lng)
 
-sql_word_m,json_vector_m = myp_res.Response_Vector_Mean(UtoV_top10_mean[:15])
+sql_word_m,json_vector_m = myp_res.Response_Vector_Mean(UtoV_top10_mean[:10])
 
 random,json_random = myp_res.Response_Random()
 

@@ -36,12 +36,13 @@ def Response_Category(cate):
         response_catejson["word_c"] = word_list
         temp_sql_word.append(temp)
 
-        for l in range(len(temp_sql_word)):
-            tmp = "，".join(temp_sql_word[l]) + " -- "
-            sql_word += tmp
-        sql_word = sql_word[:-4]
-
         json_category.append(response_catejson)
+
+    for l in range(len(temp_sql_word)):
+        tmp = "，".join(temp_sql_word[l]) + " -- "
+        sql_word += tmp
+    sql_word = sql_word[:-4]
+
     return sql_unvis,sql_vis,sql_word,json_category
 
 ##　絶対的な特徴（特徴ベクトル）のjson形式整理
