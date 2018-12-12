@@ -34,8 +34,32 @@ def Spot_List_TFIDF(select_spot):
         temp = []
     return everyspot
 
-## TFIDFを求める(単語に重み付け)
+## TFIDFを求める(単語に重み付け)，特徴ベクトル用
 def Tfidf(review_all):
+    dictionary = corpora.Dictionary(review_all)
+    dictionary_inv = {}
+    for dic in dictionary.token2id.items():
+        dictionary_inv[dic[1]]=dic[0]
+    corpus = list(map(dictionary.doc2bow,review_all))
+    test_model = models.TfidfModel(corpus)
+    corpus_tfidf = list(test_model[corpus])
+    j = 0
+    doc2 = [] ## id表示ではないもの
+    for wod in corpus_tfidf:
+        i = 0
+        doc2.append('') ## 空要素
+        doc3 = []
+        for ch in wod:
+            doc3.append('')
+            doc3[i] = [dictionary_inv[ch[0]],ch[1]]
+            i += 1
+        doc2[j] = doc3
+        j += 1
+    return doc2
+
+
+## TFIDFを求める(単語に重み付け)，差分ベクトル用
+def Tfidf_HM(review_all):
     dictionary = corpora.Dictionary(review_all)
     dictionary_inv = {}
     for dic in dictionary.token2id.items():

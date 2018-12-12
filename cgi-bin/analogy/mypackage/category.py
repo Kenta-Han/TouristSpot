@@ -66,7 +66,7 @@ def Select_Review(data):
     set = []
     for i in range(len(data)):
         temp = []
-        select = "SELECT name,wakachi_neologd3 FROM review_all WHERE spot_id IN {};".format(tuple(data[i]))
+        select = "SELECT name,wakachi_neologd5 FROM review_all WHERE spot_id IN {};".format(tuple(data[i]))
         cur.execute(select)
         for j in cur:
             temp.append(list(j))
@@ -75,23 +75,63 @@ def Select_Review(data):
     return review_by_spot
 
 ## どのレベルまでのスポットセットを選択
-def Level(level1,level2,level3):
+def Level(level1,level2,level3,record_id):
     if level3 != []:
         review_by_spot = Select_Review(level3)
         level = level3
+        sql_update = "UPDATE analogy SET level='3' WHERE id = {};".format(record_id)
     else:
         if level2 != []:
             review_by_spot = Select_Review(level2)
             level = level2
+            sql_update = "UPDATE analogy SET level='2' WHERE id = {};".format(record_id)
         else:
             if level1 != []:
                 review_by_spot = Select_Review(level1)
                 level = level1
+                sql_update = "UPDATE analogy SET level='1' WHERE id = {};".format(record_id)
             else:
                 review_by_spot = []
                 level = 0
+                sql_update = "UPDATE analogy SET level='0' WHERE id = {};".format(record_id)
+    cur.execute(sql_update)
+    conn.commit()
     return level,review_by_spot
 
+
+# ## どのレベルまでのスポットセットを選択 （バグあり）
+# def Level(level1,level2,level3,record_id):
+#     if level3 != [] and len(level3) == 5:
+#         level = level3
+#         review_by_spot = Select_Review(level)
+#         sql_update = "UPDATE analogy SET level='3' WHERE id = {rd};".format(rd=record_id)
+#     elif level3 != [] and len(level3) < 5 and len(level3) > 0:
+#         sa = 5-len(level3)
+#         level = level3 + level2[:sa]
+#         review_by_spot = Select_Review(level)
+#         sql_update = "UPDATE analogy SET level='3:{l3}，2:{l2}' WHERE id = {rd};".format(l3=len(level3), l2=(sa), rd=record_id)
+#     else:
+#         if level2 != [] and len(level2) == 5:
+#             level = level2
+#             review_by_spot = Select_Review(level)
+#             sql_update = "UPDATE analogy SET level='2' WHERE id = {rd};".format(rd=record_id)
+#         elif level2 != [] and len(level2) < 5 and len(level2) > 0:
+#             sa = 5-len(level2)
+#             level = level2 + level1[:sa]
+#             review_by_spot = Select_Review(level)
+#             sql_update = "UPDATE analogy SET level='2:{l2}，1:{l1}' WHERE id = {rd};".format(l2=len(level2), l1=(sa), rd=record_id)
+#         else:
+#             if level1 != []:
+#                 level = level1
+#                 review_by_spot = Select_Review(level)
+#                 sql_update = "UPDATE analogy SET level='1:{l1}' WHERE id = {rd};".format(l1=len(level1),rd=record_id)
+#             else:
+#                 level = 0
+#                 review_by_spot = []
+#                 sql_update = "UPDATE analogy SET level='0' WHERE id = {rd};".format(rd=record_id)
+#     cur.execute(sql_update)
+#     conn.commit()
+#     return level,review_by_spot
 
 ## (類似スポット)単語の出現回数をカウント
 def Count_word(data):
@@ -115,13 +155,13 @@ def Count_word(data):
     return result
 
 ## 絶対的な特徴(カテゴリー)
-def Category_Main(visited_spot_id_list,unvisited_spot_id_list):
+def Category_Main(visited_spot_id_list,unvisited_spot_id_list,record_id):
     cate_vispot = Category_Data(visited_spot_id_list)
     cate_unspot = Category_Data(unvisited_spot_id_list)
     ## レベルに応じて類似スポットセットを作成
     level1,level2,level3 = Spot_set_by_level(cate_vispot,cate_unspot)
     ## どのレベルまでのスポットセットを選択
-    level,review_by_spot = Level(level1,level2,level3)
+    level,review_by_spot = Level(level1,level2,level3,record_id)
 
     all_reviews = []
     for i in range(len(review_by_spot)):
@@ -146,19 +186,47 @@ def Category_Main(visited_spot_id_list,unvisited_spot_id_list):
     all,top10 = [],[]
     for i in tqdm(range(len(cntw))):
         temp = []
-        for j in range(len(cntw[i][0])):
-            for k in range(len(cntw[i][1])):
-                ## 調和平均
-                if cntw[i][0][j][1]==cntw[i][1][k][1] and len(cntw[i][0][j][1])>1 and re.search(bytesymbols,cntw[i][0][j][1])==None:
-                    temp.append([cntw[i][0][j][1],abs(2/(1/int(cntw[i][0][j][0])+1/int(cntw[i][1][k][0])))])
+        same_word = list(set([cntw[i][0][j][1] for j in range(len(cntw[i][0]))]) & set([cntw[i][1][j][1] for j in range(len(cntw[i][1]))]))
+
+        for sw in same_word:
+            un = [j for j in range(len(cntw[i][0])) if cntw[i][0][j][1] == sw][0]
+            vi  = [j for j in range(len(cntw[i][1])) if cntw[i][1][j][1] == sw][0]
+            ## 調和平均
+            if len(cntw[i][0][un][1])>1 and re.search(bytesymbols,cntw[i][0][un][1])==None:
+                temp.append([cntw[i][0][un][1],abs(2/(1/int(cntw[i][0][un][0])+1/int(cntw[i][1][vi][0])))])
         all.append(temp)
         all[i].sort(key=lambda x:x[1],reverse=True)
-        select_un = "SELECT name FROM spot_mst where id='{}'".format(level[i][0])
+        select_un = "SELECT name,url FROM spot_mst where id='{}'".format(level[i][0])
         cur.execute(select_un)
-        unvisited_name = cur.fetchone()[0]
-        select_vi = "SELECT name FROM spot_mst where id='{}'".format(level[i][1])
+        unvisited_name_url = []
+        for k in cur:
+            unvisited_name_url.extend(k)
+        select_vi = "SELECT name,url FROM spot_mst where id='{}'".format(level[i][1])
         cur.execute(select_vi)
-        visited_name = cur.fetchone()[0]
+        visited_name_url = []
+        for k in cur:
+            visited_name_url.extend(k)
         ## level は unvisited,visited
-        top10.append([unvisited_name,visited_name,all[i][:10]])
+        top10.append([unvisited_name_url[0],visited_name_url[0],all[i][:5],unvisited_name_url[1]])
     return top10
+
+    ## 遅い
+    # all,top10 = [],[]
+    # for i in tqdm(range(len(cntw))):
+    #     temp = []
+    #     for j in range(len(cntw[i][0])):
+    #         for k in range(len(cntw[i][1])):
+    #             ## 調和平均
+    #             if cntw[i][0][j][1]==cntw[i][1][k][1] and len(cntw[i][0][j][1])>1 and re.search(bytesymbols,cntw[i][0][j][1])==None:
+    #                 temp.append([cntw[i][0][j][1],abs(2/(1/int(cntw[i][0][j][0])+1/int(cntw[i][1][k][0])))])
+    #     all.append(temp)
+    #     all[i].sort(key=lambda x:x[1],reverse=True)
+    #     select_un = "SELECT name FROM spot_mst where id='{}'".format(level[i][0])
+    #     cur.execute(select_un)
+    #     unvisited_name = cur.fetchone()[0]
+    #     select_vi = "SELECT name FROM spot_mst where id='{}'".format(level[i][1])
+    #     cur.execute(select_vi)
+    #     visited_name = cur.fetchone()[0]
+    #     ## level は unvisited,visited
+    #     top10.append([unvisited_name,visited_name,all[i][:10]])
+    # return top10

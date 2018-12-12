@@ -37,19 +37,19 @@ def Doc2Cec_Feature(spot_vectors): ## doc2vecを使ってスポットベクト�
     return result_list
 
 def Recommend_All(visited_name,unvisited_name,visited_review,unvisited_review):
-    value_VtoU = []
+    # value_VtoU = []
     value_UtoV = []
-    for i in range(len(visited_name)):
-        temp_VtoU = []
-        for j in range(len(unvisited_name)):
-            visited_to_unvisited = CosSim(visited_review[i],unvisited_review[j])
-            temp_VtoU.append([unvisited_name[j],visited_to_unvisited])
-        value_VtoU.append(temp_VtoU)
-    list_VtoU = list(zip(visited_name,value_VtoU)) ## リスト作成(スポット名,類似度)
-    list_VtoU_top = [] ## スポットから類似度一番高いスポットを取り出す
-    for i in range(len(list_VtoU)):
-        list_VtoU[i][1].sort(key=lambda x:x[1],reverse=True)
-        list_VtoU_top.append([list_VtoU[i][0],list_VtoU[i][1][0]])
+    # for i in range(len(visited_name)):
+    #     temp_VtoU = []
+    #     for j in range(len(unvisited_name)):
+    #         visited_to_unvisited = CosSim(visited_review[i],unvisited_review[j])
+    #         temp_VtoU.append([unvisited_name[j],visited_to_unvisited])
+    #     value_VtoU.append(temp_VtoU)
+    # list_VtoU = list(zip(visited_name,value_VtoU)) ## リスト作成(スポット名,類似度)
+    # list_VtoU_top = [] ## スポットから類似度一番高いスポットを取り出す
+    # for i in range(len(list_VtoU)):
+    #     list_VtoU[i][1].sort(key=lambda x:x[1],reverse=True)
+    #     list_VtoU_top.append([list_VtoU[i][0],list_VtoU[i][1][0]])
 
     for i in range(len(unvisited_name)):
         temp_UtoV = []
@@ -65,4 +65,5 @@ def Recommend_All(visited_name,unvisited_name,visited_review,unvisited_review):
             list_UtoV_top.append([list_UtoV[i][0],list_UtoV[i][1][0]])
         else:
             continue
-    return list_VtoU_top,list_UtoV_top
+    # return list_VtoU_top,list_UtoV_top
+    return list_UtoV_top
