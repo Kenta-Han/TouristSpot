@@ -65,9 +65,8 @@
 
       <h3>
         <ul id="setumei">
-          <li>これまで訪れたことがあり，気に入った観光スポットを4つ以上入力してください（必須）</li>
+          <li>これまで訪れたことがあり，気に入った観光スポットを4つ以上入力してください</li>
           <li>入力すると候補が表示されるので，その中から選択ください</li>
-          <li>重複禁止</li>
         </ul>
       </h3>
 
@@ -84,9 +83,8 @@
         <li><input type="text" class="visited" name="visited" /></li>
       </ol>
 
-      <h3>旅行等で行ったことがなく，これから行ってみたいエリアを入力してください</h3>
-      <h3>＊入力すると候補が表示されるので，その中から選択ください</h3>
-      <h3>都道府県（必須）：
+      <h3>旅行等で行ったことがなく，これから行ってみたい都道府県・エリアを入力してください</h3>
+      <h3>都道府県：
         <!-- <input type="text" id="prefecture" name="prefecture" placeholder="石川" /> -->
         <select name="prefecture" id="prefecture">
           <option value="北海道">北海道</option>
@@ -139,7 +137,7 @@
         </select>
       </h3>
 
-      <h3>エリア：
+      <h3>エリア（任意）：
         <input type="text" id="area" name="area" placeholder="函館・大沼・松前" />
       </h3>
       <input type="submit" id="start" value="実験開始（結果はローディング後で表示）" />
@@ -258,7 +256,7 @@
             data[i]["label"] + "：' value='1'>2つのスポットにそもそも関係性があるが，キーワードにより関係が明確になった</li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
             data[i]["label"] + "：' value='2'>2つのスポットの関係にキーワードにより初めて気がついた</li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
             data[i]["label"] + "：' value='3'>2つのスポットに関係性があるがキーワードは関係性を表していない<br><input type='text' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
-            data[i]["label"] + "t：' placeholder='適切なキーワードを入力してください' class='hyouka_text'></li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
+            data[i]["label"] + "t：' placeholder='適切なキーワードを入力してください(任意)' class='hyouka_text'></li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
             data[i]["label"] + "：' value='4'>2つのスポットに関係性はない</li></ul></td></tr>"
         }
         return "<table><tr><th>未訪問スポット</th><th>キーワード</th><th>既訪問スポット</th><th>評価</th></tr>" + set.join("") + "</table><br><h2><span style='color:#ff0000;'>入力が終わったら「承認コード」をコピーして，「結果送信」をクリックしてください．</span></h2>"
@@ -286,9 +284,9 @@
               $(".vector_result").html("<h2>Loading...</h2><div class='loader'>Loading...</div>");
               $("#start").prop("disabled", true); //ボタンクリック禁止
               window.onerror = function() {
-                alert("Error：注意事項を見て入力してください");
+                alert("Error：入力に問題が見つかったためもう一度入力してください．");
                 location.reload();
-                $(".vector_result").html("<h1>Error：注意事項を見て入力してください</h1>");
+                $(".vector_result").html("<h1>Error：入力に問題が見つかったためもう一度入力してください</h1>");
               };
               $.ajax({ //データ送信
                   url: "./cgi-bin/analogy/processing.py",
@@ -302,17 +300,17 @@
                   },
                   timeout: 300000,
                   error: function() {
-                    alert("Timeout：もう一度試してください")
+                    alert("Timeout：時間を空けて，もう一度試してください")
                   },
                 })
                 .done(function(response) { //データを受信
-                  console.log(response);
+                  // console.log(response);
                   res = $.parseJSON(response);
                   // console.log(res)
-
                   // res[0]はデータ，res[1]はrandom，res[2]はrecord_id
-                  console.log(res[0]);
+                  // console.log(res[0]);
 
+                  // ↓使わない
                   // var splice_list = []
                   // for (var i=0; i<res[0].length; i++){
                   //   if (res[0][i]["word"].length == 0){

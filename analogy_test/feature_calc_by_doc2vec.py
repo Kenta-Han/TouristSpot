@@ -48,6 +48,39 @@ unvisited_spot_id_list = ['spt_27107cc3320040646','spt_27107ad3352003168','spt_2
 #############################################################
 ## 絶対的な特徴（カテゴリ）
 #############################################################
+def Make_History_List(history):
+    all = []
+    spot = []
+    area = []
+    for i in range(len(history)):
+        temp = "%"+ history[i] +"%"
+        all.append(temp)
+        temp = 0
+    spot.append(all[0::2])
+    area.append(all[1::2])
+    return spot,area
+
+history = ["新東京ゴルフクラブ---茨城","東京ディズニーランド(R)---千葉","東京ディズニーシー(R)---千葉","千代田区観光協会---東京"]
+history_list = []
+user_spot = [] ## 履歴スポット
+history = "---".join(history)
+history_list = re.split("---", history)
+like_spot_list,like_area_list = Make_History_List(history_list)
+for i in range(len(like_spot_list[0])):
+    select_user_history = "SELECT id,name,lat,lng,area_id,url from spot_mst where name like '{spot}' AND address like '{area}' AND review=(SELECT max(review) FROM spot_mst WHERE name like '{spot}' AND address like '{area}' AND review != 0);".format(spot=like_spot_list[0][i],area=like_area_list[0][i])
+    cur.execute(select_user_history)
+    spot_data = cur.fetchone()
+    if spot_data is None:
+        continue
+    else:
+        user_spot.append(spot_data)
+print(user_spot)
+visited_spot_id_list = []
+visited_spot_url_list = []
+for i in range(len(user_spot)):
+    visited_spot_id_list.append(user_spot[i][0])
+    visited_spot_url_list.append(user_spot[i][5])
+print(visited_spot_id_list)
 
 # def SpotORReview_List(spot):
 #     spot_list = []

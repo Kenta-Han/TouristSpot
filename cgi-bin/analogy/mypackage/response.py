@@ -261,7 +261,7 @@ def Response_Feature(data,name,lat,lng,url):
     for l in range(len(temp_sql_word)):
         tmp = "，".join(temp_sql_word[l]) + "--"
         sql_word += tmp
-    sql_word = sql_word[:-4]
+    sql_word = sql_word[:-2]
 
     return sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word,json_feature
 
