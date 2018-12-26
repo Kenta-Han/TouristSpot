@@ -3,7 +3,7 @@
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <link href="./data/stylesheet_analogy.css" rel="stylesheet" type="text/css" />
+  <link href="./data/stylesheet_analogy_imecs.css" rel="stylesheet" type="text/css" />
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <!-- <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.min.css" /> -->
   <link href="./data/jquery_themes_cupertino_ui_kai.css" rel="stylesheet" type="text/css" />
@@ -23,18 +23,6 @@
         });
       }
     })
-    // $.ajax({
-    //   url:'./data/txt/area1.txt',
-    //   success: function(data){
-    //     var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
-    //     $('#prefecture').autocomplete({
-    //       source: datam,
-    //       // autoFocus: true,
-    //       delay: 300,
-    //       minLength: 1
-    //     });
-    //   }
-    // })
     $.ajax({
       url:'./data/txt/area2.txt',
       success: function(data){
@@ -71,10 +59,10 @@
       </h3>
 
       <ol>
-        <li><input type="text" class="visited" name="visited" /></li>
-        <li><input type="text" class="visited" name="visited" /></li>
-        <li><input type="text" class="visited" name="visited" /></li>
-        <li><input type="text" class="visited" name="visited" /></li>
+        <li><input type="text" class="visited" name="visited" value="釧路市ふれあいホースパーク---北海道" /></li>
+        <li><input type="text" class="visited" name="visited" value="動物ふれあいランド---北海道" /></li>
+        <li><input type="text" class="visited" name="visited" value="ふれあいファームいずみ---北海道" /></li>
+        <li><input type="text" class="visited" name="visited" value="夕日（あいロード夕日の丘観光案内所）---北海道" /></li>
         <li><input type="text" class="visited" name="visited" /></li>
         <li><input type="text" class="visited" name="visited" /></li>
         <li><input type="text" class="visited" name="visited" /></li>
@@ -285,11 +273,11 @@
               $("#start").prop("disabled", true); //ボタンクリック禁止
               window.onerror = function() {
                 alert("Error：入力に問題が見つかったためもう一度入力してください．");
-                location.reload();
+                // location.reload();
                 $(".vector_result").html("<h1>Error：入力に問題が見つかったためもう一度入力してください</h1>");
               };
               $.ajax({ //データ送信
-                  url: "./cgi-bin/analogy/processing.py",
+                  url: "./cgi-bin/analogy_deim/processing.py",
                   type: "post",
                   dataType: "text",
                   data: {
@@ -304,25 +292,10 @@
                   },
                 })
                 .done(function(response) { //データを受信
-                  // console.log(response);
+                  console.log(response);
                   res = $.parseJSON(response);
-                  // console.log(res)
+                  console.log(res)
                   // res[0]はデータ，res[1]はrandom，res[2]はrecord_id
-                  // console.log(res[0]);
-
-                  // ↓使わない
-                  // var splice_list = []
-                  // for (var i=0; i<res[0].length; i++){
-                  //   if (res[0][i]["word"].length == 0){
-                  //     splice_list.push(i);
-                  //   }
-                  // }
-                  // console.log(splice_list);
-                  // // for(var i=0; i<splice_list.length; i++){
-                  // //   res[0].splice(splice_list[i]-i, 1);//exe[i]-i番目から1つだけ削除
-                  // // }
-                  // // console.log(res[0]);
-
                   vector = Vector(res[0]);
                   $(".vector_result").html(vector);
                   $("#code").html(res[1]["randomname"]);
@@ -392,7 +365,7 @@
           idata = Insert_Data(temp);
 
           $.ajax({ //データ送信
-              url: "./cgi-bin/analogy/insert_mysql.py",
+              url: "./cgi-bin/analogy_deim/insert_mysql.py",
               type: "post",
               dataType: "text",
               data: {

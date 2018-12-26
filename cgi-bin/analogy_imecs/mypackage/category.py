@@ -79,21 +79,21 @@ def Level(level1,level2,level3,record_id):
     if level3 != []:
         review_by_spot = Select_Review(level3)
         level = level3
-        sql_update = "UPDATE analogy SET level='3' WHERE id = {};".format(record_id)
+        sql_update = "UPDATE analogy_imecs SET level='3' WHERE id = {};".format(record_id)
     else:
         if level2 != []:
             review_by_spot = Select_Review(level2)
             level = level2
-            sql_update = "UPDATE analogy SET level='2' WHERE id = {};".format(record_id)
+            sql_update = "UPDATE analogy_imecs SET level='2' WHERE id = {};".format(record_id)
         else:
             if level1 != []:
                 review_by_spot = Select_Review(level1)
                 level = level1
-                sql_update = "UPDATE analogy SET level='1' WHERE id = {};".format(record_id)
+                sql_update = "UPDATE analogy_imecs SET level='1' WHERE id = {};".format(record_id)
             else:
                 review_by_spot = []
                 level = 0
-                sql_update = "UPDATE analogy SET level='0' WHERE id = {};".format(record_id)
+                sql_update = "UPDATE analogy_imecs SET level='0' WHERE id = {};".format(record_id)
     cur.execute(sql_update)
     conn.commit()
     return level,review_by_spot
@@ -104,31 +104,31 @@ def Level(level1,level2,level3,record_id):
 #     if level3 != [] and len(level3) == 5:
 #         level = level3
 #         review_by_spot = Select_Review(level)
-#         sql_update = "UPDATE analogy SET level='3' WHERE id = {rd};".format(rd=record_id)
+#         sql_update = "UPDATE analogy_imecs SET level='3' WHERE id = {rd};".format(rd=record_id)
 #     elif level3 != [] and len(level3) < 5 and len(level3) > 0:
 #         sa = 5-len(level3)
 #         level = level3 + level2[:sa]
 #         review_by_spot = Select_Review(level)
-#         sql_update = "UPDATE analogy SET level='3:{l3}，2:{l2}' WHERE id = {rd};".format(l3=len(level3), l2=(sa), rd=record_id)
+#         sql_update = "UPDATE analogy_imecs SET level='3:{l3}，2:{l2}' WHERE id = {rd};".format(l3=len(level3), l2=(sa), rd=record_id)
 #     else:
 #         if level2 != [] and len(level2) == 5:
 #             level = level2
 #             review_by_spot = Select_Review(level)
-#             sql_update = "UPDATE analogy SET level='2' WHERE id = {rd};".format(rd=record_id)
+#             sql_update = "UPDATE analogy_imecs SET level='2' WHERE id = {rd};".format(rd=record_id)
 #         elif level2 != [] and len(level2) < 5 and len(level2) > 0:
 #             sa = 5-len(level2)
 #             level = level2 + level1[:sa]
 #             review_by_spot = Select_Review(level)
-#             sql_update = "UPDATE analogy SET level='2:{l2}，1:{l1}' WHERE id = {rd};".format(l2=len(level2), l1=(sa), rd=record_id)
+#             sql_update = "UPDATE analogy_imecs SET level='2:{l2}，1:{l1}' WHERE id = {rd};".format(l2=len(level2), l1=(sa), rd=record_id)
 #         else:
 #             if level1 != []:
 #                 level = level1
 #                 review_by_spot = Select_Review(level)
-#                 sql_update = "UPDATE analogy SET level='1:{l1}' WHERE id = {rd};".format(l1=len(level1),rd=record_id)
+#                 sql_update = "UPDATE analogy_imecs SET level='1:{l1}' WHERE id = {rd};".format(l1=len(level1),rd=record_id)
 #             else:
 #                 level = 0
 #                 review_by_spot = []
-#                 sql_update = "UPDATE analogy SET level='0' WHERE id = {rd};".format(rd=record_id)
+#                 sql_update = "UPDATE analogy_imecs SET level='0' WHERE id = {rd};".format(rd=record_id)
 #     cur.execute(sql_update)
 #     conn.commit()
 #     return level,review_by_spot
