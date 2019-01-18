@@ -59,10 +59,10 @@
       </h3>
 
       <ol>
-        <li><input type="text" class="visited" name="visited" value="釧路市ふれあいホースパーク---北海道" /></li>
-        <li><input type="text" class="visited" name="visited" value="動物ふれあいランド---北海道" /></li>
-        <li><input type="text" class="visited" name="visited" value="ふれあいファームいずみ---北海道" /></li>
-        <li><input type="text" class="visited" name="visited" value="夕日（あいロード夕日の丘観光案内所）---北海道" /></li>
+        <li><input type="text" class="visited" name="visited" /></li>
+        <li><input type="text" class="visited" name="visited" /></li>
+        <li><input type="text" class="visited" name="visited" /></li>
+        <li><input type="text" class="visited" name="visited" /></li>
         <li><input type="text" class="visited" name="visited" /></li>
         <li><input type="text" class="visited" name="visited" /></li>
         <li><input type="text" class="visited" name="visited" /></li>
@@ -132,19 +132,16 @@
     </form>
   </div>
 
-  <p style="text-align:center;font-size:20px;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大300秒かかる場合があります，300秒過ぎると「Timeout」が表示されます．）<br>結果の未訪問スポット，キーワード，既訪問スポットが同じの場合，自動的に回答が連動します．<br><span style="color:#ff0000;">結果表示後「承認コード」をコピーして，「結果送信」をクリックしてください．</span></p>
+  <p style="text-align:center;font-size:20px;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大150秒かかる場合があります，150秒過ぎると「Timeout」が表示されます．）<br>結果の未訪問スポット，キーワード，既訪問スポットが同じの場合，自動的に回答が連動します．<br><span style="color:#ff0000;">結果表示後「承認コード」をコピーして，「結果送信」をクリックしてください．</span></p>
 
   <form id="form_result" name="form_result">
     <!-- 相対的な特徴-調和平均 -->
     <div class="result">
       <!-- <h1>相対的な特徴（差分ベクトルー1.調和平均2.相加平均）</h1> -->
-
-      <!-- <div id="map"><iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205"
-        width="100%" height="750" frameborder="0" style="border:0" allowfullscreen></iframe></div>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script> -->
       <div class="vector_result"></div>
       <h1>承認コード：<span id="code"></span></h1>
-      <input type="submit" id="finish" value="結果送信" />
+      <!-- <input type="submit" id="finish" value="結果送信" /> -->
+      <div class="fini"></div>
     </div>
   </form>
 
@@ -240,7 +237,6 @@
         for (var i = 0; i < data.length; i++) {
           set[i] = "<tr><td class='unv'><a href='" + data[i]["unvis_url"] + "' target='_blank'>" + data[i]["unvis_name"] + "</a></td><td class='word'>" + data[i]["word"] +
             "</td><td class='vis'>" + data[i]["vis_name"] + "</td><td class='hyouka_word'><ul class='hyouka_ul'><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
-            data[i]["label"] + "：' value='0'>キーワードなし</li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
             data[i]["label"] + "：' value='1'>2つのスポットにそもそも関係性があるが，キーワードにより関係が明確になった</li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
             data[i]["label"] + "：' value='2'>2つのスポットの関係にキーワードにより初めて気がついた</li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
             data[i]["label"] + "：' value='3'>2つのスポットに関係性があるがキーワードは関係性を表していない<br><input type='text' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
@@ -273,7 +269,7 @@
               $("#start").prop("disabled", true); //ボタンクリック禁止
               window.onerror = function() {
                 alert("Error：入力に問題が見つかったためもう一度入力してください．");
-                // location.reload();
+                location.reload();
                 $(".vector_result").html("<h1>Error：入力に問題が見つかったためもう一度入力してください</h1>");
               };
               $.ajax({ //データ送信
@@ -286,9 +282,9 @@
                     prefecture_name: $("#prefecture").val(),
                     area_name: $("#area").val(),
                   },
-                  timeout: 300000,
+                  timeout: 150000,
                   error: function() {
-                    alert("Timeout：時間を空けて，もう一度試してください")
+                    alert("Timeout：しばらくしてもう一度試してください")
                   },
                 })
                 .done(function(response) { //データを受信
@@ -301,8 +297,7 @@
                   $("#code").html(res[1]["randomname"]);
                   record_id = res[2];
                   len = res[0].length;
-
-                  // initMap(res[2]); //map作成用
+                  $(".fini").html("<input type='submit' id='finish' value='結果送信' />");
                 })
                 .fail(function() {
                   $(".result").html("Failed.");
@@ -382,7 +377,7 @@
               // console.log(response);
               // res = $.parseJSON(response);
               // console.log(res);
-              window.location.href = "./index.html";
+              window.location.href = "./index.html";　// ページ遷移
             })
             .fail(function() {
               $(".result").html("Failed.");

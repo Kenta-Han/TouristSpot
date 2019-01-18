@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <link href="./data/stylesheet_analogy_deim_map.css" rel="stylesheet" type="text/css" />
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+  <script type="text/javascript" src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <title>観光スポット間の関係を想起する情報の提示に関する実験</title>
+</head>
+
+<body>
+  <header>
+    <h1>システムB</h1>
+  </header>
+  <!-- <div class="main">
+  </div> -->
+
+  <form id="form_result" name="form_result">
+    <div class="vector_result"></div>
+    <div class="result">
+      <div id="map">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%"
+          height="750" frameborder="0" style="border:0" allowfullscreen></iframe>
+      </div>
+      <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo&language=en"></script>
+      <h1>承認コード(システムB)：<span id="code"></span></h1>
+      <h2 style="color:#ff0000;">「承認コード」をコピーして，CrowdWorksの対応タスクに貼り付けた後に，「次へ」をクリックしてください．</h2>
+      <input type="submit" id="finish" value="次へ" />
+    </div>
+  </form>
+
+  <script type="text/javascript">
+    // マップ作成 Start
+    var map;
+    var marker = [];
+    var infoWindow = [];
+    function initMap(data) {
+      var markerData = data;
+      // 地図の作成
+      console.log("Make Map");
+      var cnt = 0,
+        sum_lat = 0,
+        sum_lng = 0;
+      for (var i = 0; i < markerData.length; i++) {
+        sum_lat = sum_lat + Number(markerData[i]["unvis_lat"]);
+        sum_lng = sum_lng + Number(markerData[i]["unvis_lng"]);
+        cnt += 1;
+      }
+      map = new google.maps.Map(document.getElementById("map"), { // #mapに地図を埋め込む
+        center: {
+          lat: sum_lat / cnt,
+          lng: sum_lng / cnt
+        },
+        zoom: 12 // 地図のズームを指定
+      });
+      // マーカー毎の処理
+      for (var i = 0; i < markerData.length; i++) {
+        markerLatLng = new google.maps.LatLng({
+          lat: Number(markerData[i]["unvis_lat"]),
+          lng: Number(markerData[i]["unvis_lng"])
+        }); // 緯度経度のデータ作成
+        marker[i] = new google.maps.Marker({ // マーカーの追加
+          position: markerLatLng, // マーカーを立てる位置を指定
+          map: map // マーカーを立てる地図を指定
+        });
+
+        infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+          // 吹き出しに表示する内容
+          content: "<table border='1' id='window'><tr><th>Unfamiliar Spot Name</th><td><a href='" + markerData[i]["url"] + "'>" + markerData[i]["unvis_name"] + "</a></td></tr></table>"
+        });
+        markerEvent(i); // マーカーにクリックイベントを追加
+      }
+      // return infoWindow;
+    }
+    // マーカーにクリックイベントを追加
+    var currentInfoWindow = null;
+
+    function markerEvent(i) {
+      marker[i].addListener("click", function() { // マーカーをクリックしたとき
+        if (currentInfoWindow) {
+          currentInfoWindow.close();
+        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+        infoWindow[i].open(map, marker[i]); // 吹き出しの表示
+        currentInfoWindow = infoWindow[i];
+      });
+    }
+    // マップ作成 Finish
+
+    // var res = ;//データを受信
+    // initMap(res);
+    // // データの送信Ajax（評価内容）
+    // $(document).ready(function() {
+    //   $("#form_result").submit(function() {
+    //     event.preventDefault();
+    //     var $form = $(this);
+    //
+    //     if ($(".vector_result").find("input:checked").length == len) {
+    //       temp = $(".vector_result").find("tr");
+    //       idata = Insert_Data(temp);
+    //
+    //       $.ajax({ //データ送信
+    //           url: "./cgi-bin/analogy_deim/insert_mysql.py",
+    //           type: "post",
+    //           dataType: "text",
+    //           data: {
+    //             record_id: record_id["record_id"],
+    //             hyouka: idata[0],
+    //             hyouka_text: idata[1],
+    //           },
+    //           timeout: 60000,
+    //           error: function() {
+    //             alert("Timeout：もう一度試してください")
+    //           },
+    //         })
+    //         .done(function(response) { //データを受信
+    //           window.location.href = "./index.html";　
+    //         })
+    //         .fail(function() {
+    //           $(".result").html("Failed.");
+    //         });
+    //     } else {
+    //       alert('チェックしてない内容がありました');
+    //     }
+    //   });
+    // });
+
+    $('#finish').click(function() {
+        link = "./index.html" //res2をB_AtoBに送信，
+        $(this).parents('form').attr('action', link);
+        $(this).parents('form').submit();
+    });
+  </script>
+</body>
+
+</html>

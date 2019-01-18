@@ -1,0 +1,218 @@
+body {
+  width: 90%;
+  margin: 3% auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+h3{
+  font-size: 20px;
+}
+
+.main {
+  width: 90%;
+  margin: auto;
+  text-align: center;
+}
+
+.form {
+  margin: 4% auto;
+}
+
+.image img {
+  width: 150px;
+  margin: auto;
+}
+
+#user_id,#area1,#area2{
+  width: 30%;
+  height: 24px;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+#prefecture1,#prefecture2{
+  width: 100px;
+  height: 24px;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+#setumei{
+  width: 65%;
+  margin: auto;
+  text-align: left;
+  padding-left: 0;
+}
+
+ol {
+  width: 70%;
+  margin: auto;
+}
+
+li {
+  margin: 8px auto;
+  padding: 8px auto;
+}
+
+.visited {
+  width: 60%;
+  height: 24px;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+#start,#finish  {
+  display: inline-block;
+  border-radius: 5%;
+  /* 角丸       */
+  font-size: 16px;
+  /* 文字サイズ */
+  text-align: center;
+  /* 文字位置   */
+  cursor: pointer;
+  /* カーソル   */
+  padding: 12px 20px;
+  /* 余白       */
+  background: #000066;
+  /* 背景色     */
+  color: #ffffff;
+  /* 文字色     */
+  line-height: 1em;
+  /* 1行の高さ  */
+  transition: .3s;
+  /* なめらか変化 */
+  box-shadow: 6px 6px 3px #666666;
+  /* 影の設定 */
+  border: 2px solid #000066;
+  /* 枠の指定 */
+  margin: 1% auto;
+}
+
+#start:hover,#finish:hover {
+  box-shadow: none;
+  /* カーソル時の影消去 */
+  color: #000066;
+  /* 背景色     */
+  background: #ffffff;
+  /* 文字色     */
+}
+
+#form_result{
+  text-align: center;
+}
+
+.result {
+  width: 100%;
+  margin: 1% auto;
+}
+
+.result #map {
+  width: 100%;
+  height: 750px;
+  margin: 0 8px 0 8px;
+}
+
+#window {
+  width: 100%;
+}
+
+/* table 設定*/
+
+table {
+  width: 100%;
+  margin: auto;
+}
+
+th, td {
+  border: solid 1px #000000;
+  padding: 7px 10px;
+}
+
+th {
+  color: white;
+  /*文字色*/
+  background-color: #2196f3;
+}
+
+.unv {
+  width: 15%;
+}
+
+.word {
+  /* width: 30%; */
+  text-align: left;
+}
+
+.vis {
+  width: 15%;
+}
+
+.hyouka_word {
+  width: 50%;
+  text-align: center;
+}
+
+.hyouka_ul{
+  list-style: none;
+  padding-left: 0;
+  text-align: left;
+}
+
+.hyouka_text{
+  width: 90%;
+  height: 24px;
+  margin:0 3%;
+  font-size: 16px;
+}
+
+
+/* ロード表示 */
+.loader,
+.loader:after {
+  border-radius: 50%;
+  width: 10em;
+  height: 10em;
+}
+
+.loader {
+  margin: 60px auto;
+  font-size: 10px;
+  position: relative;
+  text-indent: -9999em;
+  border-top: 1.1em solid rgba(255, 53, 247, 0.2);
+  border-right: 1.1em solid rgba(255, 53, 247, 0.2);
+  border-bottom: 1.1em solid rgba(255, 53, 247, 0.2);
+  border-left: 1.1em solid #ff35f7;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation: load8 1.1s infinite linear;
+  animation: load8 1.1s infinite linear;
+}
+
+@-webkit-keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}

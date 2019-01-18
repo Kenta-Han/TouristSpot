@@ -380,10 +380,8 @@ visited_spot_vectors_doc = myp_pk01.Doc2Cec_Feature(visited_spot_vectors)
 select_unvisited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(unvisited_spot_id_list))
 ## スポット特徴ベクトル
 unvisited_spot_vectors = myp_pk01.Spot_List(select_unvisited_spot_vectors)
-# print(unvisited_spot_vectors)
 ## doc2vecを使ってスポットベクトルの差分を求める
 unvisited_spot_vectors_doc = myp_pk01.Doc2Cec_Feature(unvisited_spot_vectors)
-# print(unvisited_spot_vectors_doc)
 
 
 #############################################################
@@ -398,40 +396,24 @@ for i in range(len(visited_spot_vectors)):
 for i in range(len(unvisited_spot_vectors)):
     unvisited_spot_name_all.append(unvisited_spot_vectors[i][1])
     unvisited_spot_review_all.append(list(unvisited_spot_vectors[i][2:-1]))
-result_VtoU_top,result_UtoV_top = myp_pk01.Recommend_All(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
-## print("Visited to Unvisited")
-## result_VtoU_top.sort(key=lambda x:x[1][1],reverse=True)
-## pprint(result_VtoU_top)
+result_UtoV_top = myp_pk01.Recommend_All(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
+print(unvisited_spot_id_list)
 print("Unvisited to Visited")
 result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 pprint(result_UtoV_top)
 
 ##########################
-select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd4 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd4".format(tuple(visited_spot_id_list))
+select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5".format(tuple(visited_spot_id_list))
 visited_spot_reviews = myp_pk01.Spot_List_TFIDF(select_visited_spot_reviews)
-visited_tfidf,visited_mean = myp_pk01.Tfidf(visited_spot_reviews)
-# print("既訪問毎平均：\n" + str(visited_spot_name_all) + "\n" + str(visited_mean))
+visited_tfidf = myp_pk01.Tfidf(visited_spot_reviews)
+print(visited_tfidf)
 
-select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd4 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd4".format(tuple(unvisited_spot_id_list))
+select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5".format(tuple(unvisited_spot_id_list))
 unvisited_spot_reviews = myp_pk01.Spot_List_TFIDF(select_unvisited_spot_reviews)
-unvisited_tfidf,unvisited_mean = myp_pk01.Tfidf(unvisited_spot_reviews)
-# print("未訪問毎平均：\n" + str(unvisited_spot_name_all) + "\n" + str(unvisited_mean))
+print(len(unvisited_spot_reviews))
+unvisited_tfidf = myp_pk01.Tfidf(unvisited_spot_reviews)
 
-# print("\n相加平均")
-# VtoU_top10 = myp_pk01.Sort_TFIDF_VtoU(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
-# print("\n既訪問，未訪問，特徴語，2つの値の差(絶対値)，既値，未値")
-# pprint(VtoU_top10)
-
-# UtoV_top10 = myp_pk01.Sort_TFIDF_UtoV(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
-# print("\n未訪問，既訪問，特徴語，2つの値の差(絶対値)，未値，既値")
-# pprint(UtoV_top10)
-
-print("\n調和平均")
-# VtoU_top10 = myp_pk01.Sort_TFIDF_VtoU_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
-# print("\n既訪問，未訪問，特徴語，2つの値の差(絶対値)，既値，未値")
-# pprint(VtoU_top10)
-
-UtoV_top10 = myp_pk01.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
+UtoV_top10 = myp_pk01.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
 print("\n未訪問，既訪問，特徴語，2つの値の差(絶対値)，未値，既値")
 pprint(UtoV_top10)
 
@@ -449,40 +431,23 @@ for i in range(len(visited_spot_vectors_doc)):
 for i in range(len(unvisited_spot_vectors_doc)):
     unvisited_spot_name_all.append(unvisited_spot_vectors_doc[i][0])
     unvisited_spot_review_all.append(unvisited_spot_vectors_doc[i][1])
-result_VtoU_top,result_UtoV_top = myp_pk01.Recommend_All(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
-# print("Visited Name：" + str(visited_spot_name_all))
-# print("Unvisited Name：" + str(unvisited_spot_name_all))
-# print("Visited to Unvisited")
-# pprint(result_VtoU_top)
+result_UtoV_top = myp_pk01.Recommend_All(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
+print(unvisited_spot_id_list)
 print("Unvisited to Visited")
 result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 pprint(result_UtoV_top)
 
 ##########################
-select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd4 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd4".format(tuple(visited_spot_id_list))
+select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5".format(tuple(visited_spot_id_list))
 visited_spot_reviews = myp_pk01.Spot_List_TFIDF(select_visited_spot_reviews)
-visited_tfidf,visited_mean = myp_pk01.Tfidf(visited_spot_reviews)
-## print("既訪問毎平均：\n" + str(visited_spot_name_all) + "\n" + str(visited_mean))
+visited_tfidf = myp_pk01.Tfidf(visited_spot_reviews)
+print(visited_tfidf)
 
-select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd4 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd4".format(tuple(unvisited_spot_id_list))
+select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5".format(tuple(unvisited_spot_id_list))
 unvisited_spot_reviews = myp_pk01.Spot_List_TFIDF(select_unvisited_spot_reviews)
-unvisited_tfidf,unvisited_mean = myp_pk01.Tfidf(unvisited_spot_reviews)
-## print("未訪問毎平均：\n" + str(unvisited_spot_name_all) + "\n" + str(unvisited_mean))
+print(len(unvisited_spot_reviews))
+unvisited_tfidf = myp_pk01.Tfidf(unvisited_spot_reviews)
 
-# print("\n相加平均")
-# # VtoU_top10 = myp_pk01.Sort_TFIDF_VtoU(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
-# # print("\n既訪問，未訪問，特徴語，2つの値の差(絶対値)，既値，未値")
-# # pprint(VtoU_top10)
-#
-# UtoV_top10 = myp_pk01.Sort_TFIDF_UtoV(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
-# print("\n未訪問，既訪問，特徴語，2つの値の差(絶対値)，未値，既値")
-# pprint(UtoV_top10)
-
-print("\n調和平均")
-# VtoU_top10 = myp_pk01.Sort_TFIDF_VtoU_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_VtoU_top)
-# print("\n既訪問，未訪問，特徴語，2つの値の差(絶対値)，既値，未値")
-# pprint(VtoU_top10)
-
-UtoV_top10 = myp_pk01.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,visited_mean,unvisited_mean,result_UtoV_top)
+UtoV_top10 = myp_pk01.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
 print("\n未訪問，既訪問，特徴語，2つの値の差(絶対値)，未値，既値")
 pprint(UtoV_top10)

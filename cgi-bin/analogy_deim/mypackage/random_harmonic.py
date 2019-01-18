@@ -4,36 +4,41 @@ import random
 
 bytesymbols = re.compile("[!-/:*-@[-`{-~\d]") ## 半角記号，数字\d
 
-def Word_Random(all_spot,result):
-    ## 既訪問と未訪問が共に出現する単語
+## 算術平均
+def Word_Mean(all_spot,result):
     all_data,top10 = [],[]
-    # for i in tqdm(range(len(all_spot[0]))):
-    #     temp = []
-    #     same_word = list(set([all_spot[0][i][j][0] for j in range(len(all_spot[0][i]))]) & set([all_spot[1][i][j][0] for j in range(len(all_spot[1][i]))]))
-    #     for sw in same_word:
-    #         un = [j for j in range(len(all_spot[0][i])) if all_spot[0][i][j][0] == sw][0]
-    #         vi = [j for j in range(len(all_spot[1][i])) if all_spot[1][i][j][0] == sw][0]
-    #         if len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None:
-    #              temp.append(all_spot[0][i][un][0])
-    #     all_data.append(temp)
-    #     random.shuffle(all_data[i])
-    #     # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
-    #     top10.append([result[i][0],result[i][1][0],result[i][1][1],all_data[i][:5]])
-    ## 既訪問と未訪問が共に出現する単語でなくでも大丈夫
-    for i in range(len(all_spot[0])):
-        temp1,temp2 = [],[]
-        for j in range(len(all_spot[0][i])):
-            if len(all_spot[0][i][j][0])>1 and re.search(bytesymbols,all_spot[0][i][j][0])==None:
-                temp1.append(all_spot[0][i][j][0])
-        for k in range(len(all_spot[1][i])):
-            if len(all_spot[1][i][k][0])>1 and re.search(bytesymbols,all_spot[1][i][k][0])==None:
-                temp2.append(all_spot[1][i][k][0])
-        all_data.append(temp1+temp2)
-        # random.shuffle(all_data[i]) ## ランダムソート
-        word = random.sample(all_data[i],5) ## ランダム5つ取り出す
-        top10.append([result[i][0],result[i][1][0],result[i][1][1],word])
+    for i in tqdm(range(len(all_spot[0]))):
+        temp = []
+        same_word = list(set([all_spot[0][i][j][0] for j in range(len(all_spot[0][i]))]) & set([all_spot[1][i][j][0] for j in range(len(all_spot[1][i]))]))
+        for sw in same_word:
+            un = [j for j in range(len(all_spot[0][i])) if all_spot[0][i][j][0] == sw][0]
+            vi = [j for j in range(len(all_spot[1][i])) if all_spot[1][i][j][0] == sw][0]
+            if len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None:
+                 temp.append([all_spot[0][i][un][0],(all_spot[0][i][un][1]+all_spot[1][i][vi][1])/2])
+        all_data.append(temp)
+        all_data[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
+        # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
+        top10.append([result[i][0],result[i][1][0],result[i][1][1],all_data[i][:5]])
     return top10
 
+## 掛け算
+def Word_Multiplication(all_spot,result):
+    all_data,top10 = [],[]
+    for i in tqdm(range(len(all_spot[0]))):
+        temp = []
+        same_word = list(set([all_spot[0][i][j][0] for j in range(len(all_spot[0][i]))]) & set([all_spot[1][i][j][0] for j in range(len(all_spot[1][i]))]))
+        for sw in same_word:
+            un = [j for j in range(len(all_spot[0][i])) if all_spot[0][i][j][0] == sw][0]
+            vi = [j for j in range(len(all_spot[1][i])) if all_spot[1][i][j][0] == sw][0]
+            if len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None:
+                 temp.append([all_spot[0][i][un][0],all_spot[0][i][un][1]*all_spot[1][i][vi][1]])
+        all_data.append(temp)
+        all_data[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
+        # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
+        top10.append([result[i][0],result[i][1][0],result[i][1][1],all_data[i][:5]])
+    return top10
+
+## 調和平均
 def Word_Harmonic(all_spot,result):
     ## 一番類似するスポットの特徴語top10を求める
     all_data,top10 = [],[]
@@ -44,14 +49,13 @@ def Word_Harmonic(all_spot,result):
             un = [j for j in range(len(all_spot[0][i])) if all_spot[0][i][j][0] == sw][0]
             vi = [j for j in range(len(all_spot[1][i])) if all_spot[1][i][j][0] == sw][0]
             if len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None:
-                 temp.append([all_spot[0][i][un][0],abs(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))])
+                 temp.append([all_spot[0][i][un][0],2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1])])
         all_data.append(temp)
         all_data[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
         # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
         top10.append([result[i][0],result[i][1][0],result[i][1][1],all_data[i][:5]])
     return top10
 
-## 調和平均 差が小値が大，差が大値が小 → 値が大の方が良い(昇順後ろから10個)
 def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,result):
     ## TFIDFの結果にスポット名を追加
     vis_spot,unvis_spot = [],[]
@@ -85,6 +89,7 @@ def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,result):
     #     # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
     #     top10.append([result[i][0],result[i][1][0],result[i][1][1],word_r,word_h])
     # return top10
-    top_random = Word_Random(all_spot,result)
+    top_random = Word_Mean(all_spot,result)
+    top_multi = Word_Multiplication(all_spot,result)
     top_harmonic = Word_Harmonic(all_spot,result)
-    return top_random,top_harmonic
+    return top_random,top_multi,top_harmonic

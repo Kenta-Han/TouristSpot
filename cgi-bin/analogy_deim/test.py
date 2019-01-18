@@ -126,19 +126,21 @@ result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 ## 既訪問スポットの単語に重みつけ
 select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(visited_spot_id_list))
 visited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_visited_spot_reviews)
-visited_tfidf,visited_mean = myp_tfidf.Tfidf_HM(visited_spot_reviews)
+visited_tfidf = myp_tfidf.Tfidf(visited_spot_reviews)
 
 ## 未訪問スポットの単語に重みつけ
 select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(unvisited_spot_id_list))
 unvisited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_unvisited_spot_reviews)
-unvisited_tfidf,unvisited_mean = myp_tfidf.Tfidf_HM(unvisited_spot_reviews)
+unvisited_tfidf = myp_tfidf.Tfidf(unvisited_spot_reviews)
 
 ## 既訪問と未訪問スポット特徴語TOP10(調和平均)
-top10_random,top10_harmonic = myp_rh.Sort_TFIDF_UtoV(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
+top10_mean,top10_harmonic = myp_rh.Sort_TFIDF_UtoV(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
 # top10 = myp_hmean.Sort_TFIDF_UtoV(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
+print(top10_mean)
+print(top10_harmonic)
 
 ## レスポンス作成，mysqlに入れるためのカラム内容作成
-sql_word_r,json_wrandom = myp_res.Response_WRandom(top10_random[:5],name,lat,lng,url)
+sql_word_r,json_wmean = myp_res.Response_WMean(top10_mean[:5],name,lat,lng,url)
 
 sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word_h,json_harmonic = myp_res.Response_Harmonic(top10_harmonic[:5],name,lat,lng,url)
 

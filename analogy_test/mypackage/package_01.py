@@ -44,26 +44,7 @@ def Doc2Cec_Feature(spot_vectors): ## doc2vecを使ってスポットベクト�
     return result_list
 
 def Recommend_All(visited_name,unvisited_name,visited_review,unvisited_review):
-    value_VtoU = []
     value_UtoV = []
-    for i in range(len(visited_name)):
-        temp_VtoU = []
-        for j in range(len(unvisited_name)):
-            # visited_to_unvisited = sc.sim_cos(visited_review[i],unvisited_review[j])
-            visited_to_unvisited = CosSim(visited_review[i],unvisited_review[j])
-            temp_VtoU.append([unvisited_name[j],visited_to_unvisited])
-        value_VtoU.append(temp_VtoU)
-    list_VtoU = list(zip(visited_name,value_VtoU)) ## リスト作成(スポット名,類似度)
-    list_VtoU_top = [] ## スポットから類似度一番高いスポットを取り出す
-    for i in range(len(list_VtoU)):
-        list_VtoU[i][1].sort(key=lambda x:x[1],reverse=True) ## 降順ソート
-        # list_VtoU_top.append([list_VtoU[i][0],list_VtoU[i][1][0]])
-        ## 0.1以上
-        if list_VtoU[i][1][0][1] > 0.125:
-            list_VtoU_top.append([list_VtoU[i][0],list_VtoU[i][1][0]])
-        else:
-            continue
-
     for i in range(len(unvisited_name)):
         temp_UtoV = []
         for j in range(len(visited_name)):
@@ -79,11 +60,7 @@ def Recommend_All(visited_name,unvisited_name,visited_review,unvisited_review):
             list_UtoV_top.append([list_UtoV[i][0],list_UtoV[i][1][0]])
         else:
             continue
-    # pprint(list_VtoU)
-    # print("VtoU　↑\nUtoV　↓")
-    # pprint(list_UtoV)
-    return list_VtoU_top,list_UtoV_top
-
+    return list_UtoV_top
 
 ########################################################
 ########################################################
@@ -92,6 +69,7 @@ def Spot_List_TFIDF(select_spot):
     cur.execute(select_spot)
     for i in cur:
         all_spot_list.append(i)
+    print(len(all_spot_list))
     spot_review_list = []
     temp = []
     for i in range(len(all_spot_list)):
@@ -117,6 +95,7 @@ def Spot_List_TFIDF(select_spot):
 ## TFIDFを求める(単語に重み付け)
 def Tfidf(review_all):
     dictionary = corpora.Dictionary(review_all)
+    # print(dictionary)
     dictionary_inv = {}
     for dic in dictionary.token2id.items():
         dictionary_inv[dic[1]]=dic[0]
@@ -135,51 +114,7 @@ def Tfidf(review_all):
             i += 1
         doc2[j] = doc3
         j += 1
-    ## スポット毎の平均を計算
-    mean = []
-    sum = 0
-    for i in range(len(doc2)):
-        for j in range(len(doc2[i])):
-            sum += doc2[i][j][1]
-        mean.append(sum/len(doc2[i]))
-        sum = 0
-    return doc2,mean
-
-def Sort_TFIDF_VtoU(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean,unvis_mean,result):
-    ## TFIDFの結果にスポット名を追加
-    vis_spot,unvis_spot = [],[]
-    for i in range(len(vis_spot_name)):
-        vis_spot.append([vis_spot_name[i],vis_tfidf[i],vis_mean[i]])
-    for i in range(len(unvis_spot_name)):
-        unvis_spot.append([unvis_spot_name[i],unvis_tfidf[i],unvis_mean[i]])
-    ## 一番類似するスポットを関連付ける
-    visited,unvisited,all_spot = [],[],[]
-    visited_mean,unvisited_mean = [],[]
-    for i in range(len(result)):
-        for j in range(len(vis_spot)):
-            if result[i][0] == vis_spot[j][0]:
-                visited.append(vis_spot[j][1])
-                visited_mean.append(unvis_spot[j][2])
-    for i in range(len(result)):
-        for j in range(len(unvis_spot)):
-            if result[i][1][0] == unvis_spot[j][0]:
-                unvisited.append(unvis_spot[j][1])
-                unvisited_mean.append(unvis_spot[j][2])
-    all_spot.extend([visited,unvisited])
-    ## 一番類似するスポットの特徴語top10を求める
-    all,top10 = [],[]
-    for i in tqdm(range(len(all_spot[0]))):
-        temp = []
-        for j in tqdm(range(len(all_spot[0][i]))):
-            for k in range(len(all_spot[1][i])):
-                ## 同じ単語，値は共に平均以上
-                if all_spot[0][i][j][0]==all_spot[1][i][k][0] and all_spot[0][i][j][1]>=visited_mean[i] and all_spot[1][i][k][1]>=unvisited_mean[i]:
-                # if all_spot[0][i][j][0]==all_spot[1][i][k][0] and all_spot[0][i][j][1]>=0.01 and all_spot[1][i][k][1]>=0.01:
-                    temp.append([all_spot[0][i][j][0],abs(all_spot[0][i][j][1]-all_spot[1][i][k][1]),all_spot[0][i][j][1],all_spot[1][i][k][1]]) ## 元の値をみる
-        all.append(temp)
-        all[i].sort(key=lambda x:x[1]) ## 昇順ソート(0に近い程が良い)
-        top10.append([result[i][0],result[i][1][0],all[i][:10]])
-    return top10
+    return doc2
 
 def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean,unvis_mean,result):
     ## TFIDFの結果にスポット名を追加
@@ -221,44 +156,15 @@ def Sort_TFIDF_UtoV(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean
     return top10
 
 ## 調和平均 差が小値が大，差が大値が小 → 値が大の方が良い(昇順後ろから10個)
-def Sort_TFIDF_VtoU_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean,unvis_mean,result):
+def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,result):
     ## TFIDFの結果にスポット名を追加
     vis_spot,unvis_spot = [],[]
     for i in range(len(vis_spot_name)):
         vis_spot.append([vis_spot_name[i],vis_tfidf[i]])
     for i in range(len(unvis_spot_name)):
         unvis_spot.append([unvis_spot_name[i],unvis_tfidf[i]])
-    ## 一番類似するスポットを関連付ける
-    visited,unvisited,all_spot = [],[],[]
-    for i in range(len(result)):
-        for j in range(len(vis_spot)):
-            if result[i][0] == vis_spot[j][0]:
-                visited.append(vis_spot[j][1])
-    for i in range(len(result)):
-        for j in range(len(unvis_spot)):
-            if result[i][1][0] == unvis_spot[j][0]:
-                unvisited.append(unvis_spot[j][1])
-    all_spot.extend([visited,unvisited])
-    ## 一番類似するスポットの特徴語top10を求める
-    all,top10 = [],[]
-    for i in tqdm(range(len(all_spot[0]))):
-        temp = []
-        for j in tqdm(range(len(all_spot[0][i]))):
-            for k in range(len(all_spot[1][i])):
-                if all_spot[0][i][j][0]==all_spot[1][i][k][0] and len(all_spot[0][i][j][0])>1 and re.search(bytesymbols,all_spot[0][i][j][0])==None:
-                    temp.append([all_spot[0][i][j][0],abs(2/(1/all_spot[0][i][j][1]+1/all_spot[1][i][k][1])),all_spot[0][i][j][1],all_spot[1][i][k][1]])
-        all.append(temp)
-        all[i].sort(key=lambda x:x[1],reverse=True) ## 昇順ソート
-        top10.append([result[i][0],result[i][1][0],all[i][:10]])
-    return top10
-
-def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,vis_mean,unvis_mean,result):
-    ## TFIDFの結果にスポット名を追加
-    vis_spot,unvis_spot = [],[]
-    for i in range(len(vis_spot_name)):
-        vis_spot.append([vis_spot_name[i],vis_tfidf[i]])
-    for i in range(len(unvis_spot_name)):
-        unvis_spot.append([unvis_spot_name[i],unvis_tfidf[i]])
+    # print(vis_spot)
+    # print(unvis_spot)
     ## 一番類似するスポットを関連付ける
     visited,unvisited,all_spot = [],[],[]
     for i in range(len(result)):
@@ -277,10 +183,11 @@ def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
         same_word = list(set([all_spot[0][i][j][0] for j in range(len(all_spot[0][i]))]) & set([all_spot[1][i][j][0] for j in range(len(all_spot[1][i]))]))
         for sw in same_word:
             un = [j for j in range(len(all_spot[0][i])) if all_spot[0][i][j][0] == sw][0]
-            vi  = [j for j in range(len(all_spot[1][i])) if all_spot[1][i][j][0] == sw][0]
+            vi = [j for j in range(len(all_spot[1][i])) if all_spot[1][i][j][0] == sw][0]
             if len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None:
                  temp.append([all_spot[0][i][un][0],abs(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1])),all_spot[0][i][un][1],all_spot[1][i][vi][1]])
         all.append(temp)
-        all[i].sort(key=lambda x:x[1],reverse=True)
-        top10.append([result[i][0],result[i][1][0],all[i][:10]])
+        all[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
+        # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
+        top10.append([result[i][0],result[i][1][0],result[i][1][1],all[i][:5]])
     return top10
