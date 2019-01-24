@@ -237,6 +237,7 @@
         for (var i = 0; i < data.length; i++) {
           set[i] = "<tr><td class='unv'><a href='" + data[i]["unvis_url"] + "' target='_blank'>" + data[i]["unvis_name"] + "</a></td><td class='word'>" + data[i]["word"] +
             "</td><td class='vis'>" + data[i]["vis_name"] + "</td><td class='hyouka_word'><ul class='hyouka_ul'><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
+            data[i]["label"] + "：' value='0'>キーワードなし</li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
             data[i]["label"] + "：' value='1'>2つのスポットにそもそも関係性があるが，キーワードにより関係が明確になった</li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
             data[i]["label"] + "：' value='2'>2つのスポットの関係にキーワードにより初めて気がついた</li><li><input type='radio' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
             data[i]["label"] + "：' value='3'>2つのスポットに関係性があるがキーワードは関係性を表していない<br><input type='text' name='" + data[i]["unvis_name"] + " and " + data[i]["vis_name"] + "_" +
@@ -288,9 +289,9 @@
                   },
                 })
                 .done(function(response) { //データを受信
-                  console.log(response);
+                  // console.log(response);
                   res = $.parseJSON(response);
-                  console.log(res)
+                  // console.log(res)
                   // res[0]はデータ，res[1]はrandom，res[2]はrecord_id
                   vector = Vector(res[0]);
                   $(".vector_result").html(vector);

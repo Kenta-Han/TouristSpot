@@ -22,8 +22,7 @@ def Spot_Group(unf,fam):
         result.extend([unf[j] + " and " + fam[j]])
     return result
 
-select_data = "SELECT * FROM analogy_deim WHERE finish_datetime is not NULL;"
-# select_data = "SELECT * FROM analogy_imecs WHERE id=19;"
+select_data = "SELECT * FROM analogy_deim WHERE finish_datetime is not NULL and id not in(10,19,23,24,26,28,32,20,22,30,34);"
 all_data = Spot_List(select_data)
 
 for i in range(len(all_data)):

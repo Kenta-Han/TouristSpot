@@ -1,4 +1,4 @@
-import json
+# import json
 import random, string
 
 def Randomname(n):
@@ -7,20 +7,18 @@ def Randomname(n):
 
 ## 承認コード，乱数生成
 def Response_Random():
-    json_random = {"randomname":""}
     random = Randomname(12)
-    json_random["randomname"] = random
-    return random,json_random
+    return random
 
 ##　相対的な特徴（差分ベクトルー調和平均）のjson形式整理
-def Response_Harmonic(data,name,lat,lng,url,record_id,json_random):
+def Response_Harmonic(data,name,lat,lng,url):
     json_harmonic = []
     temp_sql_word = []
     sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = [],[],[],[],[],""
 
     for i in range(len(data)):
         response_json = {"unvis_name":"","vis_name":"","cossim":"","unvis_lat":"","unvis_lng":"","word":"","unvis_url":""}
-
+        #
         response_json["unvis_name"] = data[i][0]
         sql_unvis.append(data[i][0])
 
@@ -56,11 +54,4 @@ def Response_Harmonic(data,name,lat,lng,url,record_id,json_random):
         sql_word += tmp
     sql_word = sql_word[:-2]
 
-    record = {"record_id":""}
-    record["record_id"] = record_id
-    all_json = []
-    all_json = [json_harmonic] + [json_random] + [record]
-
-    print(json.dumps(all_json)) ## 送信
-
-    return sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word
+    return json_harmonic,sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word

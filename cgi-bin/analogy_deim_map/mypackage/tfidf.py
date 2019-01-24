@@ -56,35 +56,3 @@ def Tfidf(review_all):
         doc2[j] = doc3
         j += 1
     return doc2
-
-
-## TFIDFを求める(単語に重み付け)，差分ベクトル用
-def Tfidf_HM(review_all):
-    dictionary = corpora.Dictionary(review_all)
-    dictionary_inv = {}
-    for dic in dictionary.token2id.items():
-        dictionary_inv[dic[1]]=dic[0]
-    corpus = list(map(dictionary.doc2bow,review_all))
-    test_model = models.TfidfModel(corpus)
-    corpus_tfidf = list(test_model[corpus])
-    j = 0
-    doc2 = [] ## id表示ではないもの
-    for wod in corpus_tfidf:
-        i = 0
-        doc2.append('') ## 空要素
-        doc3 = []
-        for ch in wod:
-            doc3.append('')
-            doc3[i] = [dictionary_inv[ch[0]],ch[1]]
-            i += 1
-        doc2[j] = doc3
-        j += 1
-    ## スポット毎の平均を計算
-    mean = []
-    sum = 0
-    for i in range(len(doc2)):
-        for j in range(len(doc2[i])):
-            sum += doc2[i][j][1]
-        mean.append(sum/len(doc2[i]))
-        sum = 0
-    return doc2,mean

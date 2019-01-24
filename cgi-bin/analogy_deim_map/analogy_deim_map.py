@@ -1,19 +1,56 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import cgi,cgitb
+import random
+
+import MySQLdb
+import os, sys ## 全フォルダ参照
+path = os.path.join(os.path.dirname(__file__), '../')
+sys.path.append(path)
+from mysql_connect import jalan_ktylab_new
+conn,cur = jalan_ktylab_new.main()
+
+cgitb.enable()
+
+count_method_AB = "SELECT method,count(method) FROM analogy_deim_map WHERE finish_datetime is not null AND method='AtoB_B'"
+cur.execute(count_method_AB)
+AtoB = cur.fetchone()
+print(AtoB)
+count_method_BA = "SELECT method,count(method) FROM analogy_deim_map WHERE finish_datetime is not null AND method='BtoA_A'"
+cur.execute(count_method_BA)
+BtoA = cur.fetchone()
+print(BtoA)
+
+jsrand = ""
+if (BtoA[1] - AtoB[1]) != 0 :
+    if BtoA[1] > AtoB[1]:
+        jsrand = "processingAB_A.py"
+    else:
+        jsrand = "processingBA_B.py"
+else:
+    rand = random.randrange(2)+1
+    if rand == 1:
+        jsrand = "processingAB_A.py"
+    else:
+        jsrand = "processingBA_B.py"
+
+html_body = u"""
 <!DOCTYPE html>
 <html>
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <link href="./data/stylesheet_analogy_map.css" rel="stylesheet" type="text/css" />
+  <link href="../../data/stylesheet_analogy_deim_map.css" rel="stylesheet" type="text/css" />
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
   <script type="text/javascript" src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-  <title>Information to recall the relationship between tourist spots</title>
+  <title>観光スポット間の関係を想起する情報の提示に関する実験</title>
   <script>
     $(function () {
     $.ajax({
-      url:'./data/txt/spot.txt',
+      url:'../../data/txt/spot.txt',
       success: function(data){
-        var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+        var datam = data.split(/\\r\\n|\\r|\\n/);
         $('.visited').autocomplete({
           source: datam,
           autoFocus: true,
@@ -23,9 +60,9 @@
       }
     })
     $.ajax({
-      url:'./data/txt/area2.txt',
+      url:'../../data/txt/area2.txt',
       success: function(data){
-        var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+        var datam = data.split(/\\r\\n|\\r|\\n/);
         $('#area').autocomplete({
           source: datam,
           // autoFocus: true,
@@ -40,18 +77,18 @@
 
 <body>
   <header>
-    <h1>Information to recall the relationship between tourist spots</h1>
+    <h1>観光スポット間の関係を想起する情報の提示に関する実験</h1>
   </header>
   <div class="main">
     <form id="form" name="form1">
-      <h3>User Name：
-        <input type="text" id="user_id" name="user_id" maxlength="40" placeholder="anonymity" />
+      <h3>CrowdWorksID（必須）：
+        <input type="text" id="user_id" name="user_id" maxlength="40" placeholder="CrowdWorksID" value="test" />
       </h3>
 
       <h3>
         <ul id="setumei">
-          <li>Please input four to ten favored tourist spots and  visited tourist spots.</li>
-          <li>Since input candidates are displayed, please select from among them.</li>
+          <li>これまで訪れたことがあり，気に入った観光スポットを4つ以上入力してください</li>
+          <li>入力すると候補が表示されるので，その中から選択ください</li>
         </ul>
       </h3>
 
@@ -68,10 +105,10 @@
         <li><input type="text" class="visited" name="visited" /></li>
       </ol>
 
-      <h3>Please enter the prefecture / area you'd like to visit, never been done on a trip etc.</h3>
+      <h3>旅行等で行ったことがなく，これから行ってみたい都道府県・エリアを入力してください</h3>
 
-      <h3>Prefecture：
-        <select name="prefecture" id="prefecture">
+      <h3>都道府県1：
+        <select name="prefecture1" id="prefecture1">
           <option value="北海道">北海道</option>
           <option value="青森">青森</option>
           <option value="岩手">岩手</option>
@@ -122,23 +159,71 @@
         </select>
       </h3>
 
-      <h3>Area(option)：
-        <input type="text" id="area" name="area" placeholder="函館・大沼・松前" />
+      <h3>エリア1(任意)：
+        <input type="text" id="area1" name="area1" placeholder="函館・大沼・松前" />
       </h3>
-      <input type="submit" id="start" value="Start" />
+
+      <h3>都道府県2：
+        <select name="prefecture2" id="prefecture2">
+          <option value="東京">東京</option>
+          <option value="北海道">北海道</option>
+          <option value="青森">青森</option>
+          <option value="岩手">岩手</option>
+          <option value="宮城">宮城</option>
+          <option value="秋田">秋田</option>
+          <option value="山形">山形</option>
+          <option value="福島">福島</option>
+          <option value="茨城">茨城</option>
+          <option value="栃木">栃木</option>
+          <option value="群馬">群馬</option>
+          <option value="埼玉">埼玉</option>
+          <option value="千葉">千葉</option>
+          <!-- <option value="東京">東京</option> -->
+          <option value="神奈川">神奈川</option>
+          <option value="新潟">新潟</option>
+          <option value="富山">富山</option>
+          <option value="石川">石川</option>
+          <option value="福井">福井</option>
+          <option value="山梨">山梨</option>
+          <option value="長野">長野</option>
+          <option value="岐阜">岐阜</option>
+          <option value="静岡">静岡</option>
+          <option value="愛知">愛知</option>
+          <option value="三重">三重</option>
+          <option value="滋賀">滋賀</option>
+          <option value="京都">京都</option>
+          <option value="大阪">大阪</option>
+          <option value="兵庫">兵庫</option>
+          <option value="奈良">奈良</option>
+          <option value="和歌山">和歌山</option>
+          <option value="鳥取">鳥取</option>
+          <option value="島根">島根</option>
+          <option value="岡山">岡山</option>
+          <option value="広島">広島</option>
+          <option value="山口">山口</option>
+          <option value="徳島">徳島</option>
+          <option value="香川">香川</option>
+          <option value="愛媛">愛媛</option>
+          <option value="高知">高知</option>
+          <option value="福岡">福岡</option>
+          <option value="佐賀">佐賀</option>
+          <option value="長崎">長崎</option>
+          <option value="熊本">熊本</option>
+          <option value="大分">大分</option>
+          <option value="宮崎">宮崎</option>
+          <option value="鹿児島">鹿児島</option>
+          <option value="沖縄">沖縄</option>
+        </select>
+      </h3>
+
+      <h3>エリア2(任意)：
+        <input type="text" id="area2" name="area2" placeholder="函館・大沼・松前" />
+      </h3>
+      <div class="vector_result"></div>
+      <p style="text-align:center;font-size:20px;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大150秒かかる場合があります，150秒過ぎると「Timeout」が表示されます．）<br><span style="color:#ff0000;">結果表示後「承認コード」をコピーして，CrowdWorksのタスクに貼り付けた後に，「次へ」をクリックしてください．</span></p>
+      <input type="submit" id="start" value="実験開始" />
     </form>
   </div>
-
-  <form id="form_result" name="form_result">
-    <div class="vector_result"></div>
-    <div class="result">
-      <div id="map">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%"
-          height="750" frameborder="0" style="border:0" allowfullscreen></iframe>
-      </div>
-      <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo&language=en"></script>
-    </div>
-  </form>
 
   <script type="text/javascript">
     var temp_vis = [];
@@ -159,7 +244,11 @@
         flag = 1;
       } else if (temp_vis.length < 4) {
         flag = 1;
-      } else if (document.form1.prefecture.value == "") {
+      } else if (document.form1.prefecture1.value == "") {
+        flag = 1;
+      } else if (document.form1.prefecture2.value == "") {
+        flag = 1;
+      } else if (document.form1.prefecture1.value == document.form1.prefecture2.value) {
         flag = 1;
       }
 
@@ -171,12 +260,11 @@
     }
     //既訪問スポットの重複チェック
     function jyufuku() {
-      var counts = {};
+      var counts = [];
       for (var i = 0; i < temp_vis.length; i++) {
         var key = temp_vis[i];
         counts[key] = (counts[key]) ? counts[key] + 1 : 1;
       }
-
       var flag1 = []
       for (var key in counts) {
         // console.log(key + " : " + counts[key]);
@@ -193,7 +281,6 @@
         return false;
       }
     }
-
     //既訪問スポットが"---"入っているか
     function word_check() {
       var flag = 0;
@@ -224,67 +311,8 @@
       return intersection;
     }
 
-    // マップ作成 Start
-    var map;
-    var marker = [];
-    var infoWindow = [];
-    function initMap(data) {
-      var markerData = data;
-      // 地図の作成
-      console.log("Make Map");
-      var cnt = 0,
-        sum_lat = 0,
-        sum_lng = 0;
-      for (var i = 0; i < markerData.length; i++) {
-        sum_lat = sum_lat + Number(markerData[i]["unvis_lat"]);
-        sum_lng = sum_lng + Number(markerData[i]["unvis_lng"]);
-        cnt += 1;
-      }
-      map = new google.maps.Map(document.getElementById("map"), { // #mapに地図を埋め込む
-        center: {
-          lat: sum_lat / cnt,
-          lng: sum_lng / cnt
-        },
-        zoom: 12 // 地図のズームを指定
-      });
-      // マーカー毎の処理
-      for (var i = 0; i < markerData.length; i++) {
-        markerLatLng = new google.maps.LatLng({
-          lat: Number(markerData[i]["unvis_lat"]),
-          lng: Number(markerData[i]["unvis_lng"])
-        }); // 緯度経度のデータ作成
-        marker[i] = new google.maps.Marker({ // マーカーの追加
-          position: markerLatLng, // マーカーを立てる位置を指定
-          map: map // マーカーを立てる地図を指定
-        });
-
-        infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
-          // 吹き出しに表示する内容
-          content: "<table border='1' id='window'><tr><th>Unfamiliar Spot Name</th><td><a href='" + markerData[i]["url"] + "'>" + markerData[i]["unvis_name"] + "</a></td></tr><tr><th>Familiar Spot Name</th><td>" + markerData[i]["vis_name"] +
-            "</td</tr><tr><th>Explainable Keyword</th><td>" + markerData[i]["word"] + "</td></tr></table>"
-        });
-        markerEvent(i); // マーカーにクリックイベントを追加
-      }
-      // return infoWindow;
-    }
-    // マーカーにクリックイベントを追加
-    var currentInfoWindow = null;
-
-    function markerEvent(i) {
-      marker[i].addListener("click", function() { // マーカーをクリックしたとき
-        if (currentInfoWindow) {
-          currentInfoWindow.close();
-        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
-        infoWindow[i].open(map, marker[i]); // 吹き出しの表示
-        currentInfoWindow = infoWindow[i];
-      });
-    }
-    // マップ作成 Finish
-
     var post_visited = [];
-    // データの送信Ajax
-    $(document).ready(function() {
-      $("#form").submit(function() {
+    $('#start').click(function(){
         event.preventDefault();
         if (check() == true) {
           if (jyufuku() == true) {
@@ -295,59 +323,33 @@
                   post_visited.push($(this).val());
                 }
               });
-              location.href = "#form_result"
-              $(".vector_result").html("<h2>Loading...</h2>");
+              $(".vector_result").html("<h2>Loading...</h2><div class='loader'>Loading...</div>");
               $("#start").prop("disabled", true); //ボタンクリック禁止
               window.onerror = function() {
-                alert("Error：Please try again because the problem is found in the input.");
+                alert("Error：入力に問題が見つかったためもう一度入力してください");
                 // location.reload();
-                $(".vector_result").html("<h1>Error：Please try again because the problem is found in the input.</h1>");
+                $(".vector_result").html("<h1>Error：入力に問題が見つかったためもう一度入力してください</h1>");
               };
-              $.ajax({
-                  url: "./cgi-bin/analogy_map/processing.py",
-                  type: "post",
-                  dataType: "text",
-                  data: {
-                    user_id: $("#user_id").val(),
-                    visited_name: post_visited,
-                    prefecture_name: $("#prefecture").val(),
-                    area_name: $("#area").val(),
-                  },
-                  timeout: 60000,
-                  error: function() {
-                    alert("Timeout：Try again later.")
-                  },
-                })
-                .done(function(response) { //データを受信
-                  // console.log(response);
-                  var res = $.parseJSON(response); //受信したデータをjson形式に変更
-                  console.log(res); // resは相対(差分+調和)
-                  console.log(typeof res); 
-                  if (res.length == 0){
-                    $(".vector_result").html("<h1>Search Result：Not found.</h1>");
-                    $("#start").prop("disabled", false); //ボタンクリック禁止を解除
-                  }
-                  else {
-                    $(".vector_result").html("<h2>Search Result：Please look while zooming.</h2>");
-                    initMap(res);
-                    $("#start").prop("disabled", false); //ボタンクリック禁止を解除
-                  }
-                })
-                .fail(function() {
-                  $(".result").html("Failed.");
-                });
+              var link = "%s";
+              $(this).parents('form').attr('action', link);
+              $(this).parents('form').submit();
+              setTimeout(function(){
+                  alert("Timeout：しばらくしてもう一度試してください");
+                  location.href = "index_map.py";
+              }, 150000);
             } else {
-              alert('Please choose from the search candidate.');
+              alert('検索候補から選んでください');
             }
           } else {
-            alert('There was a duplicate input.');
+            alert('入力に重複がありました');
           }
         } else {
-          alert('There was not entered in the required fields.');
+          alert('・必須項目に未記入欄がありました\\n・都道府県に重複がありました');
         }
-      });
     });
   </script>
 </body>
 
 </html>
+"""
+print(html_body % str(jsrand))
