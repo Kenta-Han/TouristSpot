@@ -1,15 +1,24 @@
 # TouristSpot
 
-## 作成中
+#### M1後期 DEIM2019実験用01
+#### ユーザの既訪問スポットの位置付けに基づく未訪問スポットの説明手法
+TouristSpot/analogy_deim.html
+TouristSpot/cgi-bin/analogy_deim
 
-#### M1後期 実験用
-#### 未訪問エリアの理解支援のための既訪問スポットに基づく類推情報提示手法
-TouristSpot/index_analogy.html
-TouristSpot/cgi-bin/analogy
+#### M1後期 IMECS2019実験用02
+#### ユーザの既訪問スポットの位置付けに基づく未訪問スポットの説明手法
+TouristSpot/analogy_deim_map.html
+TouristSpot/cgi-bin/analogy_deim_map
 
-#### M1後期 実験用のテストバージョン(visited_mapのテスト)
-#### 未訪問エリアの理解支援のための既訪問スポットに基づく類推情報提示手法
-TouristSpot/cgi-bin/analogy_test
+#### M1後期 IMECS2019実験用
+#### ユーザの既訪問スポットの位置付けに基づく未訪問スポットの説明手法
+TouristSpot/analogy_imecs.html
+TouristSpot/cgi-bin/analogy_imecs
+
+#### M1後期 サービスのみ
+#### ユーザの既訪問スポットの位置付けに基づく未訪問スポットの説明手法
+TouristSpot/analogy_map.html
+TouristSpot/cgi-bin/analogy_map
 
 #### M1前期 SoC2018の実験用
 #### 観光スポット検索のためのユーザのレビュー選択と特徴抽出に関する考察
