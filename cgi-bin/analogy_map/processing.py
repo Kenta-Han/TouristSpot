@@ -141,11 +141,11 @@ select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all
 unvisited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_unvisited_spot_reviews)
 unvisited_tfidf,unvisited_mean = myp_tfidf.Tfidf_HM(unvisited_spot_reviews)
 
-## 既訪問と未訪問スポット特徴語TOP10(調和平均)
+## 既訪問と未訪問スポット特徴語(調和平均)
 UtoV_top10_harmonic = myp_hmean.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
 
-## レスポンス作成，mysqlに入れるためのカラム内容作成
-sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = myp_res.Response_Harmonic(UtoV_top10_harmonic[:5],name,lat,lng,url)
+## レスポンス作成，mysqlに入れるためのカラム内容作成(10個まで表示)
+sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = myp_res.Response_Harmonic(UtoV_top10_harmonic[:10],name,lat,lng,url)
 
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 sql_update = "UPDATE analogy_map SET unvis_name='{unv}', vis_name='{vis}', cossim='{cos}', word='{word}', unvis_lat='{lat}', unvis_lng='{lng}', word='{word}',finish_datetime='{finish}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis), vis='，'.join(sql_vis), cos='，'.join(sql_cossim), word=sql_word, lat='，'.join(sql_lat), lng='，'.join(sql_lng), finish=finish_datetime, record_id=record_id)

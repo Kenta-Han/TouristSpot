@@ -22,7 +22,7 @@ def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
             if result[i][1][0] == vis_spot[j][0]:
                 visited.append(vis_spot[j][1])
     all_spot.extend([unvisited,visited])
-    ## 一番類似するスポットの特徴語top10を求める
+    ## 一番類似するスポットの特徴語を求める
     all,top10 = [],[]
     for i in tqdm(range(len(all_spot[0]))):
         temp = []
@@ -34,6 +34,6 @@ def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
                  temp.append([all_spot[0][i][un][0],abs(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))])
         all.append(temp)
         all[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
-        # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
+        # ## 未訪問，既訪問，類似度，単語(最初の5個まで)
         top10.append([result[i][0],result[i][1][0],result[i][1][1],all[i][:5]])
     return top10
