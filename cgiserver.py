@@ -19,7 +19,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """マルチスレッド化した HTTPServer"""
     pass
 
-print("Server Start")
+print("Server Start 8000")
 server_address = ("", 8000)
 # マルチスレッド化した HTTP サーバを使う
 httpd = ThreadedHTTPServer(server_address,CGIHTTPRequestHandler)
