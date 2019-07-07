@@ -10,13 +10,13 @@ def Response_Harmonic(data,name,lat,lng,url,description):
     for i in range(len(data)):
         response_json = {"unvis_name":"","vis_name":"","cossim":"","unvis_lat":"","unvis_lng":"","word":"","unvis_url":"","unvis_description":""}
 
-        response_json["unvis_name"] = data[i][0]
+        response_json["unvis_name"] = data[i][0] ## id,group:1 未訪問
         sql_unvis.append(data[i][0])
 
-        response_json["vis_name"] = data[i][1]
+        response_json["vis_name"] = data[i][1] ##  id,group:2　既訪問
         sql_vis.append(data[i][1])
 
-        response_json["cossim"] = data[i][2]
+        response_json["cossim"] = data[i][2] ## value
         sql_cossim.append(str(data[i][2]))
 
         for k in range(len(name)):
@@ -26,7 +26,7 @@ def Response_Harmonic(data,name,lat,lng,url,description):
                 response_json["unvis_lng"] = lng[k]
                 sql_lng.append(lng[k])
                 response_json["unvis_url"] = url[k]
-                response_json["unvis_description"] = description[k]
+                response_json["unvis_description"] = description[k] ## memo
 
         word_list = []
         temp = []
@@ -49,6 +49,7 @@ def Response_Harmonic(data,name,lat,lng,url,description):
     print(json.dumps(json_harmonic)) ## 送信
 
     return sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word
+
 
 
 def Response(vis_name,vis_lat,vis_lng,vis_url,vis_description,unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description,data):

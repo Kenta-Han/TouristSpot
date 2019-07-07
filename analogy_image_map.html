@@ -7,11 +7,44 @@
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
   <script type="text/javascript" src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <!-- <title>Information to recall the relationship between tourist spots</title> -->
   <title>観光スポット間の関係を想起する情報の提示</title>
+  <script>
+    $(function () {
+    $.ajax({
+      url:'./data/txt/spot.txt',
+      success: function(data){
+        var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+        $('.visited').autocomplete({
+          source: datam,
+          autoFocus: true,
+          delay: 300,
+          minLength: 2
+        });
+      }
+    })
+    $.ajax({
+      url:'./data/txt/area2.txt',
+      success: function(data){
+        var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+        $('#area').autocomplete({
+          source: datam,
+          // autoFocus: true,
+          delay: 300,
+          minLength: 2
+        });
+      }
+    })
+  });
+  </script>
 </head>
 
 <body>
-    <div id="main_top">
+  <!-- <header>
+    <h1 style="text-align:center;">観光スポット間の関係を想起する情報提示</h1>
+  </header> -->
+  <div id="main_top">
+    <form id="form" name="form1">
       <h3>User Name：
         <input type="text" id="user_id" name="user_id" maxlength="40" placeholder="anonymity" value="test" />
       </h3>
@@ -22,14 +55,14 @@
             <li>入力すると候補が表示されるので，その中から選択ください</li>
           </ul>
         </h3>
-        <table>
+        <table class="visited">
           <tr>
             <td><input type="text" class="visited" name="visited" value="万博記念公園---大阪" /></td>
             <td><input type="text" class="visited" name="visited" value="鹿苑寺（金閣寺）---京都" /></td>
-            <td><input type="text" class="visited" name="visited" value="万博記念公園---大阪" /></td>
+            <td><input type="text" class="visited" name="visited" value="ナゴヤドーム---愛知" /></td>
           </tr>
           <tr>
-            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" value="宇野港---岡山" /></td>
             <td><input type="text" class="visited" name="visited" /></td>
             <td><input type="text" class="visited" name="visited" /></td>
           </tr>
@@ -41,11 +74,11 @@
         </table>
       </div>
       <div id="unfamilier">
-        <!-- <h3>旅行等で行ったことがなく，これから行ってみたい都道府県・エリアを入力してください</h3> -->
         <h3>これから行ってみたい都道府県・エリアを入力してください</h3>
 
         <h3>Prefecture：
           <select name="prefecture" id="prefecture">
+            <option value="東京">東京</option>
             <option value="北海道">北海道</option>
             <option value="青森">青森</option>
             <option value="岩手">岩手</option>
@@ -58,7 +91,6 @@
             <option value="群馬">群馬</option>
             <option value="埼玉">埼玉</option>
             <option value="千葉">千葉</option>
-            <option value="東京">東京</option>
             <option value="神奈川">神奈川</option>
             <option value="新潟">新潟</option>
             <option value="富山">富山</option>
@@ -97,575 +129,262 @@
         </h3>
 
         <h3>Area(option)：
-          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" />
+          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" value="渋谷" />
         </h3>
         <input type="submit" id="start" value="Start" />
       </div>
-    </div>
-    <div id="main_map">
-      <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205&language=en"
-        width="100%" height="1000%" frameborder="0" style="border:0" allowfullscreen></iframe>
-      <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo&language=en"></script>
-    </div>
-    <div id="image_map">
-      <svg></svg>    <!-- ちょっと広くして色つけた-->
-      <!-- カーソルを合わせたときに表示する情報領域-->
-      <div id="datatip">
-        <h2></h2>
-        <p></p>
+    </form>
+  </div>
+
+  <form id="form_result" name="form_result">
+    <div class="vector_result"></div>
+    <div class="result">
+      <div id="map">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
       </div>
+      <script async defer
+       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
     </div>
+  </form>
 
-    <div id="sidebar">
-      <section id= "side_setting">
-        <h2>Setting</h2>
-        <input id="rng_zoom" type="range" min="-2" max="2" value="0" step="0.1" oninput="InputZoom();">
-        Zoom: <span id="r_zoom_text">100</span>
-        <input id="rng_link" type="range" min="0" max="31" value="0" step="1" oninput="UpodateNodeLink();">
-        Link: <span id="r_link_text">0</span>
-        <br>
-        Group  : <input id="num_group" type="number" min="0" max="12" value="" step="1">
-        <input type="submit" value="set" id="btn_group" onclick="UpodateNodeLink();">
-      </section>
-
-      <!-- <section id= "side_search">
-        <h2>Search</h2>
-        <input type="text" name="group_id" id="txt_search">
-        <input type="submit" value="検索" id="btn_search" onclick="OnClickSearch();">
-      </section> -->
-
-      <section id= "side_data">
-        <section id= "side_data_left">
-          <h2>Data</h2>
-          <h3></h3>
-        </section>
-        <section id= "side_data_right">
-          <!-- <iframe id="data_memo" seamless height=80 width=220 sandbox="allow-same-origin"></iframe> -->
-          <iframe id="data_memo"></iframe>
-          <!-- <iframe id="data_relation" seamless height=140 width=220 sandbox="allow-same-origin"></iframe> -->
-        </section>
-      </section>
-    </div>
-
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script>
-    var sidedata = d3.select("#side_data");
-
-    //カーソルを合わせたときに表示する情報領域
-    var datatip = d3.select("#datatip");
-
-    var svg = d3.select("svg"),
-        width = +svg.attr("width"),
-        height = +svg.attr("height");
-
-    var color = d3.scaleOrdinal(d3.schemeCategory20);
-
-    var simulation = d3.forceSimulation()
-          .velocityDecay(0.5) //摩擦
-        .force('charge', d3.forceManyBody()) //詳細設定は後で
-        .force('link', d3.forceLink().id(function(d) { return d.id; })) //詳細設定は後で
-        .force('colllision',d3.forceCollide(40)) //nodeの衝突半径：Nodeの最大値と同じとする
-        .force('positioningX',d3.forceX()) //詳細設定は後で
-        .force('positioningY',d3.forceY()) //詳細設定は後で
-        .force('center', d3.forceCenter(width / 2, height / 2)); //重力の中心
-
-    //使用するnode図形計上形状定義(中心座標は(0,0))
-    var Defs = svg.append("defs")
-    //Circle
-    var figCircle = Defs.append('circle')
-          .attr("id","circle")
-          .attr('r', 20),   //5⇒20
-        lenCircle = figCircle.node().getTotalLength(),
-        spCircle = figCircle.node().getPointAtLength(0);
-    //Rect
-    var figRect = Defs.append('rect')
-          .attr("id","rect")
-          .attr('width', 40)
-          .attr('height', 30)
-          .attr('rx', 7)  //角を丸める
-          .attr('ry', 7)  //角を丸める
-          .attr('x', -(40/2))  //circleと中心を合わせる
-          .attr('y', -(30/2)),  //circleと中心を合わせる
-        lenRect = figRect.node().getTotalLength(),
-        spRect  = figRect.node().getPointAtLength(0);
-
-    //Ellipse
-    var figEllipse = Defs.append('ellipse')
-          .attr("id","ellipse")
-          .attr('rx', 30)
-          .attr('ry', 20),
-        lenEllipse = figEllipse.node().getTotalLength(),
-        spEllipse  = figEllipse.node().getPointAtLength(0);
-
-    // hexagon ※pointsは反時計回りで定義すると他の図形と記述の順番の整合が取れる
-    var figHexagon = Defs.append('polygon')
-          .attr("id","hexagon")
-          .attr('points', "0,20 -17.3,10 -17.3,-10 0,-20 17.3,-10 17.3,10"),
-        lenHexagon = figHexagon.node().getTotalLength(),
-        spHexagon  = figHexagon.node().getPointAtLength(0);
-
-    //"svg"にZoomイベントを設定
-    var zoom = d3.zoom()
-      .scaleExtent([1/4,4])
-      .on('zoom', SVGzoomed);
-    svg.call(zoom);
-
-    //"svg"上に"g"をappend
-    var g = svg.append("g")
-
-    function SVGzoomed() {
-      g.attr("transform", d3.event.transform);
-      console.log(d3.event.transform);
-    //倍率表示
-      d3.select("#r_zoom_text")
-        .text((d3.event.transform.k*100).toFixed(0));  //スライダーの横にある表示を更新
-      document.getElementById('rng_zoom').value=Math.log2(d3.event.transform.k).toFixed(1)
-    }
-
-    //Jsonfileのデータを保持
-    var jsondata;
-
-    d3.json("./json/miserables3.json", function(error, graph) {  //miserables3.jsonに変更
-      if (error) throw error;
-
-    //jsondataに値を格納.
-     jsondata = graph;
-
-    //Linksの定義
-      var links = g.append("g")  //svg⇒gに
-          .attr("class", "links")
-        .selectAll("g")
-        .data(graph.links)
-        .enter()
-        .append("g")
-          .attr("id", "linkArrow")  //外から使用するため、classでは無くidに
-          .attr("fill", "#999")
-          .attr("stroke","#999")  //輪郭線の色指定追加
-          .on('mouseover', function(d){
-                d3.select(this).attr('stroke', 'red'); //カーソルが合ったら赤に
-                datatip.style("left", d3.event.pageX + 20 + "px")
-                        .style("top", d3.event.pageY + 20 + "px")
-                        .style("z-index", 0)
-                        .style("opacity", 1)
-                        .style('background-image',function(){
-                          if (typeof d.source.image === "undefined" ){
-                            if (typeof d.target.image === "undefined" ){
-                              return  'url("image/unknown.png"), url("image/unknown.png")'
-                            }
-                            else {
-                              return  'url("image/unknown.png"), ' + 'url("'+ d.target.image + '")'
-                            }
-                          }
-                          else {
-                            if (typeof d.target.image === "undefined" ){
-                              return 'url("'+ d.source.image + '"), ' + 'url("image/unknown.png")'
-                            }
-                            else {
-                              return 'url("'+ d.source.image + '"), url("'+ d.target.image + '")'
-                            }
-                          }
-                        });
-
-                datatip.select("h2")
-                        .style("border-bottom", "2px solid " +color(d.source.group))
-                        .style("margin-right", "50px")
-                        .text("value:" + d.value);
-
-                datatip.select("p")
-                        .text(d.source.id + " to " + d.target.id);
-            })
-          .on('mousemove', function(){
-                datatip.style("left", d3.event.pageX + 20 + "px")
-                        .style("top", d3.event.pageY + 20 + "px")
-             })
-          .on('mouseout', function(){
-                d3.select(this).attr('stroke', "#999"); //カーソルが外れたら元の色に
-                datatip.style("z-index", -1)
-                       .style("opacity", 0)
-            })
-          .call(d3.drag()             //無いとエラーになる。。
-              .on('start', dragstarted)
-              .on('drag', dragged)
-              .on('end', dragended));
-
-    //Markerの定義
-      var marker = links.append("marker")
-          .attr("id", function(d) { return "mkr" + d.source+d.target })
-          .attr("viewBox", "0 0 20 20")
-          .attr("markerWidth", 7)
-          .attr("markerHeight", 7)
-          .attr("refX", 19)
-          .attr("refY", 10)
-          .attr("orient", "auto-start-reverse")
-
-      marker.append("path")
-          .attr("d", "M0.5,0.75L18.88,10L0.5,19.25z")
-          .attr("fill","#ddd")          //背景色と同じ
-          .attr("stroke-width", 1)
-
-    //linkの定義
-      var link = links.append("path")    //line⇒Path
-    //      .attr("stroke","#999")  //輪郭線の色指定追加
-          .attr("marker-start",function(d) { return "url(#mkr" +  d.source+d.target  + ")"})
-          .attr("marker-end",function(d) { return "url(#mkr" + d.source+d.target  + ")"})
-          .attr("fill","none")    //塗りつぶしなしを追加
-          .attr("stroke-width", function(d) { return Math.sqrt(d.value); })
-          .attr("stroke-dashoffset", 0)
-
-    // nodeの定義
-      var node = g.append('g')
-          .attr('class', 'nodes')
-        .selectAll('g')
-        .data(graph.nodes)
-        .enter()
-        .append('g')
-          .attr('id', 'nodefigure')
-        .on('mousedown', set_sidedata)
-        .call(d3.drag()
-            .on('start', dragstarted)
-            .on('drag', dragged)
-            .on('end', dragended));
-
-    // node 図形の定義
-      node.append("use")
-        .attr("xlink:href",function(d) {return "#"+ nodeTypeID(d.group)})        //図形判定
-        .attr('stroke', '#ccc')
-        .attr('fill', function(d) { return color(d.group); })
-        .style('stroke-width', '2')  //線の太さ
-        .style('stroke-dasharray',function(d) {return stroke_dasharrayCD(d)})  //破線判定
-        .on('mouseover', function(d){
-              d3.select(this).attr('fill', 'red'); //カーソルが合ったら赤に
-
-              datatip.style("left", d3.event.pageX + 10 + "px")
-                      .style("top", d3.event.pageY + 10 + "px")
-                      .style("z-index", 0)
-                      .style("opacity", 1)
-                      .style('background-image', function() {if (typeof d.image === "undefined" ) {return 'url("image/unknown.png")' } else { return 'url("'+ d.image + '")'}})
-
-              datatip.select("h2")
-                      .style("border-bottom", "2px solid " +color(d.group))
-                      .style("margin-right", "0px")
-                      .text(d.id);
-
-              datatip.select("p")
-                      .text("グループID:" + d.group);
-          })
-        .on('mousemove', function(){
-              datatip.style("left", d3.event.pageX + 10 + "px")
-                      .style("top", d3.event.pageY + 10 + "px")
-          })
-        .on('mouseout', function(){
-              d3.select(this).attr('fill', function(d) { return color(d.group); })  //カーソルが外れたら元の色に
-
-              datatip.style("z-index", -2)
-                     .style("opacity", 0)
-          })
-    //node textの定義
-      node.append('text')
-        .attr('text-anchor', 'middle')
-        .attr('fill', 'black')
-        .style('pointer-events', 'none')
-        .attr('font-size', function(d) {return '10px'; }  )
-        .attr('font-weight', function(d) { return 'bold'; }  )
-        .text(function(d) { return d.id; });
-
-      //node imageの定義
-        node.append('image')
-          .attr('xlink:href', function(d) {if (typeof d.image === "undefined") {return  "image/unknown.png" } else { return d.image }})
-          .attr('width',30)
-          .attr('x',-15)
-          .attr('y',-40)
-
-    /*表示がうっとおしいので削除
-      node.append("title")
-          .text(function(d) { return "node id:" + d.id; });
-    */
-      simulation
-          .nodes(graph.nodes)
-          .on("tick", ticked);
-
-      simulation.force("link")
-          .distance(250) //Link長
-          .links(graph.links);
-
-      simulation.force('charge')
-          .strength(function(d) {return -500})              //node間の力
-
-      simulation.force('positioningX')                      //X方向の中心に向けた引力
-          .strength(0.04)
-
-      simulation.force('positioningY')                      //Y方向の中心に向けた引力
-          .strength(0.04)
-
-      function ticked() {
-
-        link
-            .attr("d", linkArc)
-
-    /*
-            .attr("x1", function(d) { return d.source.x; })
-            .attr("y1", function(d) { return d.source.y; })
-            .attr("x2", function(d) { return d.target.x; })
-            .attr("y2", function(d) { return d.target.y; });
-    */
-        node
-            .attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; })
-            .attr('transform', function(d) {return 'translate(' + d.x + ',' + d.y + ')'}) //nodesの要素が連動して動くように設定
-      }
-    });
-
-    //Sidedataに情報をセット
-    function set_sidedata(d){
-    //画像表示
-      sidedata.style("z-index", 0)
-              .style("opacity", 1)
-              .style('background-image', function() {if (typeof d.image === "undefined" ) {return 'url("image/unknown.png")' } else { return 'url("'+ d.image + '")'}})
-
-    //node名表示
-      sidedata.select("h3")
-              .text(d.id)
-
-    //nodeのメモ表示
-      sidedata.select("#data_memo")
-              .attr("srcdoc",function(){
-                if (typeof d.memo === "undefined" ){
-                  return "<p style='font-size: 11px'></p>"
-                }
-                else {
-                  return "<p style='font-size: 11px'>" +d.memo.replace(/\n/g,"<br>") +"</p>"
-                }
-              })
-
-    //nodeにつながるLink表示
-      sidedata.select("#data_relation")
-              .attr("srcdoc",function(){
-                var r_value ="",
-                    r_target =jsondata.links.filter(function(item,index){if(item.source.id == d.id ) return true}),
-                    r_source =jsondata.links.filter(function(item,index){if(item.target.id == d.id ) return true});
-                for (var key in r_target) {
-                  r_value = r_value + "to: " + r_target[key].target.id + "<br>"
-                }
-                for (var key in r_source) {
-                  r_value = r_value + "from: " + r_source[key].source.id + "<br>"
-                }
-                return "<p style='font-size: 11px'>" + r_value +"</p>"
-              })
-      }
-
-    function InputZoom(){
-    //Zoom前の初期値を取得
-      if (g.attr("transform") == null){
-        var trnsf = "translate(0,0) scale(1)"
-      }
-      else {
-        var trnsf = g.attr("transform")
-      }
-      var pre_pos_str = trnsf.split('(')[1].split(')')[0],
-          pre_pos = {x: +pre_pos_str.split(',')[0], y: +pre_pos_str.split(',')[1]},    //Zoom前座標
-          pre_k   = trnsf.split('(')[2].split(')')[0],             //Zoom前Scale
-          pre_c   = {x:+(1-pre_k)*width/2 ,y:+(1-pre_k)*height/2},    //Zoom前画面センター座標
-          d_pos = {x:(+pre_c.x-pre_pos.x)*(1-pre_k) ,y:(+pre_c.y-pre_pos.y)*(1-pre_k) };   //Panで移動した座標
-
-
-      console.log("pre_pos_str:",pre_pos_str);
-      console.log("pre_pos:",JSON.stringify(pre_pos));
-      console.log("pre_k:",pre_k);
-      console.log("pre_c:",JSON.stringify(pre_c));
-      console.log("d_pos:",JSON.stringify(d_pos));
-
-      var zoom_scale = Math.pow(2,document.getElementById("rng_zoom").value),  //sliderで指定した倍率
-      g_c = {x:width/2 , y:height/2},                                        //画面センター（svg座標系）
-    //  zoom_c = {x:0,y :0},      //Zoom後の画面センター座標
-      pos = {x:-g_c.x-d_pos.x, y:-g_c.y-d_pos.y}
-
-      console.log("zoom_scale:",zoom_scale);
-      console.log("svg_c:",JSON.stringify(g_c));
-      console.log("pos:",JSON.stringify(pos));
-
-      svg.transition()
-        .call(zoom.transform, transform);
-
-      function transform() {
-        return d3.zoomIdentity
-            .translate(width / 2,height / 2)
-            .scale(zoom_scale)
-            .translate(-g_c.x, -g_c.y)               //指定nodeの座標
-      }
-    }
-
-    function OnClickSearch(){
-      var search_val = document.getElementById("txt_search").value
-      if (search_val == ""){
-        window.alert("検索文字列を入力して下さい")
-      }
-      else{
-        var search_data = jsondata.nodes.filter(function(d){if (d.id == search_val) return true})[0]
-        if  (typeof search_data === "undefined") {
-          window.alert("無効な検索文字列です");
-          document.getElementById("txt_search").value = "";
+  <script type="text/javascript">
+    var temp_vis = [];
+    //未入力チェック
+    function check() {
+      var flag = 0;
+      var visited_list = [];
+      $("input[name='visited']").each(function() {
+        if ($(this).val() != "") {
+          visited_list.push($(this).val());
         }
-        else {
-    　  //対象先にズームイン
-          svg.transition()
-            .duration(750)
-            .call(zoom.transform, transform);
-        //sidedataにデータを表示
-          set_sidedata(search_data);
+      });
+      temp_vis = visited_list.filter(function() {
+        return $("this").val() != ""
+      });
 
-          function transform() {
-            return d3.zoomIdentity
-                .translate(width / 2, height / 2)
-                .scale(4)                             //とりあえず4倍でZoomIn
-                .translate(-search_data.x, -search_data.y)               //指定nodeの座標
-          }
+      if (document.form1.user_id.value == "") {
+        flag = 1;
+      } else if (temp_vis.length < 4) {
+        flag = 1;
+      } else if (document.form1.prefecture.value == "") {
+        flag = 1;
+      }
+
+      if (flag == 1) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    //既訪問スポットの重複チェック
+    function jyufuku() {
+      var counts = {};
+      for (var i = 0; i < temp_vis.length; i++) {
+        var key = temp_vis[i];
+        counts[key] = (counts[key]) ? counts[key] + 1 : 1;
+      }
+
+      var flag1 = []
+      for (var key in counts) {
+        // console.log(key + " : " + counts[key]);
+        if (counts[key] == 1) {
+          flag = 0
+        } else {
+          flag1.push(1)
         }
       }
-    }
 
-
-    function UpodateNodeLink(){
-      var linkvalue = document.getElementById("rng_link").value;
-      var nodegroup = document.getElementById("num_group").value;
-
-      d3.select("#r_link_text").text(linkvalue);  //スライダーの横にある表示を更新
-
-      if (nodegroup == ""){
-      //node.group指定がnullのとき
-        //全node表示
-        d3.selectAll("#nodefigure").attr("display","inline");
-
-        //Linkは画面設定に従う
-        var linkvalue = document.getElementById("rng_link").value;
-        d3.selectAll("#linkArrow").attr("visibility",function(d){
-          if(d.value >= linkvalue){return "visible"} else {return "hidden"}})  //各矢印の表示設定を更新
-      }
-      else {
-      //node.group指定がnull以外のとき
-        //各nodeの表示設定
-        d3.selectAll("#nodefigure").attr("display",function(d){
-          if(d.group == nodegroup){return "inline"} else {return "none"}})
-        //nodeの表示設定とLinkの表示設定に従うLinkの表示設定
-        d3.selectAll("#linkArrow").attr("visibility",function(d){
-          if((d.source.group == nodegroup)&&(d.target.group == nodegroup)&&(d.value >= linkvalue)){return "visible"} else {return "hidden"}})  //各矢印の表示設定を更新
+      if (flag1.length == 0) {
+        return true;
+      } else {
+        return false;
       }
     }
 
-    //破線判定
-    function stroke_dasharrayCD(d){
-        var arr = [2,4,6,7,9,10,11,12,0]
-        if (arr.indexOf(d.group) >= 0) {
-          return "3 2"  //3:2の破線
+    //既訪問スポットが"---"入っているか
+    function word_check() {
+      var flag = 0;
+      // console.log((temp_vis));
+      var flag1 = [];
+      for (var i = 0; i < temp_vis.length; i++) {
+        if (temp_vis[i].indexOf("---") != -1) { //入っている時は-1ではない
+          flag = 0;
+        } else {
+          flag1.push(1);
         }
-        else {
-          return "none"  //破線なし
+      }
+      // console.log(flag1);
+      if (flag1.length == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    // 積集合（wordの中身をチェックするため）
+    Set.prototype.intersection = function(setB) {
+      var intersection = new Set();
+      for (var elem of setB) {
+        if (this.has(elem)) {
+          intersection.add(elem);
         }
+      }
+      return intersection;
     }
 
-    //図形判定
-    function nodeTypeID(d){
-      var arrRect = [3,4]
-      var arrEllipse = [5,6,7]
-      var arrHexagon = [9,10,11,12,0]
+    // マップ作成 Start
+    var map;
+    var marker = [];
+    var infoWindow = [];
+    function initMap(data) {
+      var markerData = data;
+      // 地図の作成
+      console.log("Make Map");
+      var cnt = 0,
+        sum_lat = 0,
+        sum_lng = 0;
+      for (var i = 0; i < markerData.length; i++) {
+        sum_lat = sum_lat + Number(markerData[i]["unvis_lat"]);
+        sum_lng = sum_lng + Number(markerData[i]["unvis_lng"]);
+        ll =
+        cnt += 1;
+      }
+      map = new google.maps.Map(document.getElementById("map"), { // #mapに地図を埋め込む
+        center: {
+          lat: sum_lat / cnt,
+          lng: sum_lng / cnt
+        },
+        zoom: 12 // 地図のズームを指定
+      });
 
-      if(arrRect.indexOf(d) >= 0){
-        //Rect
-        return "rect"
-      }
-      else if(arrEllipse.indexOf(d) >= 0){
-        //Ellipse
-        return "ellipse"
-      }
-      else if(arrHexagon.indexOf(d) >= 0){
-        //Hexagon
-        return "hexagon"
-      }
-      else{
-        //Circle
-        return "circle"
-      }
-    }
+      // マーカー毎の処理
+      for (var i = 0; i < markerData.length; i++) {
+        markerLatLng = new google.maps.LatLng({
+          lat: Number(markerData[i]["unvis_lat"]),
+          lng: Number(markerData[i]["unvis_lng"])
+        }); // 緯度経度のデータ作成
+        marker[i] = new google.maps.Marker({ // マーカーの追加
+          position: markerLatLng, // マーカーを立てる位置を指定
+          map: map // マーカーを立てる地図を指定
+        });
 
-    function linkArc(d) {
-      var dx = d.target.x - d.source.x,
-          dy = d.target.y - d.source.y,
-          dr = Math.sqrt(dx * dx + dy * dy),
-          srcPos = getIntersectionPos(d.source , d.target),
-          tgtPos = getIntersectionPos(d.target , d.source);
-          return "M" + srcPos.x + "," + srcPos.y + "A" + dr + "," + dr + " 0 0,1 " + tgtPos.x + "," + tgtPos.y;
-    }
-
-    //三点の座標から線の比率を返す
-    function calcLoengthRate(pos1,pos2,pos3){
-      var v21 = {x:pos1.x - pos2.x , y:pos1.y - pos2.y},
-          v23 = {x:pos3.x - pos2.x , y:pos3.y - pos2.y},
-          x   =  v21.x * v23.x + v21.y * v23.y,    //v21・v23
-          y   =  v21.x * v23.y - v21.y * v23.x,    //v21×v23
-          theta = Math.atan2(y,x); //角度（radian）
-      if ( theta > 0){
-        return theta / (2 * Math.PI);
+        infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+          // 吹き出しに表示する内容
+          content: "<table border='1' id='window'><tr><th>Unfamiliar Spot Name</th><td><a href='" + markerData[i]["unvis_url"] + "' target='_blank'>" + markerData[i]["unvis_name"] + "</a></td></tr><tr><th>Familiar Spot Name</th><td>" + markerData[i]["vis_name"] +
+            "</td</tr><tr><th>Explainable Keyword</th><td>" + markerData[i]["word"] + "</td></tr></table>"
+        });
+        markerEvent(i); // マーカーにクリックイベントを追加
       }
-      else {
-        return  1 + theta / (2 * Math.PI);
+      // return infoWindow;
+
+      //アローヘッドを定義
+      var color = "#ff0000";
+      //先頭
+      var headArrow = {
+          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          fillOpacity: .7,
+          fillColor: color,
+          strokeColor: color,
+          strokeOpacity: .7
       };
+      //お尻
+      var tailArrow = {
+          path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          fillOpacity: .7,
+          fillColor: color,
+          strokeColor: color,
+          strokeOpacity: .7
+      };
+      // 線を引く
+      lines = new google.maps.Polyline({
+        path: [markerLatLng,{lat:35.685,lng:139.711}],
+        strokeColor: color,
+        strokeOpacity: .7,
+        strokeWeight: 7, // cossim * 20にする
+        icons:[{icon:headArrow,offset:"100%"},{icon:tailArrow,offset:"0%"}]
+      });
+      lines.setMap(map);
     }
 
-    //node図形とlinkの交点座標を取得(d1側の座標)
-    function getIntersectionPos(d1,d2){
-      var nodeID = nodeTypeID(d1.group);
-      switch (nodeID) {
-        case "rect":
-          var pos1 = {x:d1.x + spRect.x , y:d1.y + spRect.y},
-              pos2 = {x:d1.x , y:d1.y},
-              pos3 = {x:d2.x , y:d2.y},
-              rate = calcLoengthRate(pos1,pos2,pos3),
-              dpos =  figRect.node().getPointAtLength(lenRect * rate);
-          return {x:d1.x + dpos.x, y:d1.y + dpos.y}
-          break;
-        case "ellipse":
-          var pos1 = {x:d1.x + spEllipse.x , y:d1.y + spEllipse.y},
-              pos2 = {x:d1.x , y:d1.y},
-              pos3 = {x:d2.x , y:d2.y},
-              rate = calcLoengthRate(pos1,pos2,pos3),
-              dpos =  figEllipse.node().getPointAtLength(lenEllipse * rate);
-          return {x:d1.x + dpos.x, y:d1.y + dpos.y}
-          break;
-        case "hexagon":
-          var pos1 = {x:d1.x + spHexagon.x , y:d1.y + spHexagon.y},
-              pos2 = {x:d1.x , y:d1.y},
-              pos3 = {x:d2.x , y:d2.y},
-              rate = calcLoengthRate(pos1,pos2,pos3),
-              dpos =  figHexagon.node().getPointAtLength(lenHexagon * rate);
-          return {x:d1.x + dpos.x, y:d1.y + dpos.y}
-          break;
-        default:
-          var pos1 = {x:d1.x + spCircle.x , y:d1.y + spCircle.y},
-              pos2 = {x:d1.x , y:d1.y},
-              pos3 = {x:d2.x , y:d2.y},
-              rate = calcLoengthRate(pos1,pos2,pos3),
-              dpos =  figCircle.node().getPointAtLength(lenCircle * rate);
-          return {x:d1.x + dpos.x, y:d1.y + dpos.y}
-      }
+    // マーカーにクリックイベントを追加
+    var currentInfoWindow = null;
+    function markerEvent(i) {
+      marker[i].addListener("click", function() { // マーカーをクリックしたとき
+        if (currentInfoWindow) {
+          currentInfoWindow.close();
+        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+        infoWindow[i].open(map, marker[i]); // 吹き出しの表示
+        currentInfoWindow = infoWindow[i];
+      });
     }
+    // マップ作成 Finish
 
-    function dragstarted(d) {
-      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
-
-    function dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-    }
-
-    function dragended(d) {
-      if (!d3.event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
-    }
-
-    </script>
+    var post_visited = [];
+    // データの送信Ajax
+    $(document).ready(function() {
+      $("#form").submit(function() {
+        event.preventDefault();
+        if (check() == true) {
+          if (jyufuku() == true) {
+            if (word_check() == true) {
+              var $form = $(this);
+              $(".visited").each(function() {
+                if ($(this).val() != "") {
+                  post_visited.push($(this).val());
+                }
+              });
+              location.href = "#form_result"
+              $(".vector_result").html("<h2>Loading...</h2>");
+              $("#start").prop("disabled", true); //ボタンクリック禁止
+              window.onerror = function() {
+                alert("Error：Please try again because the problem is found in the input.");
+                // location.reload();
+                $(".vector_result").html("<h1>Error：Please try again because the problem is found in the input.</h1>");
+              };
+              $.ajax({
+                  url: "./cgi-bin/analogy_map/processing.py",
+                  type: "post",
+                  dataType: "text",
+                  data: {
+                    user_id: $("#user_id").val(),
+                    visited_name: post_visited,
+                    prefecture_name: $("#prefecture").val(),
+                    area_name: $("#area").val(),
+                  },
+                  timeout: 60000,
+                  error: function() {
+                    alert("Timeout：Try again later.")
+                  },
+                })
+                .done(function(response) { //データを受信
+                  // console.log(response);
+                  var res = $.parseJSON(response); //受信したデータをjson形式に変更
+                  console.log(res); // resは相対(差分+調和)
+                  console.log(typeof res);
+                  if (res.length == 0){
+                    $(".vector_result").html("<h1>Search Result：Not found.</h1>");
+                    $("#start").prop("disabled", false); //ボタンクリック禁止を解除
+                  }
+                  else {
+                    $(".vector_result").html("<h2>Search Result：Please look while zooming.</h2>");
+                    initMap(res);
+                    $("#start").prop("disabled", false); //ボタンクリック禁止を解除
+                  }
+                })
+                .fail(function() {
+                  $(".result").html("Failed.");
+                });
+            } else {
+              alert('Please choose from the search candidate.');
+            }
+          } else {
+            alert('There was a duplicate input.');
+          }
+        } else {
+          alert('There was not entered in the required fields.');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

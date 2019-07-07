@@ -12,7 +12,7 @@
     {"id": "三島スカイウォーク", "group": 2}
   ],
   "links": [
-    {"source": "小田原城址公園", "target": "新宿御苑", "value": 2},
+    {"source": "小田原城址公園", "target": "新宿御苑", "value": 2,"word":"a,b,c,d"},
     {"source": "三島スカイウォーク", "target": "東京スカイツリー", "value": 15}
   ]
 }

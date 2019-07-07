@@ -1,0 +1,282 @@
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* position: fixed; */
+}
+
+#main_top {
+  width: 100%;
+  /* height: 100%; */
+  /* padding: 10px 0; */
+  /* position: relative; */
+  text-align: center;
+}
+
+#familiar {
+  float: left;
+  width: 50%;
+  margin: 1% auto;
+}
+
+#unfamilier {
+  float: right;
+  width: 50%;
+  margin: 1% auto;
+}
+
+#form_result {
+  clear: both;
+  width: 50%;
+  height: 0;
+  overflow: hidden;
+  /* padding-bottom: 56.25%; */
+  padding-bottom: 50%;
+  position: relative;
+  float: left;
+}
+
+#form_result iframe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/* .result {
+  width: 100%;
+  margin: 1% auto;
+} */
+
+.result #map {
+  width: 100%;
+  height: 100%;
+  margin: 0 8px 0 8px;
+  /* overflow: hidden; */
+  position: absolute;
+}
+
+#image_map {
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  padding-bottom: 50%;
+  position: relative;
+  float: right;
+}
+
+#image_map svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #ddd;
+}
+
+#user_id, #area {
+  width: 30%;
+  height: 24px;
+  font-size: 16px;
+  font-weight: normal;
+  text-align: center;
+}
+
+#prefecture {
+  width: 100px;
+  height: 24px;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.visited {
+  width: 90%;
+  height: 24px;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+#setumei {
+  margin: auto;
+  list-style: none;
+  padding: 0;
+}
+
+table {
+  width: 100%;
+  margin: auto;
+  border-collapse: collapse;
+  border: solid 2px orange;
+  /*表全体を線で囲う*/
+}
+
+table td {
+  margin: 0;
+  padding: 1px;
+}
+
+/*//////////////////////////*/
+/*そのうちCSSに移動*/
+#datatip {
+  padding: 10px 20px;
+  font-family: Verdana, arial;
+  width: 240px;
+  height: auto;
+  position: absolute;
+  border: 1px solid black;
+  background-color: white;
+  border-radius: 5px;
+  opacity: 0.0;
+  left: 0;
+  top: 0;
+  background-position: 10px 7px, 220px 7px;
+  background-size: 50px auto, 50px auto;
+  background-repeat: no-repeat, no-repeat;
+}
+
+#datatip h2 {
+  font-size: 18px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  margin-left: 50px;
+}
+
+#datatip p {
+  font-size: 14px;
+}
+
+#sidebar {
+  clear: both;
+  width: 100%;
+  float: left;
+}
+
+#side_setting {
+  padding: 5px 10px;
+  font-family: Verdana, arial;
+  width: 36%;
+  height: 120px;
+  border: 1px solid black;
+  background-color: white;
+  border-radius: 5px;
+  /* left: 0;
+  top: 0; */
+  float: left;
+}
+
+#side_setting h2 {
+  font-size: 18px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid gray
+}
+
+/* #side_search{
+  padding: 5px 10px;
+  font-family: Verdana, arial;
+  width: auto;
+  height: 120px;
+  border: 1px solid black;
+  background-color: white;
+  border-radius: 5px;
+  left: 0;
+  top: 0;
+  float:left;
+}
+
+#side_search h2{
+  font-size: 18px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid gray
+} */
+#side_data {
+  padding: 5px 10px;
+  font-family: Verdana, arial;
+  width: 60%;
+  height: 120px;
+  border: 1px solid black;
+  background-color: white;
+  border-radius: 5px;
+  background-position: 160px 7px;
+  background-size: 70px auto;
+  background-repeat: no-repeat;
+  /* left: 0;
+  top: 0; */
+  opacity: 0.0;
+  float: left;
+  margin: 0 auto 10px;
+}
+
+#side_data_left {
+  width: 39%;
+  float: left;
+}
+
+#side_data_right {
+  width: 60%;
+  float: right;
+}
+
+#data_memo {
+  padding: 18px 0;
+  width: 100%;
+  height: 80px;
+}
+
+#side_data h2 {
+  font-size: 18px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid gray;
+  margin-right: 100px;
+}
+
+#side_data h3 {
+  font-size: 14px;
+}
+
+.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+#start,#finish  {
+  display: inline-block;
+  border-radius: 5%;
+  /* 角丸       */
+  font-size: 16px;
+  /* 文字サイズ */
+  text-align: center;
+  /* 文字位置   */
+  cursor: pointer;
+  /* カーソル   */
+  padding: 12px 20px;
+  /* 余白       */
+  background: #000066;
+  /* 背景色     */
+  color: #ffffff;
+  /* 文字色     */
+  line-height: 1em;
+  /* 1行の高さ  */
+  transition: .3s;
+  /* なめらか変化 */
+  box-shadow: 6px 6px 3px #666666;
+  /* 影の設定 */
+  border: 2px solid #000066;
+  /* 枠の指定 */
+  margin: 1% auto;
+}
+
+#start:hover,#finish:hover {
+  box-shadow: none;
+  /* カーソル時の影消去 */
+  color: #000066;
+  /* 背景色     */
+  background: #ffffff;
+  /* 文字色     */
+}
