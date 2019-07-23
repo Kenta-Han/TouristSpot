@@ -1,7 +1,7 @@
 import numpy as np
 import copy
 import MySQLdb
-import re
+import re,sys
 
 import os, sys # 全フォルダ参照
 path = os.path.join(os.path.dirname(__file__), '../../')

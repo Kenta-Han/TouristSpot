@@ -29,7 +29,6 @@ body {
   height: 0;
   overflow: hidden;
   padding-bottom: 50%;
-  position: relative;
   float: left;
 }
 
@@ -43,7 +42,6 @@ body {
   width: 100%;
   margin: 1% auto;
 } */
-
 .result #map {
   width: 100%;
   height: 100%;
@@ -84,7 +82,7 @@ body {
   width: 100%;
   margin: auto;
   border-collapse: collapse;
-  border: solid 2px orange;
+  /* border: solid 2px orange; */
   /*表全体を線で囲う*/
 }
 
@@ -93,7 +91,7 @@ body {
   padding: 3px;
 }
 
-#start,#finish  {
+#start, #finish {
   display: inline-block;
   border-radius: 5%;
   /* 角丸       */
@@ -120,7 +118,7 @@ body {
   margin: 1% auto;
 }
 
-#start:hover,#finish:hover {
+#start:hover, #finish:hover {
   box-shadow: none;
   /* カーソル時の影消去 */
   color: #000066;
@@ -135,7 +133,7 @@ table {
 }
 
 th, td {
-  border: solid 1px #000000;
+  /* border: solid 1px #000000; */
   padding: 7px 10px;
 }
 
@@ -143,4 +141,10 @@ th {
   color: white;
   /*文字色*/
   background-color: #2196f3;
+}
+
+#myGraph {
+  margin: auto;
+  width: 100%;
+  height: 80px;
 }

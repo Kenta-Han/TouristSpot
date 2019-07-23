@@ -16,7 +16,7 @@ def Response_Harmonic(data,name,lat,lng,url,description):
         response_json["vis_name"] = data[i][1]
         sql_vis.append(data[i][1])
 
-        response_json["cossim"] = data[i][2]
+        response_json["cossim"] = round(data[i][2],2)
         sql_cossim.append(str(data[i][2]))
 
         for k in range(len(name)):
@@ -77,7 +77,7 @@ def Response(vis_name,vis_lat,vis_lng,vis_url,vis_description,unvis_name,unvis_l
         response_links = {"source":"","target":"","value":"","word":""}
         response_links["source"] = data[i][0] ##未訪問
         response_links["target"] = data[i][1] ##既訪問
-        response_links["value"] = data[i][2] ##類似度
+        response_links["value"] = math.floor(data[i][2],2) ##類似度
 
         word_list = []
         temp = []

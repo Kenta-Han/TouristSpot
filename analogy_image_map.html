@@ -7,6 +7,7 @@
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
   <script type="text/javascript" src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
   <!-- <title>Information to recall the relationship between tourist spots</title> -->
   <title>観光スポット間の関係を想起する情報の提示</title>
   <script>
@@ -137,13 +138,14 @@
   </div>
 
   <form id="form_result" name="form_result">
-    <div class="vector_result"></div>
+    <div class="vector_result" style="text-align: center;"></div>
+    <svg id="myGraph"></svg>
     <div class="result">
       <div id="map">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%"
+          height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
       </div>
-      <script async defer
-       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
+      <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
     </div>
   </form>
 
@@ -200,7 +202,6 @@
         return false;
       }
     }
-
     //既訪問スポットが"---"入っているか
     function word_check() {
       var flag = 0;
@@ -231,14 +232,78 @@
       return intersection;
     }
 
+    // SVGの描画サイズとマージン
+    var margin = {
+      top: 10,
+      right: 20,
+      bottom: 20,
+      left: 10
+    };
+    var container = document.querySelector('#myGraph');
+    var width = getStyleSheetValue(container, 'width') - margin.left - margin.right;
+    var height = getStyleSheetValue(container, 'height') - margin.left - margin.right;
+
+    function getStyleSheetValue(element, property) {
+      if (!element || !property) {
+        return null;
+      }
+      var style = window.getComputedStyle(element);
+      var value = style.getPropertyValue(property);
+      return value.slice(0, -2);
+    }
+
+    // SVGの表示領域を生成
+    var svg = d3.select("#myGraph")
+      // .attr("width", width + margin.left + margin.right)
+      // .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // オリジナルのグラデーション設定
+    var color = d3.scaleLinear()
+      .domain([0, 0.5, 1])
+      // .range(['cyan', 'yellow', 'orange']);
+      // .range(['blue', 'orange', 'red']);
+      .range(['blue', 'purple', 'red']);
+
+    // データ
+    var data = d3.ticks(0, 1, 100);
+
+    svg.selectAll("rect")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", width * 1.1)
+      .attr("y", 0)
+      .attr("width", width / data.length + 1)
+      .attr("height", height)
+      .attr("fill", function(d, i) {
+        // console.log(color(d));
+        return color(d);
+      })
+      .transition()
+      .delay(function(d,i){
+        return i*40;
+      })
+      .duration(300)
+      .attr("x", function(d, i) {
+        return width / data.length * i;
+      });
+
+    //
+    // console.log($('rect')[1].getAttribute('fill')); //色
+    // console.log(svg.selectAll("rect")._groups[0][1]["__data__"]); //データ(値)
+
     // マップ作成 Start
     var map;
-    var marker = [];
+    var unvis_marker = [], vis_marker = [];
     var infoWindow = [];
+
     function initMap(data) {
       var markerData = data;
       // 地図の作成
-      console.log("Make Map");
+      // console.log("Make Map");
       var cnt = 0,
         sum_lat = 0,
         sum_lng = 0;
@@ -246,7 +311,7 @@
         sum_lat = sum_lat + Number(markerData[i]["unvis_lat"]);
         sum_lng = sum_lng + Number(markerData[i]["unvis_lng"]);
         ll =
-        cnt += 1;
+          cnt += 1;
       }
       map = new google.maps.Map(document.getElementById("map"), { // #mapに地図を埋め込む
         center: {
@@ -258,61 +323,120 @@
 
       // マーカー毎の処理
       for (var i = 0; i < markerData.length; i++) {
-        markerLatLng = new google.maps.LatLng({
+        unvis_markerLatLng = new google.maps.LatLng({
           lat: Number(markerData[i]["unvis_lat"]),
           lng: Number(markerData[i]["unvis_lng"])
         }); // 緯度経度のデータ作成
-        marker[i] = new google.maps.Marker({ // マーカーの追加
-          position: markerLatLng, // マーカーを立てる位置を指定
+        vis_markerLatLng = new google.maps.LatLng({
+          lat: Number(markerData[i]["vis_lat"]),
+          lng: Number(markerData[i]["vis_lng"])
+        }); // 緯度経度のデータ作成
+        unvis_marker[i] = new google.maps.Marker({ // マーカーの追加
+          position: unvis_markerLatLng, // マーカーを立てる位置を指定
           map: map // マーカーを立てる地図を指定
+        });
+        vis_marker[i] = new google.maps.Marker({ // マーカーの追加
+          position: vis_markerLatLng, // マーカーを立てる位置を指定
+          map: map, // マーカーを立てる地図を指定
+          icon:{
+            // fillcolor:"#FF0000",//塗り潰し色
+            // fillOpacity: 0,                    //塗り潰し透過率
+            // path: google.maps.SymbolPath.CIRCLE, //円を指定
+            // scale: 12,                           //円のサイズ
+            // strokeColor: "#FF0000",              //枠の色
+            // strokeWeight: 0                    //枠の透過率
+            url:"data/vis_spot_marker.png",
+            scaledSize: new google.maps.Size(40, 40) //サイズ
+          },
+          // label: {
+            text: markerData[i]["vis_name"],                           //ラベル文字
+          //   // color: '#FFFFFF',                    //文字の色
+          //   fontSize: '26px'                     //文字のサイズ
+          // }
+
         });
 
         infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
           // 吹き出しに表示する内容
-          content: "<table border='1' id='window'><tr><th>Unfamiliar Spot Name</th><td><a href='" + markerData[i]["unvis_url"] + "' target='_blank'>" + markerData[i]["unvis_name"] + "</a></td></tr><tr><th>Familiar Spot Name</th><td>" + markerData[i]["vis_name"] +
+          content: "<table border='1' id='window'><tr><th>Unfamiliar Spot Name</th><td><a href='" + markerData[i]["unvis_url"] + "' target='_blank'>" + markerData[i]["unvis_name"] + "</a></td></tr><tr><th>Familiar Spot Name</th><td>" +
+            markerData[i]["vis_name"] +
             "</td</tr><tr><th>Explainable Keyword</th><td>" + markerData[i]["word"] + "</td></tr></table>"
         });
         markerEvent(i); // マーカーにクリックイベントを追加
+        var color = markerData[i]["color"];
+        lines = new google.maps.Polyline({
+          path: [unvis_markerLatLng,vis_markerLatLng],
+          strokeColor: color,
+          strokeOpacity: .7,
+          strokeWeight: 7, // cossim * 20にする
+        });
+        lines.setMap(map);
+
+
       }
       // return infoWindow;
 
-      //アローヘッドを定義
-      var color = "#ff0000";
-      //先頭
-      var headArrow = {
-          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-          fillOpacity: .7,
-          fillColor: color,
-          strokeColor: color,
-          strokeOpacity: .7
-      };
-      //お尻
-      var tailArrow = {
-          path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-          fillOpacity: .7,
-          fillColor: color,
-          strokeColor: color,
-          strokeOpacity: .7
-      };
-      // 線を引く
-      lines = new google.maps.Polyline({
-        path: [markerLatLng,{lat:35.685,lng:139.711}],
-        strokeColor: color,
-        strokeOpacity: .7,
-        strokeWeight: 7, // cossim * 20にする
-        icons:[{icon:headArrow,offset:"100%"},{icon:tailArrow,offset:"0%"}]
-      });
-      lines.setMap(map);
+      // //アローヘッドを定義
+      // var color = "#ff0000";
+      // //先頭
+      // var headArrow = {
+      //   path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+      //   fillOpacity: .7,
+      //   fillColor: color,
+      //   strokeColor: color,
+      //   strokeOpacity: .7
+      // };
+      // //お尻
+      // var tailArrow = {
+      //   path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+      //   fillOpacity: .7,
+      //   fillColor: color,
+      //   strokeColor: color,
+      //   strokeOpacity: .7
+      // };
+      // // 線を引く
+      // lines = new google.maps.Polyline({
+      //   path: [markerLatLng, {
+      //     lat: 35.685,
+      //     lng: 139.711
+      //   }, markerLatLng, {
+      //     lat: 35.9,
+      //     lng: 139.711
+      //   }],
+      //   strokeColor: color,
+      //   strokeOpacity: .7,
+      //   strokeWeight: 7, // cossim * 20にする
+      //   // icons: [{
+      //   //   icon: headArrow,
+      //   //   offset: "100%"
+      //   // }, {
+      //   //   icon: tailArrow,
+      //   //   offset: "0%"
+      //   // }]
+      // });
+      // lines.setMap(map);
+
     }
+
+
 
     // マーカーにクリックイベントを追加
     var currentInfoWindow = null;
+
     function markerEvent(i) {
-      marker[i].addListener("click", function() { // マーカーをクリックしたとき
+      unvis_marker[i].addListener("click", function() { // マーカーをクリックしたとき
         if (currentInfoWindow) {
           currentInfoWindow.close();
         } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
-        infoWindow[i].open(map, marker[i]); // 吹き出しの表示
+        infoWindow[i].open(map, unvis_marker[i]); // 吹き出しの表示
+        currentInfoWindow = infoWindow[i];
+      });
+      vis_marker[i].addListener("click", function() { // マーカーをクリックしたとき
+        
+        if (currentInfoWindow) {
+          currentInfoWindow.close();
+        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+        infoWindow[i].open(map, vis_marker[i]); // 吹き出しの表示
         currentInfoWindow = infoWindow[i];
       });
     }
@@ -338,10 +462,10 @@
               window.onerror = function() {
                 alert("Error：Please try again because the problem is found in the input.");
                 // location.reload();
-                $(".vector_result").html("<h1>Error：Please try again because the problem is found in the input.</h1>");
+                $(".vector_result").html("<h2>Error：Please try again because the problem is found in the input.</h2>");
               };
               $.ajax({
-                  url: "./cgi-bin/analogy_map/processing.py",
+                  url: "./cgi-bin/analogy_image_map/processing.py",
                   type: "post",
                   dataType: "text",
                   data: {
@@ -356,15 +480,14 @@
                   },
                 })
                 .done(function(response) { //データを受信
-                  // console.log(response);
+                  console.log(response);
                   var res = $.parseJSON(response); //受信したデータをjson形式に変更
                   console.log(res); // resは相対(差分+調和)
-                  console.log(typeof res);
-                  if (res.length == 0){
-                    $(".vector_result").html("<h1>Search Result：Not found.</h1>");
+                  // console.log(typeof res);
+                  if (res.length == 0) {
+                    $(".vector_result").html("<h2>Search Result：Not found.</h2>");
                     $("#start").prop("disabled", false); //ボタンクリック禁止を解除
-                  }
-                  else {
+                  } else {
                     $(".vector_result").html("<h2>Search Result：Please look while zooming.</h2>");
                     initMap(res);
                     $("#start").prop("disabled", false); //ボタンクリック禁止を解除

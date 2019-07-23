@@ -5,11 +5,14 @@ from tqdm import tqdm
 import datetime
 import re
 import json
+import numpy as np
 import mypackage.other as myp_other
 import mypackage.doc2vec_recommend as myp_doc_rec
 import mypackage.tfidf as myp_tfidf
 import mypackage.harmonic_mean as myp_hmean
 import mypackage.response as myp_res
+import mypackage.calculation as myp_cal
+import mypackage.color as myp_color
 
 import MySQLdb
 import os, sys ## 全フォルダ参照
@@ -33,7 +36,7 @@ print('Content-type: text/html\nAccess-Control-Allow-Origin: *\n')
 ############################################################
 ## 既訪問を利用
 history_list = []
-user_spot = [] ## 履歴スポット
+visited_spot_list = [] ## 履歴スポット
 history = "---".join(history)
 history_list = re.split("---", history)
 like_spot_list,like_area_list = myp_other.Make_History_List(history_list)
@@ -44,7 +47,7 @@ for i in range(len(like_spot_list[0])):
     if spot_data is None:
         continue
     else:
-        user_spot.append(spot_data)
+        visited_spot_list.append(spot_data)
 
 visited_spot_id_list = []
 vis_name,vis_lat,vis_lng,vis_url,vis_description = [],[],[],[],[]
@@ -87,7 +90,7 @@ else:
 # print("<h4>エリアIDの数：\t{}</h4>".format(len(unvisited_area_id_list)))
 
 ## 未訪問エリア内(レビュー and [lat or lng])ありスポット
-select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review,url FROM spot_mst WHERE area_id IN {area} AND review!=0 AND (lat!=0 or lng!=0) AND id NOT IN {vis} ORDER BY review DESC limit 20;".format(area=tuple(unvisited_area_id_list),vis=tuple(visited_spot_id_list))
+select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review,url,description FROM spot_mst WHERE area_id IN {area} AND review!=0 AND (lat!=0 or lng!=0) AND id NOT IN {vis} ORDER BY review DESC limit 20;".format(area=tuple(unvisited_area_id_list),vis=tuple(visited_spot_id_list))
 unvisited_spot_list = myp_other.SpotORReview_List(select_unvisited_spot)
 
 ## 未訪問エリア内スポットIDリスト
@@ -147,14 +150,19 @@ select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all
 unvisited_spot_reviews = myp_tfidf.Spot_List_TFIDF(select_unvisited_spot_reviews)
 unvisited_tfidf,unvisited_mean = myp_tfidf.Tfidf_HM(unvisited_spot_reviews)
 
-
 ## 既訪問と未訪問スポット特徴語(調和平均)
 UtoV_top10_harmonic = myp_hmean.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
-print(UtoV_top10_harmonic,file=sys.stderr)
+# print(UtoV_top10_harmonic,file=sys.stderr)
+
+## 線の色
+color_res = myp_color.Color_BPR()
+
+myp_cal.Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic[:50],color_res)
 
 ## レスポンス作成，mysqlに入れるためのカラム内容作成(10個まで表示)
-# sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = myp_res.Response_Harmonic(UtoV_top10_harmonic[:50],nvis_name,unvis_lat,unvis_lng,unvis_url)
-myp_res.Response(vis_name,vis_lat,vis_lng,vis_url,vis_description,unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description,UtoV_top10_harmonic[:50])
+# sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = myp_res.Response_Harmonic(UtoV_top10_harmonic[:50],unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description)
+
+# myp_res.Response(vis_name,vis_lat,vis_lng,vis_url,vis_description,unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description,UtoV_top10_harmonic[:50])
 
 # finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 # sql_update = "UPDATE analogy_map SET unvis_name='{unv}', vis_name='{vis}', cossim='{cos}', word='{word}', unvis_lat='{lat}', unvis_lng='{lng}', word='{word}',finish_datetime='{finish}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis), vis='，'.join(sql_vis), cos='，'.join(sql_cossim), word=sql_word, lat='，'.join(sql_lat), lng='，'.join(sql_lng), finish=finish_datetime, record_id=record_id)
