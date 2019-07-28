@@ -1,9 +1,10 @@
 import sys
-import collections
+import collections, copy
 import numpy as np
 import json
 
 def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color):
+    # print(data ,file=sys.stderr)
     max_cossim,min_cossim = max([i[2] for i in data]), min([i[2] for i in data])
     cluster = []
     visname_tmp = []
@@ -25,11 +26,12 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
                 group.append(vis_lat[j])
                 group.append(vis_lng[j])
 
-        ## 最大値を1，最小値を0
-        cossim = (data[i][2]-min_cossim) / (max_cossim-min_cossim)
-        group.append(str(round(cossim,2))) ## cossim
+        # group.append(str(round(cossim,2))) ## cossim
+        group.append(data[i][2]) ## cossim
 
         for j in range(len(color)):
+            ## 最大値を1，最小値を0
+            cossim = (data[i][2]-min_cossim) / (max_cossim-min_cossim)
             if color[j][0] == round(cossim,2):
                 group.append(str(color[j][1]))
 
@@ -44,8 +46,6 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
         cluster.append(group)
         # response_json = Resp(group[0],group[1],group[2],group[3],group[4],group[5],group[6],group[7],group[8])
         # json_data.append(response_json)
-    # print(json.dumps(json_data)) ## 送信
-
 
     ## 未訪問スポットと関連する既訪問スポットの数の多い順(降順)でソード
     vis_list = collections.Counter(visname_tmp).most_common()
@@ -59,24 +59,66 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
         result.append(tmp)
     print(result, file=sys.stderr)
 
-    ## 既訪問スポット座標変更
+    result_tmp = copy.copy(result)
     for i in range(len(result)):
-        if len(result[i]) > 1:
-            sum_res_lat,sum_res_lng = 0, 0
-            for j in range(len(result[i])):
-                sum_res_lat = sum_res_lat + float(result[i][j][1])
-                sum_res_lng = sum_res_lng + float(result[i][j][2])
-            mean_res_lat = sum_res_lat / vis_list[i][1]
-            mean_res_lng = sum_res_lng / vis_list[i][1]
-            for j in range(len(result[i])):
-                response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],mean_res_lat,mean_res_lng,result[i][j][6],result[i][j][7],result[i][j][8])
-                json_data.append(response_json)
+        max_spot, min_spot = result_tmp[i][0], result_tmp[i][-1]
+        if max_spot == min_spot:
+            continue
         else:
-            for j in range(len(result[i])):
-                response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],result[i][j][4],result[i][j][5],result[i][j][6],result[i][j][7],result[i][j][8])
-                json_data.append(response_json)
-    print(json.dumps(json_data)) ## 送信
+            print("\nmax_spot:{}\nmin_spot:{}".format(max_spot,min_spot),file=sys.stderr)
+            max_spot_latlng = np.array([float(max_spot[1]),float(max_spot[2])])
+            min_spot_latlng = np.array([float(min_spot[1]),float(min_spot[2])])
+            print("max_spot_latlng:{}\nmin_spot_latlng:{}".format(max_spot_latlng,min_spot_latlng) ,file=sys.stderr)
+            tmp = (max_spot_latlng * max_spot[6] + min_spot_latlng * min_spot[6]) / (max_spot[6] + min_spot[6])
+            print("new_latlng:{}".format(tmp), file=sys.stderr)
+            result_tmp[i][0][4] = str(tmp[0])
+            result_tmp[i][0][5] = str(tmp[1])
+            result_tmp[i].pop(-1)
 
+            next_target = []
+            next_target.extend([result_tmp[i][j] for j in range(len(result_tmp[i])) if np.all((max_spot_latlng-0.02) <= np.array([float(result_tmp[i][j][1]),float(result_tmp[i][j][2])])) and np.all(np.array([float(result_tmp[i][j][1]),float(result_tmp[i][j][2])])<=(max_spot_latlng+0.02))])
+            next_target.pop(0)
+
+            if len(next_target) != 0:
+                for j in range(len(next_target)):
+                    print("next_target:{}".format(next_target), file=sys.stderr)
+                    if len(next_target) != 0:
+                        next_target_latlng = np.array([float(next_target[j][1]),float(next_target[j][2])])
+                        tmp2 = (max_spot_latlng * max_spot[6] + next_target_latlng * next_target[j][6]) / (max_spot[6] + next_target[j][6])
+                        print("new_latlng:{}".format(tmp2), file=sys.stderr)
+                        next_target.pop(0)
+                        for k in range(len(result[i])):
+                            result[i][k][4] = str(tmp2[0])
+                            result[i][k][5] = str(tmp2[1])
+            else:
+                for k in range(len(result[i])):
+                    result[i][k][4] = result_tmp[i][0][4]
+                    result[i][k][5] = result_tmp[i][0][5]
+    print("\nresult:{}".format(result), file=sys.stderr)
+
+    for i in range(len(result)):
+        for j in range(len(result[i])):
+            response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],result[i][j][4],result[i][j][5],result[i][j][6],result[i][j][7],result[i][j][8])
+            json_data.append(response_json)
+
+    ## 既訪問スポット座標変更(平均)
+    # for i in range(len(result)):
+    #     if len(result[i]) > 1:
+    #         sum_res_lat,sum_res_lng = 0, 0
+    #         for j in range(len(result[i])):
+    #             sum_res_lat = sum_res_lat + float(result[i][j][1])
+    #             sum_res_lng = sum_res_lng + float(result[i][j][2])
+    #         mean_res_lat = sum_res_lat / vis_list[i][1]
+    #         mean_res_lng = sum_res_lng / vis_list[i][1]
+    #         for j in range(len(result[i])):
+    #             response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],mean_res_lat,mean_res_lng,result[i][j][6],result[i][j][7],result[i][j][8])
+    #             json_data.append(response_json)
+    #     else:
+    #         for j in range(len(result[i])):
+    #             response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],result[i][j][4],result[i][j][5],result[i][j][6],result[i][j][7],result[i][j][8])
+    #             json_data.append(response_json)
+
+    print(json.dumps(json_data)) ## 送信
 
 def Resp(unvis,unlat,unlng,vis,vislat,vislng,cos,color,word):
     response_json = {"unvis_name":"","unvis_lat":"","unvis_lng":"","vis_name":"","vis_lat":"","vis_lng":"","cossim":"","color":"","word":""}
