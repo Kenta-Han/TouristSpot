@@ -63,7 +63,9 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
     for i in range(len(result)):
         max_spot, min_spot = result_tmp[i][0], result_tmp[i][-1]
         if max_spot == min_spot:
-            continue
+            result[i][0][4] = result[i][0][1]
+            result[i][0][5] = str(float(result[i][0][2]) + (1-result[i][0][6])/100)
+            # continue
         else:
             print("\nmax_spot:{}\nmin_spot:{}".format(max_spot,min_spot),file=sys.stderr)
             max_spot_latlng = np.array([float(max_spot[1]),float(max_spot[2])])

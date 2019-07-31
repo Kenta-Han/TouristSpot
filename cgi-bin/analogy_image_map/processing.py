@@ -90,7 +90,7 @@ else:
 # print("<h4>エリアIDの数：\t{}</h4>".format(len(unvisited_area_id_list)))
 
 ## 未訪問エリア内(レビュー and [lat or lng])ありスポット
-select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review,url,description FROM spot_mst WHERE area_id IN {area} AND review!=0 AND (lat!=0 or lng!=0) AND id NOT IN {vis} ORDER BY review DESC limit 20;".format(area=tuple(unvisited_area_id_list),vis=tuple(visited_spot_id_list))
+select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review,url,description FROM spot_mst WHERE area_id IN {area} AND review!=0 AND (lat!=0 or lng!=0) AND id NOT IN {vis} AND name NOT LIKE '%レンタ%' ORDER BY review DESC limit 20;".format(area=tuple(unvisited_area_id_list),vis=tuple(visited_spot_id_list))
 unvisited_spot_list = myp_other.SpotORReview_List(select_unvisited_spot)
 
 ## 未訪問エリア内スポットIDリスト

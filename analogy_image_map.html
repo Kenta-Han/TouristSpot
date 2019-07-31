@@ -284,21 +284,21 @@
       })
       .transition()
       .delay(function(d,i){
-        return i*40;
+        return i; // return i*40;
       })
-      .duration(300)
+      .duration(300) //300
       .attr("x", function(d, i) {
         return width / data.length * i;
       });
-
-    //
     // console.log($('rect')[1].getAttribute('fill')); //色
     // console.log(svg.selectAll("rect")._groups[0][1]["__data__"]); //データ(値)
 
     // マップ作成 Start
     var map;
+    var unvis_markerLatLng = [], vis_markerLatLng = [];
     var unvis_marker = [], vis_marker = [];
-    var infoWindow = [];
+    var unvis_infoWindow = [], vis_infoWindow = [];
+    var infoLines = [];
 
     function initMap(data) {
       var markerData = data;
@@ -323,20 +323,21 @@
 
       // マーカー毎の処理
       for (var i = 0; i < markerData.length; i++) {
-        unvis_markerLatLng = new google.maps.LatLng({
+        unvis_markerLatLng[i] = new google.maps.LatLng({
           lat: Number(markerData[i]["unvis_lat"]),
           lng: Number(markerData[i]["unvis_lng"])
         }); // 緯度経度のデータ作成
-        vis_markerLatLng = new google.maps.LatLng({
+        vis_markerLatLng[i] = new google.maps.LatLng({
           lat: Number(markerData[i]["vis_lat"]),
           lng: Number(markerData[i]["vis_lng"])
         }); // 緯度経度のデータ作成
+
         unvis_marker[i] = new google.maps.Marker({ // マーカーの追加
-          position: unvis_markerLatLng, // マーカーを立てる位置を指定
+          position: unvis_markerLatLng[i], // マーカーを立てる位置を指定
           map: map // マーカーを立てる地図を指定
         });
         vis_marker[i] = new google.maps.Marker({ // マーカーの追加
-          position: vis_markerLatLng, // マーカーを立てる位置を指定
+          position: vis_markerLatLng[i], // マーカーを立てる位置を指定
           map: map, // マーカーを立てる地図を指定
           icon:{
             // fillcolor:"#FF0000",//塗り潰し色
@@ -353,26 +354,27 @@
           //   // color: '#FFFFFF',                    //文字の色
           //   fontSize: '26px'                     //文字のサイズ
           // }
-
         });
 
-        infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+        unvis_infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
           // 吹き出しに表示する内容
           content: "<table border='1' id='window'><tr><th>Unfamiliar Spot Name</th><td><a href='" + markerData[i]["unvis_url"] + "' target='_blank'>" + markerData[i]["unvis_name"] + "</a></td></tr><tr><th>Familiar Spot Name</th><td>" +
             markerData[i]["vis_name"] +
-            "</td</tr><tr><th>Explainable Keyword</th><td>" + markerData[i]["word"] + "</td></tr></table>"
+            "</td></tr><tr><th>Explainable Keyword</th><td>" + markerData[i]["word"] + "</td></tr></table>"
         });
-        markerEvent(i); // マーカーにクリックイベントを追加
-        var color = markerData[i]["color"];
-        lines = new google.maps.Polyline({
-          path: [unvis_markerLatLng,vis_markerLatLng],
-          strokeColor: color,
-          strokeOpacity: .7,
+        vis_infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+          // 吹き出しに表示する内容
+          content: "<h2 style='text-align:center;'>" + markerData[i]["vis_name"] + "</h2>"
+        });
+
+        infoLines[i] = new google.maps.Polyline({
+          path: [unvis_markerLatLng[i],vis_markerLatLng[i]],
+          strokeColor: markerData[i]["color"],
+          strokeOpacity: .7, //透過率
           strokeWeight: 7, // cossim * 20にする
         });
-        lines.setMap(map);
-
-
+        // infoLines.setMap(map);
+        markerEvent(i,markerData); // マーカーにクリックイベントを追加
       }
       // return infoWindow;
 
@@ -418,26 +420,34 @@
 
     }
 
-
-
     // マーカーにクリックイベントを追加
     var currentInfoWindow = null;
+    var currentInfoLines = null;
 
-    function markerEvent(i) {
+    function markerEvent(i,markerData) {
       unvis_marker[i].addListener("click", function() { // マーカーをクリックしたとき
         if (currentInfoWindow) {
           currentInfoWindow.close();
         } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
-        infoWindow[i].open(map, unvis_marker[i]); // 吹き出しの表示
-        currentInfoWindow = infoWindow[i];
+        unvis_infoWindow[i].open(map, unvis_marker[i]); // 吹き出しの表示
+        currentInfoWindow = unvis_infoWindow[i];
       });
+
       vis_marker[i].addListener("click", function() { // マーカーをクリックしたとき
-        
         if (currentInfoWindow) {
-          currentInfoWindow.close();
+          currentInfoWindow.close(),
+          currentInfoLines.setMap(null);
         } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
-        infoWindow[i].open(map, vis_marker[i]); // 吹き出しの表示
-        currentInfoWindow = infoWindow[i];
+        vis_infoWindow[i].open(map, vis_marker[i]); // 吹き出しの表示
+        for (var k = 0; k < markerData.length; k++){
+          if (infoLines[i].getPath().j[0] === infoLines[k].getPath().j[0]){
+            console.log("same");
+          }
+        }
+        infoLines[i].setMap(map)
+        currentInfoWindow = vis_infoWindow[i];
+        console.log(infoLines[i].getPath().j[0]);
+        currentInfoLines = infoLines[i];
       });
     }
     // マップ作成 Finish
