@@ -4,8 +4,8 @@ import numpy as np
 import json
 
 def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color):
-    # print(data ,file=sys.stderr)
-    max_cossim,min_cossim = max([i[2] for i in data]), min([i[2] for i in data])
+    print(data ,file=sys.stderr)
+    # max_cossim,min_cossim = max([i[2] for i in data]), min([i[2] for i in data])
     cluster = []
     visname_tmp = []
     json_data = []
@@ -29,12 +29,6 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
         # group.append(str(rounsd(data[i][2],2))) ## cossim
         group.append(data[i][2]) ## cossim
 
-        for j in range(len(color)):
-            ## 最大値を1，最小値を0
-            cossim = (data[i][2]-min_cossim) / (max_cossim-min_cossim)
-            if color[j][0] == round(cossim,2):
-                group.append(str(color[j][1]))
-
         word_list = []
         temp = []
         for j in range(len(data[i][3])):
@@ -44,8 +38,6 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
                 continue
         group.append(word_list)
         cluster.append(group)
-        # response_json = Resp(group[0],group[1],group[2],group[3],group[4],group[5],group[6],group[7],group[8])
-        # json_data.append(response_json)
 
     ## 未訪問スポットと関連する既訪問スポットの数の多い順(降順)でソード
     vis_list = collections.Counter(visname_tmp).most_common()
@@ -101,29 +93,26 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
                     result[i][k][5] = result_tmp[i][0][5]
     print("\nresult:{}".format(result), file=sys.stderr)
 
+    new_group = []
     for i in range(len(result)):
+        tmp = []
         for j in range(len(result[i])):
             if result[i][j][6] > 0.1:
-                response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],result[i][j][4],result[i][j][5],result[i][j][6],result[i][j][7],result[i][j][8])
-                json_data.append(response_json)
-
-    ## 既訪問スポット座標変更(平均)
-    # for i in range(len(result)):
-    #     if len(result[i]) > 1:
-    #         sum_res_lat,sum_res_lng = 0, 0
-    #         for j in range(len(result[i])):
-    #             sum_res_lat = sum_res_lat + float(result[i][j][1])
-    #             sum_res_lng = sum_res_lng + float(result[i][j][2])
-    #         mean_res_lat = sum_res_lat / vis_list[i][1]
-    #         mean_res_lng = sum_res_lng / vis_list[i][1]
-    #         for j in range(len(result[i])):
-    #             response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],mean_res_lat,mean_res_lng,result[i][j][6],result[i][j][7],result[i][j][8])
-    #             json_data.append(response_json)
-    #     else:
-    #         for j in range(len(result[i])):
-    #             response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],result[i][j][4],result[i][j][5],result[i][j][6],result[i][j][7],result[i][j][8])
-    #             json_data.append(response_json)
-
+                tmp.append(result[i][j])
+        new_group.append(tmp)
+    max_cossim = max([j[6] for i in new_group for j in i])
+    min_cossim = min([j[6] for i in new_group for j in i])
+    print(new_group, file=sys.stderr)
+    for i in range(len(new_group)):
+        for j in range(len(new_group[i])):
+            c = 0
+            for k in range(len(color)):
+                ## 最大値を1，最小値を0
+                cossim = (new_group[i][j][6] - min_cossim) / (max_cossim - min_cossim)
+                if color[k][0] == round(cossim,2):
+                    c = color[k][1]
+            response_json = Resp(new_group[i][j][0],new_group[i][j][1],new_group[i][j][2],new_group[i][j][3],new_group[i][j][4],new_group[i][j][5],new_group[i][j][6],c,new_group[i][j][7])
+            json_data.append(response_json)
     print(json.dumps(json_data)) ## 送信
 
 def Resp(unvis,unlat,unlng,vis,vislat,vislng,cos,color,word):

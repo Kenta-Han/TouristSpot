@@ -12,6 +12,7 @@ import mypackage.tfidf as myp_tfidf
 import mypackage.harmonic_mean as myp_hmean
 import mypackage.response as myp_res
 import mypackage.calculation as myp_cal
+import mypackage.calculation_2 as myp_cal2
 import mypackage.color as myp_color
 
 import MySQLdb
@@ -157,7 +158,7 @@ UtoV_top10_harmonic = myp_hmean.Sort_TFIDF_UtoV_Harmonic(visited_tfidf,unvisited
 ## 線の色
 color_res = myp_color.Color_BPR()
 try:
-    myp_cal.Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic[:50],color_res)
+    myp_cal2.Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res)
 except:
     import traceback
     traceback.print_exc()

@@ -422,7 +422,7 @@
 
     // マーカーにクリックイベントを追加
     var currentInfoWindow = null;
-    var currentInfoLines = null;
+    var currentInfoLines = [];
 
     function markerEvent(i,markerData) {
       unvis_marker[i].addListener("click", function() { // マーカーをクリックしたとき
@@ -435,19 +435,20 @@
 
       vis_marker[i].addListener("click", function() { // マーカーをクリックしたとき
         if (currentInfoWindow) {
-          currentInfoWindow.close(),
-          currentInfoLines.setMap(null);
+          currentInfoWindow.close();
+          for (var k = 0; k < currentInfoLines.length;k++){
+            currentInfoLines[k].setMap(null);
+          }
         } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
         vis_infoWindow[i].open(map, vis_marker[i]); // 吹き出しの表示
         for (var k = 0; k < markerData.length; k++){
-          if (infoLines[i].getPath().j[0] === infoLines[k].getPath().j[0]){
-            console.log("same");
+          if ((infoLines[i].getPath().j[1].lat() === infoLines[k].getPath().j[1].lat()) && (infoLines[i].getPath().j[1].lng() === infoLines[k].getPath().j[1].lng())) {
+            infoLines[k].setMap(map);
+            currentInfoLines.push(infoLines[k]);
           }
         }
-        infoLines[i].setMap(map)
         currentInfoWindow = vis_infoWindow[i];
-        console.log(infoLines[i].getPath().j[0]);
-        currentInfoLines = infoLines[i];
+        // currentInfoLines = infoLines[i];
       });
     }
     // マップ作成 Finish
