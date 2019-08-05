@@ -112,7 +112,9 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
                 if color[k][0] == round(cossim,2):
                     c = color[k][1]
             response_json = Resp(new_group[i][j][0],new_group[i][j][1],new_group[i][j][2],new_group[i][j][3],new_group[i][j][4],new_group[i][j][5],new_group[i][j][6],c,new_group[i][j][7])
+            print(response_json, file=sys.stderr)
             json_data.append(response_json)
+    print(json_data, file=sys.stderr)
     print(json.dumps(json_data)) ## 送信
 
 def Resp(unvis,unlat,unlng,vis,vislat,vislng,cos,color,word):
