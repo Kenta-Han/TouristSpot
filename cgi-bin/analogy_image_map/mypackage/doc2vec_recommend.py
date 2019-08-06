@@ -49,7 +49,7 @@ def Recommend_All(visited_name,unvisited_name,visited_review,unvisited_review):
     for i in range(len(list_UtoV)):
         list_UtoV[i][1].sort(key=lambda x:x[1],reverse=True)
         for j in range(len(list_UtoV[i][1])):
-            # if list_UtoV[i][1][j][1] > 0: #0.125 / 0.1 /0.05
+            # if list_UtoV[i][1][j][1] > 0.1: #0.125 / 0.1 /0.05
             list_UtoV_top.append([list_UtoV[i][0],list_UtoV[i][1][j]])
             # else:
             #     continue
