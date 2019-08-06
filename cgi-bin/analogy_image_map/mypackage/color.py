@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 
-def Color_CYO():
+def color_cyo():
     # html用rgb作成 .range(['cyan', 'yellow', 'orange']);
     num = np.arange(0, 1.01, 0.01)
     color_res = []
@@ -17,7 +17,7 @@ def Color_CYO():
     # print(color_res, file=sys.stderr)
     return color_res
 
-def Color_BOR():
+def color_bor():
     ## html用rgb作成 .range(['blue', 'orange', 'red']);
     num = np.arange(0, 1.01, 0.01)
     color_res = []
@@ -34,7 +34,7 @@ def Color_BOR():
     # print(color_res, file=sys.stderr)
     return color_res
 
-def Color_BPR():
+def color_bpr():
     ## html用rgb作成 .range(['blue', 'purple', 'red']);
     num = np.arange(-1.01, 1.01, 0.01)
     color_res = []
@@ -46,7 +46,7 @@ def Color_BPR():
     # print(color_res, file=sys.stderr)
     return color_res
 
-def Color_CYO_FU():
+def color_cyo_fu():
     # html用rgb作成 .range(['cyan', 'yellow', 'orange']);
     num = np.arange(-1, 0.01, 0.01)
     color_res = []
@@ -62,7 +62,7 @@ def Color_CYO_FU():
     # print(color_res, file=sys.stderr)
     return color_res
 
-# def Color_CBPR():
+# def Color_cbpr():
 #     ## html用rgb作成 .range(['blue', 'purple', 'red']);
 #     num = np.arange(-1.01, 1.01, 0.01)
 #     color_res = []

@@ -6,7 +6,7 @@ from mysql_connect import jalan_ktylab_new
 conn,cur = jalan_ktylab_new.main()
 
 ## 履歴スポットリスト作成(DBでLIKE検索するため)
-def Make_History_List(history):
+def make_history_list(history):
     all = []
     spot = []
     area = []
@@ -19,7 +19,7 @@ def Make_History_List(history):
     return spot,area
 
 ## スポット，レビューリスト作成
-def SpotORReview_List(spot):
+def spot_or_reviewlist(spot):
     spot_list = []
     cur.execute(spot)
     for i in cur:
@@ -27,7 +27,7 @@ def SpotORReview_List(spot):
     return spot_list
 
 ## エリアIDリスト作成
-def Area_id_List(area):
+def area_id_list(area):
     area_id_list = []
     cur.execute(area)
     for i in cur:

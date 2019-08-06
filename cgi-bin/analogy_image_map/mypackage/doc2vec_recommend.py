@@ -9,17 +9,17 @@ sys.path.append(path)
 from mysql_connect import jalan_ktylab_new
 conn,cur = jalan_ktylab_new.main()
 
-def Spot_List(select_spot):
+def spot_list(select_spot):
     spot_list = []
     cur.execute(select_spot)
     for i in cur:
         spot_list.append(i)
     return spot_list
 
-def CosSim(x, y):
+def cossim(x, y):
     return np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))
 
-def Doc2Cec_Feature(spot_vectors): ## doc2vecを使ってスポットベクトルの差を求める
+def doc2vec_feature(spot_vectors): ## doc2vecを使ってスポットベクトルの差を求める
     result_list = []
     for i in range(len(spot_vectors)):
         x = copy.deepcopy(spot_vectors)
@@ -36,12 +36,12 @@ def Doc2Cec_Feature(spot_vectors): ## doc2vecを使ってスポットベクト�
         result = []
     return result_list
 
-def Recommend_All(visited_name,unvisited_name,visited_review,unvisited_review):
+def recommend_all(visited_name,unvisited_name,visited_review,unvisited_review):
     value_UtoV = []
     for i in range(len(unvisited_name)):
         temp_UtoV = []
         for j in range(len(visited_name)):
-            unvisited_to_visited = CosSim(unvisited_review[i],visited_review[j])
+            unvisited_to_visited = cossim(unvisited_review[i],visited_review[j])
             temp_UtoV.append([visited_name[j],unvisited_to_visited])
         value_UtoV.append(temp_UtoV)
     list_UtoV = list(zip(unvisited_name,value_UtoV))

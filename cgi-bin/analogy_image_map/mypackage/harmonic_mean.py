@@ -4,7 +4,7 @@ import re
 bytesymbols = re.compile("[!-/:*-@[-`{-~\d]") ## 半角記号，数字\d
 ## 調和平均 差が小値が大，差が大値が小 → 値が大の方が良い(昇順後ろから10個)
 
-def Sort_TFIDF_UtoV_Harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,result):
+def sort_tfidf_UtoV_harmonic(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,result):
     ## TFIDFの結果にスポット名を追加
     vis_spot,unvis_spot = [],[]
     for i in range(len(vis_spot_name)):

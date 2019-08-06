@@ -3,7 +3,7 @@ import collections, copy
 import numpy as np
 import json
 
-def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color):
+def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color):
     # print(data ,file=sys.stderr)
     max_cossim,min_cossim = max([i[2] for i in data]), min([i[2] for i in data])
     cluster = []
@@ -104,7 +104,7 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
     for i in range(len(result)):
         for j in range(len(result[i])):
             if result[i][j][6] > 0.1:
-                response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],result[i][j][4],result[i][j][5],result[i][j][6],result[i][j][7],result[i][j][8])
+                response_json = resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],result[i][j][4],result[i][j][5],result[i][j][6],result[i][j][7],result[i][j][8])
                 json_data.append(response_json)
 
     ## 既訪問スポット座標変更(平均)
@@ -117,7 +117,7 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
     #         mean_res_lat = sum_res_lat / vis_list[i][1]
     #         mean_res_lng = sum_res_lng / vis_list[i][1]
     #         for j in range(len(result[i])):
-    #             response_json = Resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],mean_res_lat,mean_res_lng,result[i][j][6],result[i][j][7],result[i][j][8])
+    #             response_json = resp(result[i][j][0],result[i][j][1],result[i][j][2],result[i][j][3],mean_res_lat,mean_res_lng,result[i][j][6],result[i][j][7],result[i][j][8])
     #             json_data.append(response_json)
     #     else:
     #         for j in range(len(result[i])):
@@ -126,7 +126,7 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
 
     print(json.dumps(json_data)) ## 送信
 
-def Resp(unvis,unlat,unlng,vis,vislat,vislng,cos,color,word):
+def resp(unvis,unlat,unlng,vis,vislat,vislng,cos,color,word):
     response_json = {"unvis_name":"","unvis_lat":"","unvis_lng":"","vis_name":"","vis_lat":"","vis_lng":"","cossim":"","color":"","word":""}
     response_json["unvis_name"] = unvis
     response_json["unvis_lat"] = unlat

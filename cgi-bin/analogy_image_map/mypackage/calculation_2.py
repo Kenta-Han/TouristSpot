@@ -3,7 +3,7 @@ import collections, copy
 import numpy as np
 import json
 
-def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color):
+def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color):
     print(data ,file=sys.stderr)
     cluster = []
     visname_tmp = []
@@ -106,11 +106,11 @@ def Calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
                 cossim = (new_group[i][j][6] - min_cossim) / (max_cossim - min_cossim)
                 if color[k][0] == round(cossim,2):
                     c = color[k][1]
-            response_json = Resp(new_group[i][j][0],new_group[i][j][1],new_group[i][j][2],new_group[i][j][3],new_group[i][j][4],new_group[i][j][5],new_group[i][j][6],c,new_group[i][j][7])
+            response_json = resp(new_group[i][j][0],new_group[i][j][1],new_group[i][j][2],new_group[i][j][3],new_group[i][j][4],new_group[i][j][5],new_group[i][j][6],c,new_group[i][j][7])
             json_data.append(response_json)
     print(json.dumps(json_data)) ## 送信
 
-def Resp(unvis,unlat,unlng,vis,vislat,vislng,cos,color,word):
+def resp(unvis,unlat,unlng,vis,vislat,vislng,cos,color,word):
     response_json = {"unvis_name":"","unvis_lat":"","unvis_lng":"","vis_name":"","vis_lat":"","vis_lng":"","cossim":"","color":"","word":""}
     response_json["unvis_name"] = unvis
     response_json["unvis_lat"] = unlat

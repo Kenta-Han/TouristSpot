@@ -2,7 +2,7 @@ import json
 import random, string
 
 ##　相対的な特徴（差分ベクトルー調和平均）のjson形式整理
-def Response_Harmonic(data,name,lat,lng,url,description):
+def response_harmonic(data,name,lat,lng,url,description):
     json_harmonic = []
     temp_sql_word = []
     sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = [],[],[],[],[],""
@@ -51,7 +51,7 @@ def Response_Harmonic(data,name,lat,lng,url,description):
     return sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word
 
 
-def Response(vis_name,vis_lat,vis_lng,vis_url,vis_description,unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description,data):
+def response(vis_name,vis_lat,vis_lng,vis_url,vis_description,unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description,data):
     json_vis, json_unvis = [], []
     response = {"nodes":[],"links":[]}
     for i in range(len(vis_name)):

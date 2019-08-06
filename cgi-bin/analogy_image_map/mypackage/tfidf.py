@@ -7,7 +7,7 @@ sys.path.append(path)
 from mysql_connect import jalan_ktylab_new
 conn,cur = jalan_ktylab_new.main()
 
-def Spot_List_TFIDF(select_spot):
+def spot_list_tfidf(select_spot):
     all_spot_list = []
     cur.execute(select_spot)
     for i in cur:
@@ -35,7 +35,7 @@ def Spot_List_TFIDF(select_spot):
     return everyspot
 
 ## TFIDFを求める(単語に重み付け)，特徴ベクトル用
-def Tfidf(review_all):
+def tfidf(review_all):
     dictionary = corpora.Dictionary(review_all)
     dictionary_inv = {}
     for dic in dictionary.token2id.items():
@@ -59,7 +59,7 @@ def Tfidf(review_all):
 
 
 ## TFIDFを求める(単語に重み付け)，差分ベクトル用
-def Tfidf_HM(review_all):
+def tfidf_hm(review_all):
     dictionary = corpora.Dictionary(review_all)
     dictionary_inv = {}
     for dic in dictionary.token2id.items():
