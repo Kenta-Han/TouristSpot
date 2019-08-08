@@ -36,6 +36,18 @@ def color_bor():
 
 def color_bpr():
     ## html用rgb作成 .range(['blue', 'purple', 'red']);
+    num = np.arange(0, 1.01, 0.01)
+    color_res = []
+    r,g,b = 0,0,255
+    for i in range(len(num)):
+        color_res.append([num[i],"rgb(" + str(r) + "," + str(g) + "," + str(b) +")"])
+        r = r + 2.5
+        b = b - 2.5
+    print(color_res, file=sys.stderr)
+    return color_res
+
+def color_bpr_fu():
+    ## html用rgb作成 .range(['blue', 'purple', 'red']);
     num = np.arange(-1.01, 1.01, 0.01)
     color_res = []
     r,g,b = 0,0,255
@@ -43,7 +55,7 @@ def color_bpr():
         color_res.append([float(str(num[i])[:4]),"rgb(" + str(r) + "," + str(g) + "," + str(b) +")"])
         r = r + 1
         b = b - 1
-    # print(color_res, file=sys.stderr)
+    print(color_res, file=sys.stderr)
     return color_res
 
 def color_cyo_fu():
@@ -62,7 +74,7 @@ def color_cyo_fu():
     # print(color_res, file=sys.stderr)
     return color_res
 
-# def Color_cbpr():
+# def color_cbpr():
 #     ## html用rgb作成 .range(['blue', 'purple', 'red']);
 #     num = np.arange(-1.01, 1.01, 0.01)
 #     color_res = []

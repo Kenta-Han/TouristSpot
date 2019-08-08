@@ -13,7 +13,7 @@ import mypackage.harmonic_mean as myp_hmean
 import mypackage.response as myp_res
 import mypackage.calculation as myp_cal
 import mypackage.calculation_2 as myp_cal2
-import mypackage.normal_distribution as myp_normal
+import mypackage.normal_distribution as myp_norm
 import mypackage.color as myp_color
 
 import MySQLdb
@@ -159,11 +159,19 @@ UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited
 
 ## 線の色
 color_res = myp_color.color_bpr()
+# try:
+#     myp_cal2.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res)
+# except:
+#     import traceback
+#     traceback.print_exc()
+
 try:
-    myp_cal2.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res)
+    myp_norm.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res)
 except:
     import traceback
     traceback.print_exc()
+
+# myp_norm.normal_distribution()
 
 ## レスポンス作成，mysqlに入れるためのカラム内容作成(10個まで表示)
 # sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word = myp_res.response_harmonic(UtoV_top10_harmonic[:50],unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description)
