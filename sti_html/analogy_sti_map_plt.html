@@ -334,6 +334,105 @@
     //     return width / data.length * i;
     //   });
 
+    // // マップ作成 Start
+    // var map_P;
+    // var unvis_markerLatLng_P, vis_markerLatLng_P ;
+    // var unvis_marker_P = [], vis_marker_P = [];
+    // var unvis_infoWindow_P = [], vis_infoWindow_P = [];
+    // var infoLines_P = [];
+    // var markerData_P;
+    // function initMap_Position(data) {
+    //   markerData_P = data;
+    //   // 地図の作成
+    //   var cnt = 0,
+    //     sum_lat = 0,
+    //     sum_lng = 0;
+    //   for (var i = 0; i < markerData_P.length; i++) {
+    //     sum_lat = sum_lat + Number(markerData_P[i]["unvis_lat"]);
+    //     sum_lng = sum_lng + Number(markerData_P[i]["unvis_lng"]);
+    //     ll =
+    //       cnt += 1;
+    //   }
+    //   map_P = new google.maps.Map(document.getElementById("map_positon"), { // #mapに地図を埋め込む
+    //     center: {
+    //       lat: sum_lat / cnt,
+    //       lng: sum_lng / cnt
+    //     },
+    //     zoom: 13 // 地図のズームを指定
+    //   });
+    //
+    //   // マーカー毎の処理
+    //   for (var i = 0; i < markerData_P.length; i++) {
+    //     unvis_markerLatLng_P = new google.maps.LatLng({
+    //       lat: Number(markerData_P[i]["unvis_lat"]),
+    //       lng: Number(markerData_P[i]["unvis_lng"])
+    //     }); // 緯度経度のデータ作成
+    //     vis_markerLatLng_P = new google.maps.LatLng({
+    //       lat: Number(markerData_P[i]["vis_lat"]),
+    //       lng: Number(markerData_P[i]["vis_lng"])
+    //     }); // 緯度経度のデータ作成
+    //
+    //     unvis_marker_P[i] = new google.maps.Marker({ // マーカーの追加
+    //       position: unvis_markerLatLng_P, // マーカーを立てる位置を指定
+    //       map: map_P, // マーカーを立てる地図を指定
+    //     });
+    //     vis_marker_P[i] = new google.maps.Marker({ // マーカーの追加
+    //       position: vis_markerLatLng_P, // マーカーを立てる位置を指定
+    //       map: map_P, // マーカーを立てる地図を指定
+    //       icon:{
+    //         url:"../data/vis_spot_marker.png",
+    //         scaledSize: new google.maps.Size(40, 40) //サイズ
+    //       },
+    //       text: markerData_P[i]["vis_name"],
+    //     });
+    //
+    //     unvis_infoWindow_P[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+    //       // 吹き出しに表示する内容
+    //       content: "<h2 style='text-align:center; font-size:22px;' >" + markerData_P[i]["unvis_name"] + "</h2>"
+    //     });
+    //     vis_infoWindow_P[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+    //       // 吹き出しに表示する内容
+    //       content: "<table border='1' id='window'><tr><th>未訪問スポット名</th><td><a href='" + markerData_P[i]["unvis_url"] + "' target='_blank'>" + markerData_P[i]["unvis_name"] + "</a></td></tr><tr><th>既訪問スポット名</th><td>" +
+    //         markerData_P[i]["vis_name"] +
+    //         "</td></tr><tr><th>関連キーワード</th><td>" + markerData_P[i]["word"] + "</td></tr></table>",
+    //     });
+    //
+    //     infoLines_P[i] = new google.maps.Polyline({
+    //       path: [unvis_markerLatLng_P,vis_markerLatLng_P],
+    //       strokeColor: markerData_P[i]["color"],
+    //       strokeOpacity: .7, //透過率
+    //       strokeWeight: 7, // cossim * 20にする
+    //     });
+    //     markerEvent_Position(i,markerData_P); // マーカーにクリックイベントを追加
+    //   }
+    // }
+    // var currentInfoWindow_P = null;
+    // var currentInfoLines_P = [];
+    // function markerEvent_Position(i,markerData) {
+    //   vis_marker_P[i].addListener("click", function() { // マーカーをクリックしたとき
+    //     if (currentInfoWindow_P) {
+    //       currentInfoWindow_P.close();
+    //     } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+    //     vis_infoWindow_P[i].open(map_P, vis_marker_P[i]); // 吹き出しの表示
+    //     currentInfoWindow_P = vis_infoWindow_P[i];
+    //   });
+    //
+    //   unvis_marker_P[i].addListener("click", function() { // マーカーをクリックしたとき
+    //     if (currentInfoWindow_P) {
+    //       currentInfoWindow_P.close();
+    //     } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+    //     unvis_infoWindow_P[i].open(map_P, unvis_marker_P[i]); // 吹き出しの表示
+    //     for (var k = 0; k < markerData_P.length; k++){
+    //       vis_marker_P[k].setZIndex(0);
+    //       if ((infoLines_P[i].getPath().g[0].lat() === infoLines_P[k].getPath().g[0].lat()) && (infoLines_P[i].getPath().g[0].lng() === infoLines_P[k].getPath().g[0].lng())) {
+    //         vis_marker_P[k].setZIndex(1000);
+    //       }
+    //     }
+    //     currentInfoWindow_P = unvis_infoWindow_P[i];
+    //   });
+    // }
+    // // マップ作成 Finish
+
     // マップ作成 Start
     var map_P;
     var unvis_markerLatLng_P, vis_markerLatLng_P ;
@@ -388,13 +487,16 @@
 
         unvis_infoWindow_P[i] = new google.maps.InfoWindow({ // 吹き出しの追加
           // 吹き出しに表示する内容
-          content: "<h2 style='text-align:center; font-size:22px;' >" + markerData_P[i]["unvis_name"] + "</h2>"
+          // content: "<h2 style='text-align:center; font-size:22px;' >" + markerData_P[i]["unvis_name"] + "</h2>",
+          content: "<h2 style='text-align:center; font-size:22px;'><a href='" + markerData_P[i]["unvis_url"] + "'target='_blank'>" + markerData_P[i]["unvis_name"] + "</a></h2>",
         });
         vis_infoWindow_P[i] = new google.maps.InfoWindow({ // 吹き出しの追加
           // 吹き出しに表示する内容
-          content: "<table border='1' id='window'><tr><th>未訪問スポット名</th><td><a href='" + markerData_P[i]["unvis_url"] + "' target='_blank'>" + markerData_P[i]["unvis_name"] + "</a></td></tr><tr><th>既訪問スポット名</th><td>" +
-            markerData_P[i]["vis_name"] +
-            "</td></tr><tr><th>関連キーワード</th><td>" + markerData_P[i]["word"] + "</td></tr></table>",
+          // content: "<table border='1' id='window'><tr><th>未訪問スポット名</th><td><a href='" + markerData_P[i]["unvis_url"] + "' target='_blank'>" + markerData_P[i]["unvis_name"] + "</a></td></tr><tr><th>既訪問スポット名</th><td>" +
+          //   markerData_P[i]["vis_name"] +
+          //   "</td></tr><tr><th>関連キーワード</th><td>" + markerData_P[i]["word"] + "</td></tr></table>",
+          content: "<table border='1' id='window'><tr><th>既訪問スポット名</th><td>" + markerData_P[i]["vis_name"] +
+          "</td></tr><tr><th>関連キーワード</th><td>" + markerData_P[i]["word"] + "</td></tr></table>",
         });
 
         infoLines_P[i] = new google.maps.Polyline({
@@ -407,28 +509,42 @@
       }
     }
     var currentInfoWindow_P = null;
+    var currentInfoWindow_P2 = null;
     var currentInfoLines_P = [];
     function markerEvent_Position(i,markerData) {
       vis_marker_P[i].addListener("click", function() { // マーカーをクリックしたとき
-        if (currentInfoWindow_P) {
-          currentInfoWindow_P.close();
-        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
-        vis_infoWindow_P[i].open(map_P, vis_marker_P[i]); // 吹き出しの表示
-        currentInfoWindow_P = vis_infoWindow_P[i];
+        if (currentInfoLines_P.length == 0){
+          alert("未訪問スポット(赤色のピン)の座標をクリックしてください");
+        }
+        else {
+          if (currentInfoWindow_P) {
+            currentInfoWindow_P.close();
+          } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+
+          vis_infoWindow_P[i].open(map_P, vis_marker_P[i]); // 吹き出しの表示
+          vis_infoWindow_P[i].setZIndex(1200);
+          currentInfoWindow_P = vis_infoWindow_P[i];
+        }
       });
 
       unvis_marker_P[i].addListener("click", function() { // マーカーをクリックしたとき
-        if (currentInfoWindow_P) {
+        if (currentInfoWindow_P2 != null && currentInfoWindow_P == null) {
+          currentInfoWindow_P2.close();
+        }
+        else if (currentInfoWindow_P2 != null && currentInfoWindow_P != null){
+          currentInfoWindow_P2.close();
           currentInfoWindow_P.close();
-        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+        }
         unvis_infoWindow_P[i].open(map_P, unvis_marker_P[i]); // 吹き出しの表示
         for (var k = 0; k < markerData_P.length; k++){
           vis_marker_P[k].setZIndex(0);
           if ((infoLines_P[i].getPath().g[0].lat() === infoLines_P[k].getPath().g[0].lat()) && (infoLines_P[i].getPath().g[0].lng() === infoLines_P[k].getPath().g[0].lng())) {
             vis_marker_P[k].setZIndex(1000);
+            currentInfoLines_P.push(infoLines_P[k]);
           }
         }
-        currentInfoWindow_P = unvis_infoWindow_P[i];
+        unvis_infoWindow_P[i].setZIndex(1100);
+        currentInfoWindow_P2 = unvis_infoWindow_P[i];
       });
     }
     // マップ作成 Finish

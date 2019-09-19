@@ -34,7 +34,7 @@ def normal_distribution(data,num=0):
         for t_latlng in rlatlng:
             tmp = []
             for j in range(len(data[i])):
-                cossim, average, alpha = data[i][j][6], 0, 1
+                cossim, average, alpha = data[i][j][7], 0, 1
                 standard_deviation = (1 - abs(cossim)) * alpha
                 x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
                 dis = euclid_distance(x_latlng, t_latlng)
@@ -48,8 +48,8 @@ def normal_distribution(data,num=0):
             res.append([t_latlng, sum(tmp)])
         sortedRes = sorted(res, key=lambda x: x[1], reverse=True)
         for j in range(len(data[i])):
-            data[i][j][4] = str(sortedRes[0][0][0])
-            data[i][j][5] = str(sortedRes[0][0][1])
+            data[i][j][5] = str(sortedRes[0][0][0])
+            data[i][j][6] = str(sortedRes[0][0][1])
     return data
 
 def select_and_resp_data(data,color,record_id,sql_unvis,sql_vis,sql_word):
@@ -58,7 +58,7 @@ def select_and_resp_data(data,color,record_id,sql_unvis,sql_vis,sql_word):
     for i in range(len(data)):
         tmp = []
         for j in range(len(data[i])):
-            if len(data[i][j][7]) >= 2:
+            if len(data[i][j][8]) >= 2:
                 tmp.append(data[i][j])
         res.append(tmp)
     ## 類似度に応じて色ずけ
@@ -68,19 +68,20 @@ def select_and_resp_data(data,color,record_id,sql_unvis,sql_vis,sql_word):
         for j in range(len(res[i])):
             c = 0
             for k in range(len(color)):
-                cossim = (res[i][j][6] + 1) / 2
+                cossim = (res[i][j][7] + 1) / 2
                 if color[k][0] == round(cossim,2):
                     c = color[k][1]
-            response_json = resp(record_id,res[i][j][0],res[i][j][1],res[i][j][2],res[i][j][3],res[i][j][4],res[i][j][5],res[i][j][6],c,res[i][j][7],sql_unvis,sql_vis,sql_word)
+            response_json = resp(record_id,res[i][j][0],res[i][j][1],res[i][j][2],res[i][j][3],res[i][j][4],res[i][j][5],res[i][j][6],res[i][j][7],c,res[i][j][8],sql_unvis,sql_vis,sql_word)
             json_data.append(response_json)
     return json_data
 
-def resp(record_id,unvis,unlat,unlng,vis,vislat,vislng,cos,color,word,sql_unvis,sql_vis,sql_word):
-    response_json = {"record_id":"","unvis_name":"","unvis_lat":"","unvis_lng":"","vis_name":"","vis_lat":"","vis_lng":"","cossim":"","color":"","word":""}
+def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,color,word,sql_unvis,sql_vis,sql_word):
+    response_json = {"record_id":"","unvis_name":"","unvis_lat":"","unvis_lng":"","unvis_url":"","vis_name":"","vis_lat":"","vis_lng":"","cossim":"","color":"","word":""}
     response_json["record_id"] = record_id
     response_json["unvis_name"] = unvis
     response_json["unvis_lat"] = unlat
     response_json["unvis_lng"] = unlng
+    response_json["unvis_url"] = unurl
     response_json["vis_name"] = vis
     response_json["vis_lat"] = vislat
     response_json["vis_lng"] = vislng
@@ -92,7 +93,7 @@ def resp(record_id,unvis,unlat,unlng,vis,vislat,vislng,cos,color,word,sql_unvis,
     conn.commit()
     return response_json
 
-def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color,record_id):
+def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color,record_id,unvis_url):
     cluster, visname_tmp = [], []
     sql_unvis, sql_vis, sql_word, temp_sql_word = [], [], "", []
     for i in range(len(data)):
@@ -104,6 +105,7 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
             if data[i][0] == unvis_name[j]:
                 group.append(unvis_lat[j])
                 group.append(unvis_lng[j])
+                group.append(unvis_url[j])
 
         group.append(data[i][1]) ## vis_name
         sql_vis.append(data[i][1])
@@ -139,7 +141,7 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
     for i in range(len(vis_list)):
         tmp = []
         for j in range(len(cluster)):
-            if vis_list[i][0] == cluster[j][3]:
+            if vis_list[i][0] == cluster[j][4]:
                 tmp.append(cluster[j])
         result.append(tmp)
     # print(result, file=sys.stderr)

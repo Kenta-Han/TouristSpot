@@ -76,7 +76,7 @@ for i in range(len(visited_spot_list)):
         continue
 
 vis_cate = [x for x in set(vis_cate) if vis_cate.count(x) >= 1]
-print(vis_cate, file=sys.stderr)
+# print(vis_cate, file=sys.stderr)
 
 ############################################################
 ## DB挿入
@@ -194,7 +194,7 @@ UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited
 # print(UtoV_top10_harmonic,file=sys.stderr)
 
 try:
-    json_data_map_line = myp_norm_l.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id)
+    json_data_map_line = myp_norm_l.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id,unvis_url)
 except:
     import traceback
     traceback.print_exc()
@@ -265,7 +265,7 @@ UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited
 # print(UtoV_top10_harmonic,file=sys.stderr)
 
 try:
-    json_data_map_position = myp_norm_p.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id)
+    json_data_map_position = myp_norm_p.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id,unvis_url)
 except:
     import traceback
     traceback.print_exc()
@@ -338,7 +338,7 @@ UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited
 # print(UtoV_top10_harmonic,file=sys.stderr)
 
 try:
-    json_data_map_table = myp_norm_t.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id)
+    json_data_map_table = myp_norm_t.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id,unvis_url)
 except:
     import traceback
     traceback.print_exc()
