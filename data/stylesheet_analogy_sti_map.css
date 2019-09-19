@@ -1,0 +1,155 @@
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+h2{
+  font-size: 30px;
+}
+
+#main_top {
+  width: 100%;
+  text-align: center;
+  margin: 10% auto;
+}
+
+#familiar {
+  float: left;
+  width: 50%;
+  margin: 1% auto;
+}
+
+#setumei {
+  margin: auto;
+  list-style: none;
+  padding: 0;
+}
+
+.visited {
+  width: 95%;
+  height: 30px;
+  font-size: 18px;
+  font-weight: normal;
+}
+
+.visited td {
+  margin: 5px;
+  padding: 5px;
+}
+
+#unfamiliar {
+  float: right;
+  width: 50%;
+  margin: 1% auto;
+}
+
+#prefecture {
+  width: 100px;
+  height: 30px;
+  font-size: 18px;
+  font-weight: normal;
+}
+
+#user_id, #area, #purpose {
+  width: 30%;
+  height: 30px;
+  font-size: 18px;
+  text-align: center;
+}
+
+#result1,#result2,#result3 {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+#result1 #color{
+  width: 100%;
+  text-align: center;
+}
+
+#result1 #color img{
+  width: 100%;
+  height: 5%;
+}
+
+#result1 #map1,#result2 #map2,#result3 #map3 {
+  width: 100%;
+  height: 90%;
+  margin: auto;
+}
+
+#next1,#next2,#next3 {
+  display: inline-block;
+  border-radius: 5%;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  padding: 12px 20px;
+  background: #000066;
+  color: #ffffff;
+  line-height: 1em;
+  transition: .3s;
+  box-shadow: 6px 6px 3px #666666;
+  border: 2px solid #000066;
+  margin: 1% 48%;
+}
+
+#next1:hover,#next2:hover,#next3:hover{
+  box-shadow: none;
+  color: #000066;
+  background: #ffffff;
+}
+
+#start, #finish {
+  display: inline-block;
+  border-radius: 5%;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  padding: 12px 20px;
+  background: #000066;
+  color: #ffffff;
+  line-height: 1em;
+  transition: .3s;
+  box-shadow: 6px 6px 3px #666666;
+  border: 2px solid #000066;
+  margin: 1% auto;
+}
+
+#start:hover, #finish:hover {
+  box-shadow: none;
+  color: #000066;
+  background: #ffffff;
+}
+
+#map1_title, #map2_title, #map3_title{
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  margin: auto;
+}
+
+tr{
+  width: 100%;
+}
+
+th, td {
+  padding: 7px 10px;
+}
+
+th {
+  color: white;
+  background-color: #2196f3;
+}
+
+/* #result #myGraph {
+  margin: 0px auto;
+  width: 100%;
+  height: 70px;
+  padding: 0px;
+} */
