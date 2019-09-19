@@ -59,29 +59,29 @@ h2{
   text-align: center;
 }
 
-#result1,#result2,#result3 {
+#result_positon, #result_line, #result_table {
   width: 100%;
   height: 100%;
   position: absolute;
 }
 
-#result1 #color{
+#result_line #color{
   width: 100%;
   text-align: center;
 }
 
-#result1 #color img{
+#result_line #color img{
   width: 100%;
   height: 5%;
 }
 
-#result1 #map1,#result2 #map2,#result3 #map3 {
+#result_positon #map_positon, #result_line #map_line, #result_table #map_table {
   width: 100%;
   height: 90%;
   margin: auto;
 }
 
-#next1,#next2,#next3 {
+#next_p, #next_l, #next_t {
   display: inline-block;
   border-radius: 5%;
   font-size: 16px;
@@ -97,7 +97,7 @@ h2{
   margin: 1% 48%;
 }
 
-#next1:hover,#next2:hover,#next3:hover{
+#next_p:hover, #next_l:hover, #next_t:hover{
   box-shadow: none;
   color: #000066;
   background: #ffffff;
@@ -125,7 +125,7 @@ h2{
   background: #ffffff;
 }
 
-#map1_title, #map2_title, #map3_title{
+#map_positon_title, #map_line_title, #map_table_title{
   text-align: center;
 }
 

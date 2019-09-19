@@ -9,9 +9,9 @@ import mypackage.other as myp_other
 import mypackage.doc2vec_recommend as myp_doc_rec
 import mypackage.tfidf as myp_tfidf
 import mypackage.harmonic_mean as myp_hmean
-import mypackage.normal_distribution_map1 as myp_norm_map1
-import mypackage.normal_distribution_map2 as myp_norm_map2
-import mypackage.normal_distribution_map3 as myp_norm_map3
+import mypackage.normal_distribution_map_position as myp_norm_p
+import mypackage.normal_distribution_map_line as myp_norm_l
+import mypackage.normal_distribution_map_table as myp_norm_t
 import mypackage.color as myp_color
 
 import MySQLdb
@@ -112,39 +112,39 @@ for i in range(len(vis_cate)):
     unvisited_spot_list.append(tmp)
 
 # print(len(unvisited_spot_list), file=sys.stderr)
-unvisited_spot_list_map1,unvisited_spot_list_map2,unvisited_spot_list_map3 = [],[],[]
+unvisited_spot_list_map_l,unvisited_spot_list_map_t,unvisited_spot_list_map_p = [],[],[]
 for i in range(len(unvisited_spot_list)):
     n = 0
-    unvisited_spot_list_map1.extend(unvisited_spot_list[i][n:n+3])
+    unvisited_spot_list_map_p.extend(unvisited_spot_list[i][n:n+3])
     n = 3
-    unvisited_spot_list_map2.extend(unvisited_spot_list[i][n:n+3])
+    unvisited_spot_list_map_l.extend(unvisited_spot_list[i][n:n+3])
     n = 6
-    unvisited_spot_list_map3.extend(unvisited_spot_list[i][n:n+3])
-if len(unvisited_spot_list_map1) != len(unvisited_spot_list_map2) or len(unvisited_spot_list_map2) != len(unvisited_spot_list_map3) or len(unvisited_spot_list_map1) != len(unvisited_spot_list_map3):
-    a = min([len(unvisited_spot_list_map1),len(unvisited_spot_list_map2),len(unvisited_spot_list_map3)])
-    unvisited_spot_list_map1 = unvisited_spot_list_map1[:a]
-    unvisited_spot_list_map2 = unvisited_spot_list_map2[:a]
-    unvisited_spot_list_map3 = unvisited_spot_list_map3[:a]
+    unvisited_spot_list_map_t.extend(unvisited_spot_list[i][n:n+3])
+if len(unvisited_spot_list_map_l) != len(unvisited_spot_list_map_t) or len(unvisited_spot_list_map_t) != len(unvisited_spot_list_map_p) or len(unvisited_spot_list_map_l) != len(unvisited_spot_list_map_p):
+    a = min([len(unvisited_spot_list_map_l),len(unvisited_spot_list_map_t),len(unvisited_spot_list_map_p)])
+    unvisited_spot_list_map_p = unvisited_spot_list_map_p[:a]
+    unvisited_spot_list_map_l = unvisited_spot_list_map_l[:a]
+    unvisited_spot_list_map_t = unvisited_spot_list_map_t[:a]
 
 ## 線の色
 color_res = myp_color.color_bpr()
 
-#################  map1  #######################
-#################  map1  #######################
-#################  map1  #######################
+#################  map_line  #######################
+#################  map_line  #######################
+#################  map_line  #######################
 ## 未訪問エリア内スポットIDリスト
 unvisited_spot_id_list = []
 ## GoogleMapの表示
 unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description = [],[],[],[],[]
-for i in range(len(unvisited_spot_list_map1)):
-    for j in range(len(unvisited_spot_list_map1[i])):
-        unvisited_spot_id_list.append(unvisited_spot_list_map1[i][j][0])
-        if unvisited_spot_list_map1[i][j][2]!=0 and unvisited_spot_list_map1[i][j][3]!=0:
-            unvis_name.append(unvisited_spot_list_map1[i][j][1])
-            unvis_lat.append(str(unvisited_spot_list_map1[i][j][2]))
-            unvis_lng.append(str(unvisited_spot_list_map1[i][j][3]))
-            unvis_url.append(str(unvisited_spot_list_map1[i][j][6]))
-            unvis_description.append(str(unvisited_spot_list_map1[i][j][7]))
+for i in range(len(unvisited_spot_list_map_l)):
+    for j in range(len(unvisited_spot_list_map_l[i])):
+        unvisited_spot_id_list.append(unvisited_spot_list_map_l[i][j][0])
+        if unvisited_spot_list_map_l[i][j][2]!=0 and unvisited_spot_list_map_l[i][j][3]!=0:
+            unvis_name.append(unvisited_spot_list_map_l[i][j][1])
+            unvis_lat.append(str(unvisited_spot_list_map_l[i][j][2]))
+            unvis_lng.append(str(unvisited_spot_list_map_l[i][j][3]))
+            unvis_url.append(str(unvisited_spot_list_map_l[i][j][6]))
+            unvis_description.append(str(unvisited_spot_list_map_l[i][j][7]))
         else:
             continue
 
@@ -194,29 +194,101 @@ UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited
 # print(UtoV_top10_harmonic,file=sys.stderr)
 
 try:
-    json_data_map1 = myp_norm_map1.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id)
+    json_data_map_line = myp_norm_l.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id)
+except:
+    import traceback
+    traceback.print_exc()
+
+
+#################  map_positon  #######################
+#################  map_positon  #######################
+#################  map_positon  #######################
+## 未訪問エリア内スポットIDリスト
+unvisited_spot_id_list = []
+## GoogleMapの表示
+unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description = [],[],[],[],[]
+for i in range(len(unvisited_spot_list_map_p)):
+    for j in range(len(unvisited_spot_list_map_p[i])):
+        unvisited_spot_id_list.append(unvisited_spot_list_map_p[i][j][0])
+        if unvisited_spot_list_map_p[i][j][2]!=0 and unvisited_spot_list_map_p[i][j][3]!=0:
+            unvis_name.append(unvisited_spot_list_map_p[i][j][1])
+            unvis_lat.append(str(unvisited_spot_list_map_p[i][j][2]))
+            unvis_lng.append(str(unvisited_spot_list_map_p[i][j][3]))
+            unvis_url.append(str(unvisited_spot_list_map_p[i][j][6]))
+            unvis_description.append(str(unvisited_spot_list_map_p[i][j][7]))
+        else:
+            continue
+
+############################################################
+############################################################
+## 既訪問スポットベクトル
+select_visited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(visited_spot_id_list))
+## 特徴ベクトル
+visited_spot_vectors = myp_doc_rec.spot_list(select_visited_spot_vectors)
+## 特徴ベクトル差分
+visited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(visited_spot_vectors)
+
+## 未訪問スポットベクトル
+select_unvisited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(unvisited_spot_id_list))
+unvisited_spot_vectors = myp_doc_rec.spot_list(select_unvisited_spot_vectors)
+unvisited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(unvisited_spot_vectors)
+
+############################################################
+## 相対的な特徴（差分ベクトル）
+############################################################
+## 既訪問と未訪問スポットベクトルの差の類似度計算
+visited_spot_name_all,unvisited_spot_name_all = [],[]
+visited_spot_review_all,unvisited_spot_review_all = [],[]
+for i in range(len(visited_spot_vectors_doc)):
+    visited_spot_name_all.append(visited_spot_vectors_doc[i][0])
+    visited_spot_review_all.append(visited_spot_vectors_doc[i][1])
+for i in range(len(unvisited_spot_vectors_doc)):
+    unvisited_spot_name_all.append(unvisited_spot_vectors_doc[i][0])
+    unvisited_spot_review_all.append(unvisited_spot_vectors_doc[i][1])
+result_UtoV_top = myp_doc_rec.recommend_all(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
+
+## 類似度高い順でソート
+result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
+
+## 既訪問スポットの単語に重みつけ
+select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(visited_spot_id_list))
+visited_spot_reviews = myp_tfidf.spot_list_tfidf(select_visited_spot_reviews)
+visited_tfidf,visited_mean = myp_tfidf.tfidf_hm(visited_spot_reviews)
+
+## 未訪問スポットの単語に重みつけ
+select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(unvisited_spot_id_list))
+unvisited_spot_reviews = myp_tfidf.spot_list_tfidf(select_unvisited_spot_reviews)
+unvisited_tfidf,unvisited_mean = myp_tfidf.tfidf_hm(unvisited_spot_reviews)
+
+## 既訪問と未訪問スポット特徴語(調和平均)
+UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
+# print(UtoV_top10_harmonic,file=sys.stderr)
+
+try:
+    json_data_map_position = myp_norm_p.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id)
 except:
     import traceback
     traceback.print_exc()
 
 
 
-#################  map2  #######################
-#################  map2  #######################
-#################  map2  #######################
+
+#################  map_table  #######################
+#################  map_table  #######################
+#################  map_table  #######################
 ## 未訪問エリア内スポットIDリスト
 unvisited_spot_id_list = []
 ## GoogleMapの表示
 unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description = [],[],[],[],[]
-for i in range(len(unvisited_spot_list_map2)):
-    for j in range(len(unvisited_spot_list_map2[i])):
-        unvisited_spot_id_list.append(unvisited_spot_list_map2[i][j][0])
-        if unvisited_spot_list_map2[i][j][2]!=0 and unvisited_spot_list_map2[i][j][3]!=0:
-            unvis_name.append(unvisited_spot_list_map2[i][j][1])
-            unvis_lat.append(str(unvisited_spot_list_map2[i][j][2]))
-            unvis_lng.append(str(unvisited_spot_list_map2[i][j][3]))
-            unvis_url.append(str(unvisited_spot_list_map2[i][j][6]))
-            unvis_description.append(str(unvisited_spot_list_map2[i][j][7]))
+for i in range(len(unvisited_spot_list_map_t)):
+    for j in range(len(unvisited_spot_list_map_t[i])):
+        unvisited_spot_id_list.append(unvisited_spot_list_map_t[i][j][0])
+        if unvisited_spot_list_map_t[i][j][2]!=0 and unvisited_spot_list_map_t[i][j][3]!=0:
+            unvis_name.append(unvisited_spot_list_map_t[i][j][1])
+            unvis_lat.append(str(unvisited_spot_list_map_t[i][j][2]))
+            unvis_lng.append(str(unvisited_spot_list_map_t[i][j][3]))
+            unvis_url.append(str(unvisited_spot_list_map_t[i][j][6]))
+            unvis_description.append(str(unvisited_spot_list_map_t[i][j][7]))
         else:
             continue
 
@@ -266,88 +338,16 @@ UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited
 # print(UtoV_top10_harmonic,file=sys.stderr)
 
 try:
-    json_data_map2 = myp_norm_map2.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id)
-except:
-    import traceback
-    traceback.print_exc()
-
-
-
-#################  map3  #######################
-#################  map3  #######################
-#################  map3  #######################
-## 未訪問エリア内スポットIDリスト
-unvisited_spot_id_list = []
-## GoogleMapの表示
-unvis_name,unvis_lat,unvis_lng,unvis_url,unvis_description = [],[],[],[],[]
-for i in range(len(unvisited_spot_list_map3)):
-    for j in range(len(unvisited_spot_list_map3[i])):
-        unvisited_spot_id_list.append(unvisited_spot_list_map3[i][j][0])
-        if unvisited_spot_list_map3[i][j][2]!=0 and unvisited_spot_list_map3[i][j][3]!=0:
-            unvis_name.append(unvisited_spot_list_map3[i][j][1])
-            unvis_lat.append(str(unvisited_spot_list_map3[i][j][2]))
-            unvis_lng.append(str(unvisited_spot_list_map3[i][j][3]))
-            unvis_url.append(str(unvisited_spot_list_map3[i][j][6]))
-            unvis_description.append(str(unvisited_spot_list_map3[i][j][7]))
-        else:
-            continue
-
-############################################################
-############################################################
-## 既訪問スポットベクトル
-select_visited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(visited_spot_id_list))
-## 特徴ベクトル
-visited_spot_vectors = myp_doc_rec.spot_list(select_visited_spot_vectors)
-## 特徴ベクトル差分
-visited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(visited_spot_vectors)
-
-## 未訪問スポットベクトル
-select_unvisited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(unvisited_spot_id_list))
-unvisited_spot_vectors = myp_doc_rec.spot_list(select_unvisited_spot_vectors)
-unvisited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(unvisited_spot_vectors)
-
-############################################################
-## 相対的な特徴（差分ベクトル）
-############################################################
-## 既訪問と未訪問スポットベクトルの差の類似度計算
-visited_spot_name_all,unvisited_spot_name_all = [],[]
-visited_spot_review_all,unvisited_spot_review_all = [],[]
-for i in range(len(visited_spot_vectors_doc)):
-    visited_spot_name_all.append(visited_spot_vectors_doc[i][0])
-    visited_spot_review_all.append(visited_spot_vectors_doc[i][1])
-for i in range(len(unvisited_spot_vectors_doc)):
-    unvisited_spot_name_all.append(unvisited_spot_vectors_doc[i][0])
-    unvisited_spot_review_all.append(unvisited_spot_vectors_doc[i][1])
-result_UtoV_top = myp_doc_rec.recommend_all(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
-
-## 類似度高い順でソート
-result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
-
-## 既訪問スポットの単語に重みつけ
-select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(visited_spot_id_list))
-visited_spot_reviews = myp_tfidf.spot_list_tfidf(select_visited_spot_reviews)
-visited_tfidf,visited_mean = myp_tfidf.tfidf_hm(visited_spot_reviews)
-
-## 未訪問スポットの単語に重みつけ
-select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(unvisited_spot_id_list))
-unvisited_spot_reviews = myp_tfidf.spot_list_tfidf(select_unvisited_spot_reviews)
-unvisited_tfidf,unvisited_mean = myp_tfidf.tfidf_hm(unvisited_spot_reviews)
-
-## 既訪問と未訪問スポット特徴語(調和平均)
-UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
-# print(UtoV_top10_harmonic,file=sys.stderr)
-
-try:
-    json_data_map3 = myp_norm_map3.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id)
+    json_data_map_table = myp_norm_t.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id)
 except:
     import traceback
     traceback.print_exc()
 
 random,json_random = Response_Random()
-json_data = [json_data_map1] + [json_data_map2] + [json_data_map3] + [json_random]
+json_data = [json_data_map_position] + [json_data_map_line] + [json_data_map_table] + [json_random]
 
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-sql_insert = "UPDATE analogy_sti SET code='{rand}',finish_datetime='{finish}' WHERE id = {record_id};".format(rand=random,finish=finish_datetime,record_id=record_id)
+sql_insert = "UPDATE analogy_sti SET category='{cate}', code='{rand}',finish_datetime='{finish}' WHERE id = {record_id};".format(cate='，'.join(vis_cate),rand=random,finish=finish_datetime,record_id=record_id)
 cur.execute(sql_insert)
 conn.commit()
 # print(json_data, file=sys.stderr)
