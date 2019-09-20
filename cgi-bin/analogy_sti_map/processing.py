@@ -107,7 +107,7 @@ else:
 ## 未訪問エリア内(レビュー and [lat or lng])ありスポット
 unvisited_spot_list = []
 for i in range(len(vis_cate)):
-    select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review,url,description,category1 FROM spot_mst2 WHERE area_id IN {area} AND review!=0 AND (lat!=0 or lng!=0) AND id NOT IN {vis} AND name NOT LIKE '%レンタ%' AND category1 LIKE '%{vis_cate}%' ORDER BY review DESC limit 18;".format(area=tuple(unvisited_area_id_list),vis=tuple(visited_spot_id_list),vis_cate=vis_cate[i])
+    select_unvisited_spot = "SELECT DISTINCT id,name,lat,lng,area_id,review,url,description,category1 FROM spot_mst2 WHERE area_id IN {area} AND review!=0 AND (lat!=0 or lng!=0) AND id NOT IN {vis} AND name NOT LIKE '%レンタ%' AND category1 LIKE '%{vis_cate}%' ORDER BY review DESC limit 12;".format(area=tuple(unvisited_area_id_list),vis=tuple(visited_spot_id_list),vis_cate=vis_cate[i])
     tmp = myp_other.spot_or_reviewlist(select_unvisited_spot)
     unvisited_spot_list.append(tmp)
 
@@ -194,7 +194,7 @@ UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited
 # print(UtoV_top10_harmonic,file=sys.stderr)
 
 try:
-    json_data_map_line = myp_norm_l.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id,unvis_url)
+    json_data_map_line = myp_norm_l.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,record_id,unvis_url)
 except:
     import traceback
     traceback.print_exc()
@@ -265,7 +265,7 @@ UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited
 # print(UtoV_top10_harmonic,file=sys.stderr)
 
 try:
-    json_data_map_position = myp_norm_p.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id,unvis_url)
+    json_data_map_position = myp_norm_p.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,record_id,unvis_url)
 except:
     import traceback
     traceback.print_exc()
@@ -338,7 +338,7 @@ UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited
 # print(UtoV_top10_harmonic,file=sys.stderr)
 
 try:
-    json_data_map_table = myp_norm_t.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,color_res,record_id,unvis_url)
+    json_data_map_table = myp_norm_t.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_harmonic,record_id,unvis_url)
 except:
     import traceback
     traceback.print_exc()

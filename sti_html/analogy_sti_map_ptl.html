@@ -46,7 +46,7 @@
   <div id="main_top">
     <form id="form_main" name="form_main">
       <h3>CrowdWorksID：
-        <input type="text" id="user_id" name="user_id" maxlength="40" placeholder="CrowdWorksID" value="test" />
+        <input type="text" id="user_id" name="user_id" maxlength="40" value="test"/>
       </h3>
       <div id="familiar">
         <h3>
@@ -129,10 +129,10 @@
         </h3>
 
         <h3>エリア(任意)：
-          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" value="渋谷" />
+          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" value="渋谷"/>
         </h3>
       </div>
-      <p style="text-align:center;font-size:22px; clear:both;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大150秒かかる場合があります，150秒過ぎると「Timeout」が表示されます．）</p>
+      <p style="text-align:center;font-size:22px; clear:both;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大150秒かかる場合があります，「Timeout」が表示された場合，再読込を行なってください．）</p>
       <input type="text" id="orders" value="ptl" hidden>
       <input type="submit" id="start" value="実験開始" />
     </form>
@@ -141,30 +141,34 @@
   <div class="vector_result" id="vector_result" style="text-align: center;"></div>
 
   <div id="result_positon" hidden>
-    <h2 id="map_positon_title">↓ Map_Positon ↓</h2>
+    <h2 id="map_positon_title">↓ Positon_Map ↓</h2>
     <div id="map_positon">
       <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
     </div>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
+    <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<input type="text" id="next_p_text"></p>
     <input type="button" id="next_p" value="次へ" >
+
   </div>
 
   <div id="result_line" hidden>
-    <h2 id="map_line_title">↓ Map_Line ↓</h2>
-    <h3 id="color"><img src="../data/color2.png" ></img></h3>
+    <h2 id="map_line_title">↓ Line_Map ↓</h2>
+    <h3 id="color"><img src="../data/sti/color3.png" ></img></h3>
     <div id="map_line">
       <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
     </div>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
+    <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<input type="text" id="next_l_text"></p>
     <input type="button" id="next_l" value="次へ" >
   </div>
 
   <div id="result_table" hidden>
-    <h2 id="map_table_title">↓ Map_Table ↓</h2>
-    <div id="map_table">
+    <h2 id="map_table_title">↓ Table_Map ↓</h2>
+    <div id="map_table" >
       <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
     </div>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
+    <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<input type="text" id="next_t_text"></p>
     <input type="button" id="next_t" value="次へ" >
   </div>
 
@@ -189,7 +193,7 @@
 
       if (document.form_main.user_id.value == "") {
         flag = 1;
-      } else if (temp_vis.length < 4) {
+      } else if (temp_vis.length < 3) {
         flag = 1;
       } else if (document.form_main.prefecture.value == "") {
         flag = 1;
@@ -256,7 +260,7 @@
     }
 
     // マップ作成 Start
-    var map_P;
+    var map_P,bounds_P;
     var unvis_markerLatLng_P, vis_markerLatLng_P ;
     var unvis_marker_P = [], vis_marker_P = [];
     var unvis_infoWindow_P = [], vis_infoWindow_P = [];
@@ -264,24 +268,8 @@
     var markerData_P;
     function initMap_Position(data) {
       markerData_P = data;
-      // 地図の作成
-      var cnt = 0,
-        sum_lat = 0,
-        sum_lng = 0;
-      for (var i = 0; i < markerData_P.length; i++) {
-        sum_lat = sum_lat + Number(markerData_P[i]["unvis_lat"]);
-        sum_lng = sum_lng + Number(markerData_P[i]["unvis_lng"]);
-        ll =
-          cnt += 1;
-      }
-      map_P = new google.maps.Map(document.getElementById("map_positon"), { // #mapに地図を埋め込む
-        center: {
-          lat: sum_lat / cnt,
-          lng: sum_lng / cnt
-        },
-        zoom: 13 // 地図のズームを指定
-      });
-
+      map_P = new google.maps.Map(document.getElementById("map_positon"));
+      bounds_P = new google.maps.LatLngBounds();
       // マーカー毎の処理
       for (var i = 0; i < markerData_P.length; i++) {
         unvis_markerLatLng_P = new google.maps.LatLng({
@@ -306,7 +294,12 @@
           },
           text: markerData_P[i]["vis_name"],
         });
+        bounds_P.extend(unvis_marker_P[i].position);
+        bounds_P.extend(vis_marker_P[i].position);
 
+        if ((Math.sign(markerData_P[i]["cossim"]) == -1) || (markerData_P[i]["cossim"] == 0)){
+          markerData_P[i]["word"] = "なし";
+        }
         unvis_infoWindow_P[i] = new google.maps.InfoWindow({ // 吹き出しの追加
           // 吹き出しに表示する内容
           // content: "<h2 style='text-align:center; font-size:22px;' >" + markerData_P[i]["unvis_name"] + "</h2>",
@@ -323,7 +316,7 @@
 
         infoLines_P[i] = new google.maps.Polyline({
           path: [unvis_markerLatLng_P,vis_markerLatLng_P],
-          strokeColor: markerData_P[i]["color"],
+          // strokeColor: markerData_P[i]["color"],
           strokeOpacity: .7, //透過率
           strokeWeight: 7, // cossim * 20にする
         });
@@ -372,7 +365,7 @@
     // マップ作成 Finish
 
     // マップ作成 Start
-    var map_L;
+    var map_L, bounds_L;
     var unvis_markerLatLng_L, vis_markerLatLng_L ;
     var unvis_marker_L = [], vis_marker_L = [];
     var unvis_infoWindow_L = [], vis_infoWindow_L = [];
@@ -380,23 +373,8 @@
     var markerData_L;
     function initMap_Line(data) {
       markerData_L = data;
-      // 地図の作成
-      var cnt = 0,
-        sum_lat = 0,
-        sum_lng = 0;
-      for (var i = 0; i < markerData_L.length; i++) {
-        sum_lat = sum_lat + Number(markerData_L[i]["unvis_lat"]);
-        sum_lng = sum_lng + Number(markerData_L[i]["unvis_lng"]);
-        ll =
-          cnt += 1;
-      }
-      map_L = new google.maps.Map(document.getElementById("map_line"), { // #mapに地図を埋め込む
-        center: {
-          lat: sum_lat / cnt,
-          lng: sum_lng / cnt
-        },
-        zoom: 13 // 地図のズームを指定
-      });
+      map_L = new google.maps.Map(document.getElementById("map_line"));
+      bounds_L = new google.maps.LatLngBounds();
 
       // マーカー毎の処理
       for (var i = 0; i < markerData_L.length; i++) {
@@ -422,7 +400,12 @@
           },
           text: markerData_L[i]["vis_name"],
         });
+        bounds_L.extend(unvis_marker_L[i].position);
+        bounds_L.extend(vis_marker_L[i].position);
 
+        if ((Math.sign(markerData_L[i]["cossim"]) == -1) || (markerData_L[i]["cossim"] == 0)){
+          markerData_L[i]["word"] = "なし";
+        }
         unvis_infoWindow_L[i] = new google.maps.InfoWindow({ // 吹き出しの追加
           // 吹き出しに表示する内容
           content: "<h2 style='text-align:center; font-size:22px;' >" + markerData_L[i]["unvis_name"] + "</h2>"
@@ -440,11 +423,9 @@
           strokeOpacity: .7, //透過率
           strokeWeight: 7, // cossim * 20にする
         });
-        // infoLines.setMap(map);
         markerEvent_Line(i,markerData_L); // マーカーにクリックイベントを追加
       }
     }
-    // マーカーにクリックイベントを追加
     var currentInfoWindow_L = null;
     var currentInfoLines_L = [];
     function markerEvent_Line(i,markerData) {
@@ -483,28 +464,15 @@
     // マップ作成 Finish
 
     // マップ作成 Start
-    var map_T;
+    var map_T, bounds_T;
     var unvis_markerLatLng_T;
     var unvis_marker_T = [], unvis_infoWindow_T = [];
     var markerData_T, set_data = [];
     function initMap_Table(data) {
       markerData_T = data;
-      var cnt = 0,
-        sum_lat = 0,
-        sum_lng = 0;
-      for (var i = 0; i < markerData_T.length; i++) {
-        sum_lat = sum_lat + Number(markerData_T[i]["unvis_lat"]);
-        sum_lng = sum_lng + Number(markerData_T[i]["unvis_lng"]);
-        ll =
-          cnt += 1;
-      }
-      map_T = new google.maps.Map(document.getElementById("map_table"), {
-        center: {
-          lat: sum_lat / cnt,
-          lng: sum_lng / cnt
-        },
-        zoom: 13 // 地図のズームを指定
-      });
+      map_T = new google.maps.Map(document.getElementById("map_table"));
+      bounds_T = new google.maps.LatLngBounds();
+
       // マーカー毎の処理
       var memo = []
       for (var i = 0; i < markerData_T.length; i++) {
@@ -531,8 +499,13 @@
           position: unvis_markerLatLng_T,
           map: map_T,
         });
+        bounds_T.extend(unvis_marker_T[i].position);
+
         var table_data = "<h2 style='text-align:center;'><a href = '" + set_data[i][0]["unvis_url"] + "' target='_blank'>" + set_data[i][0]["unvis_name"] + "</a></h2><table border='1' id='window2'><tr><th>既訪問スポット名</th><th>関連キーワード</th><th>類似度</th></tr>"
         for (var j = 0; j < set_data[i].length; j++){
+          if ((Math.sign(set_data[i][j]["cossim"]) == -1) || (set_data[i][j]["cossim"] == 0)){
+            set_data[i][j]["word"] = "なし";
+          }
           table_data += "<tr><td>" + set_data[i][j]["vis_name"] + "</td><td>" + set_data[i][j]["word"] + "</td><td>" + Math.round(set_data[i][j]["cossim"] * 1000)/1000 +"</td></tr>"
         }
         table_data = table_data + "</table>"
@@ -575,7 +548,6 @@
               window.onerror = function() {
                 alert("Error：入力に問題が見つかったため，もう一度やり直してください．\nまた，目的に合致するスポットがないため，目的を変更してください．");
                 location.reload();
-                // $(".vector_result").html("<h2>Error：入力に問題が見つかったため，もう一度やり直してください．</h2>");
               };
               $.ajax({
                   url: "../cgi-bin/analogy_sti_map/processing.py",
@@ -597,15 +569,16 @@
                   console.log(response);
                   res = $.parseJSON(response); //受信したデータをjson形式に変更
                   console.log(res); // resは相対(差分+調和)
-                  // console.log(typeof res);
                   if (res.length == 0) {
                     $(".vector_result").html("<h2>Search Result：Not found.</h2>");
                   } else {
-                    $(".vector_result").html("<p style='font-size:22px;'>検索結果が密集していたり，画面外にもあるかもしれません．<br>ズームイン/アウトしながら見てください．</p>");
+                    // $(".vector_result").html("<p style='font-size:20px; margin: 10px auto;'>検索結果が密集していたり，画面外にもあるかもしれません．ズームイン/アウトしながら見てください．</p>");
+                    $(".vector_result").html("");
                     initMap_Position(res[0]);
                     initMap_Line(res[1]);
                     initMap_Table(res[2]);
                     document.getElementById("result_positon").style.display="block";
+                    map_P.fitBounds(bounds_P);
                     $("#code").html(res[3]["randomname"]);
                   }
                 })
@@ -613,9 +586,13 @@
                   $(".result_positon").html("Failed.");
                 });
                 $("#next_p").click(function(){
-                  document.getElementById("result_positon").style.display="none";
-                  document.getElementById("result_table").style.display="block";
-                  location.href = "#result_table";
+                  $.when(
+                    document.getElementById("result_positon").style.display="none",
+                    document.getElementById("result_table").style.display="block",
+                    location.href = "#result_table"
+                  ).done(function(){
+                    map_T.fitBounds(bounds_T);
+                  });
                 });
                 $("#next_l").click(function(){
                   document.getElementById("result_line").style.display="none";
@@ -623,9 +600,13 @@
                   document.getElementById("main_last").style.display="block";
                 });
                 $("#next_t").click(function(){
-                  document.getElementById("result_table").style.display="none";
-                  document.getElementById("result_line").style.display="block";
-                  location.href = "#result_line";
+                  $.when(
+                    document.getElementById("result_table").style.display="none",
+                    document.getElementById("result_line").style.display="block",
+                    location.href = "#result_line",
+                  ).done(function(){
+                    map_L.fitBounds(bounds_L);
+                  });
                 });
             } else {
               alert('検索候補から選んでください．');

@@ -1,5 +1,5 @@
 import sys
-import collections, copy
+import collections, copy, math
 import numpy as np
 import json, random, string
 from scipy.stats import norm
@@ -58,7 +58,7 @@ def normal_distribution(data,num=0):
             # print(data[i][j][5], file=sys.stderr)
     return data
 
-def select_and_resp_data(data,color,record_id,sql_unvis,sql_vis,sql_word):
+def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
     res, json_data = [], []
     ## 単語2つ以下切り捨て
     for i in range(len(data)):
@@ -69,17 +69,35 @@ def select_and_resp_data(data,color,record_id,sql_unvis,sql_vis,sql_word):
         res.append(tmp)
     # print("\nselect_data:{}".format(res), file=sys.stderr)
     ## 類似度に応じて色ずけ
-    # max_cossim = max([j[6] for i in res for j in i])
-    # min_cossim = min([j[6] for i in res for j in i])
+    max_cossim = max([j[6] for i in res for j in i])
+    min_cossim = min([j[6] for i in res for j in i])
     for i in range(len(res)):
         for j in range(len(res[i])):
             c = 0
-            for k in range(len(color)):
+            # for k in range(len(color)):
                 ## 正規化（最大値を1，最小値を0）
                 # cossim = (res[i][j][6] - min_cossim) / (max_cossim - min_cossim)
-                cossim = (res[i][j][7] + 1) / 2
-                if color[k][0] == round(cossim,2):
-                    c = color[k][1]
+                # if color[k][0] == round(cossim,2):
+                #     c = color[k][1]
+                # cossim = (res[i][j][7] + 1) / 2
+            if np.sign(res[i][j][7]) == -1:
+                tmp = res[i][j][7] * -1
+                cossim = ((math.sqrt(tmp) * (-1)) + 1) / 2
+            else:
+                cossim = (math.sqrt(res[i][j][7]) + 1) / 2
+
+            if round(cossim,2) > 0 and round(cossim,2) <= 0.17:
+                c = "rgb(0, 255, 0)"
+            if round(cossim,2) > 0.17 and round(cossim,2) <= 0.34:
+                c = "rgb(115, 255, 0)"
+            if round(cossim,2) > 0.34 and round(cossim,2) <= 0.51:
+                c = "rgb(230, 255, 0)"
+            if round(cossim,2) > 0.51 and round(cossim,2) <= 0.68:
+                c = "rgb(255, 209, 0)"
+            if round(cossim,2) > 0.68 and round(cossim,2) <= 0.85:
+                c = "rgb(255, 94, 0)"
+            if round(cossim,2) > 0.85 and round(cossim,2) <= 1:
+                c = "rgb(255,0,0)"
             response_json = resp(record_id,res[i][j][0],res[i][j][1],res[i][j][2],res[i][j][3],res[i][j][4],res[i][j][5],res[i][j][6],res[i][j][7],c,res[i][j][8],sql_unvis,sql_vis,sql_word)
             json_data.append(response_json)
     # print(json.dumps(json_data)) ## 送信
@@ -103,7 +121,7 @@ def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,color,word,sql_
     conn.commit()
     return response_json
 
-def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color,record_id,unvis_url):
+def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,record_id,unvis_url):
     cluster, visname_tmp = [], []
     sql_unvis, sql_vis, sql_word, temp_sql_word = [], [], "", []
     for i in range(len(data)):
@@ -156,5 +174,5 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
         result.append(tmp)
     # print(result, file=sys.stderr)
     data = normal_distribution(result) ## 正規分布計算
-    json_data = select_and_resp_data(data, color, record_id, sql_unvis, sql_vis, sql_word)
+    json_data = select_and_resp_data(data, record_id, sql_unvis, sql_vis, sql_word)
     return json_data

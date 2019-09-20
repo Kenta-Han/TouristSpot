@@ -53,7 +53,7 @@ def normal_distribution(data,num=0):
             data[i][j][6] = str(sortedRes[0][0][1])
     return data
 
-def select_and_resp_data(data,color,record_id,sql_unvis,sql_vis,sql_word):
+def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
     res, json_data = [], []
     ## 単語2つ以下切り捨て
     for i in range(len(data)):
@@ -62,20 +62,14 @@ def select_and_resp_data(data,color,record_id,sql_unvis,sql_vis,sql_word):
             if len(data[i][j][8]) >= 2:
                 tmp.append(data[i][j])
         res.append(tmp)
-    ## 類似度に応じて色ずけ
     for i in range(len(res)):
         for j in range(len(res[i])):
-            c = 0
-            for k in range(len(color)):
-                cossim = (res[i][j][7] + 1) / 2
-                if color[k][0] == round(cossim,2):
-                    c = color[k][1]
-            response_json = resp(record_id,res[i][j][0],res[i][j][1],res[i][j][2],res[i][j][3],res[i][j][4],res[i][j][5],res[i][j][6],res[i][j][7],c,res[i][j][8],sql_unvis,sql_vis,sql_word)
+            response_json = resp(record_id,res[i][j][0],res[i][j][1],res[i][j][2],res[i][j][3],res[i][j][4],res[i][j][5],res[i][j][6],res[i][j][7],res[i][j][8],sql_unvis,sql_vis,sql_word)
             json_data.append(response_json)
     return json_data
 
-def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,color,word,sql_unvis,sql_vis,sql_word):
-    response_json = {"record_id":"","unvis_name":"","unvis_lat":"","unvis_lng":"","unvis_url":"","vis_name":"","vis_lat":"","vis_lng":"","cossim":"","color":"","word":""}
+def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,word,sql_unvis,sql_vis,sql_word):
+    response_json = {"record_id":"","unvis_name":"","unvis_lat":"","unvis_lng":"","unvis_url":"","vis_name":"","vis_lat":"","vis_lng":"","cossim":"","word":""}
     response_json["record_id"] = record_id
     response_json["unvis_name"] = unvis
     response_json["unvis_lat"] = unlat
@@ -85,14 +79,13 @@ def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,color,word,sql_
     response_json["vis_lat"] = vislat
     response_json["vis_lng"] = vislng
     response_json["cossim"] = cos
-    response_json["color"] = color
     response_json["word"] = word
     sql_insert = "UPDATE analogy_sti SET unvis_name_map_table='{unv}',vis_name_map_table='{vis}',word_map_table='{word}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis),vis='，'.join(sql_vis),word=sql_word,record_id=record_id)
     cur.execute(sql_insert)
     conn.commit()
     return response_json
 
-def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,color,record_id,unvis_url):
+def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,record_id,unvis_url):
     cluster, visname_tmp = [], []
     sql_unvis, sql_vis, sql_word, temp_sql_word = [], [], "", []
     for i in range(len(data)):
@@ -143,5 +136,5 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,col
                 tmp.append(cluster[j])
         result.append(tmp)
     data = normal_distribution(result) ## 正規分布計算
-    json_data = select_and_resp_data(data, color, record_id, sql_unvis, sql_vis, sql_word)
+    json_data = select_and_resp_data(data, record_id, sql_unvis, sql_vis, sql_word)
     return json_data

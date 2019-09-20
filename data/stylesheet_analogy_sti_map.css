@@ -52,32 +52,42 @@ h2{
   font-weight: normal;
 }
 
-#user_id, #area, #purpose {
+#user_id, #area, #purpose{
   width: 30%;
   height: 30px;
   font-size: 18px;
   text-align: center;
 }
 
+#next_p_text, #next_l_text, #next_t_text {
+  width: 30%;
+  height: 24px;
+  font-size: 16px;
+  text-align: center;
+}
+
 #result_positon, #result_line, #result_table {
   width: 100%;
-  height: 100%;
-  position: absolute;
+  height: 96%;
+  /* position: absolute; */
+  position: fixed;
 }
 
 #result_line #color{
   width: 100%;
   text-align: center;
+  margin: 1px auto;
+  padding: 0;
 }
 
 #result_line #color img{
   width: 100%;
-  height: 5%;
+  height: 2%;
 }
 
 #result_positon #map_positon, #result_line #map_line, #result_table #map_table {
   width: 100%;
-  height: 90%;
+  height: 70%;
   margin: auto;
 }
 
@@ -87,14 +97,14 @@ h2{
   font-size: 16px;
   text-align: center;
   cursor: pointer;
-  padding: 12px 20px;
+  padding: 8px 20px;
   background: #000066;
   color: #ffffff;
   line-height: 1em;
   transition: .3s;
   box-shadow: 6px 6px 3px #666666;
   border: 2px solid #000066;
-  margin: 1% 48%;
+  margin: 0 48%;
 }
 
 #next_p:hover, #next_l:hover, #next_t:hover{
@@ -127,6 +137,8 @@ h2{
 
 #map_positon_title, #map_line_title, #map_table_title{
   text-align: center;
+  margin: 0 auto 5px;
+  padding: 0;
 }
 
 table {
@@ -147,7 +159,7 @@ th {
   background-color: #2196f3;
 }
 
-/* #result #myGraph {
+/* #result_line #myGraph {
   margin: 0px auto;
   width: 100%;
   height: 70px;
