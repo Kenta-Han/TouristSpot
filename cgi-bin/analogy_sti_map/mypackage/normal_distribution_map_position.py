@@ -22,13 +22,43 @@ def random_latlng(list, n, lat_s, lat_f, lng_s, lng_f):
 def euclid_distance(x,t):
     return np.linalg.norm(x-t)
 
-def normal_distribution(data,num=0):
+def normal_distribution(data):
     for i in range(len(data)):
         ## ランダム座標作成
         min_lat, max_lat = float(min([j[1] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
         min_lng, max_lng = float(min([j[2] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
         latlng = []
         rlatlng = random_latlng(latlng, 200, min_lat, max_lat, min_lng, max_lng)
+
+        res = []
+        for t_latlng in rlatlng:
+            tmp = []
+            for j in range(len(data[i])):
+                cossim, average, alpha = data[i][j][7], 0, 1
+                standard_deviation = (1 - abs(cossim)) * alpha
+                x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
+                dis = euclid_distance(x_latlng, t_latlng)
+                P_xt = norm.pdf(dis, average, standard_deviation)
+                if cossim < 0:
+                    tmp.append(-0.5 * P_xt)
+                elif cossim > 0:
+                    tmp.append(1 * P_xt)
+                else :
+                    tmp.append(0)
+            res.append([t_latlng, sum(tmp)])
+        sortedRes = sorted(res, key=lambda x: x[1], reverse=True)
+        for j in range(len(data[i])):
+            data[i][j][5] = str(sortedRes[0][0][0])
+            data[i][j][6] = str(sortedRes[0][0][1])
+    return data
+
+def normal_distribution_before2(data):
+    for i in range(len(data)):
+        ## ランダム座標作成
+        min_lat, max_lat = float(min([j[5] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
+        min_lng, max_lng = float(min([j[6] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
+        latlng = []
+        rlatlng = random_latlng(latlng, 50, min_lat, max_lat, min_lng, max_lng)
 
         res = []
         for t_latlng in rlatlng:
@@ -137,5 +167,9 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,rec
         result.append(tmp)
     # print(result, file=sys.stderr)
     data = normal_distribution(result) ## 正規分布計算
+    for num in range(2):
+            data = normal_distribution_before2(data) ## 正規分布（範囲1回目計算後の既訪問）
+            if num == 1:
+                break
     json_data = select_and_resp_data(data, record_id, sql_unvis, sql_vis, sql_word)
     return json_data
