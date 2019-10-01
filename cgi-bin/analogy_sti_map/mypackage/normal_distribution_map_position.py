@@ -167,9 +167,9 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,rec
         result.append(tmp)
     # print(result, file=sys.stderr)
     data = normal_distribution(result) ## 正規分布計算
-    for num in range(2):
-            data = normal_distribution_before2(data) ## 正規分布（範囲1回目計算後の既訪問）
-            if num == 1:
-                break
+    # for num in range(2):
+    #         data = normal_distribution_before2(data) ## 正規分布（範囲1回目計算後の既訪問）
+    #         if num == 1:
+    #             break
     json_data = select_and_resp_data(data, record_id, sql_unvis, sql_vis, sql_word)
     return json_data

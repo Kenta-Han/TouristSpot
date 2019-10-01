@@ -29,7 +29,7 @@ def normal_distribution(data):
         min_lat, max_lat = float(min([j[1] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
         min_lng, max_lng = float(min([j[2] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
         latlng = []
-        rlatlng = random_latlng(latlng, 50, min_lat, max_lat, min_lng, max_lng)
+        rlatlng = random_latlng(latlng, 200, min_lat, max_lat, min_lng, max_lng)
 
         res = []
         for t_latlng in rlatlng:
@@ -202,11 +202,11 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,rec
             if vis_list[i][0] == cluster[j][4]:
                 tmp.append(cluster[j])
         result.append(tmp)
-    # print(result, file=sys.stderr)
+    print(result, file=sys.stderr)
     data = normal_distribution(result) ## 正規分布計算
-    for num in range(2):
-            data = normal_distribution_before2(data) ## 正規分布（範囲1回目計算後の既訪問）
-            if num == 1:
-                break
+    # for num in range(2):
+    #         data = normal_distribution_before2(data) ## 正規分布（範囲1回目計算後の既訪問）
+    #         if num == 1:
+    #             break
     json_data = select_and_resp_data(data, record_id, sql_unvis, sql_vis, sql_word)
     return json_data
