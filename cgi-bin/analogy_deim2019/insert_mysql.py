@@ -21,7 +21,7 @@ print('Content-type: text/html\nAccess-Control-Allow-Origin: *\n')
 
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
-sql_update = "UPDATE analogy_deim SET hyouka='{h}', hyouka_text='{ht}', finish_datetime='{finish}' WHERE id = {record_id};".format(h='，'.join(hyouka), ht='，'.join(hyouka_text), finish=finish_datetime, record_id=record_id)
+sql_update = "UPDATE analogy_deim2019 SET hyouka='{h}', hyouka_text='{ht}', finish_datetime='{finish}' WHERE id = {record_id};".format(h='，'.join(hyouka), ht='，'.join(hyouka_text), finish=finish_datetime, record_id=record_id)
 print(json.dumps({"sql":sql_update}))
 
 cur.execute(sql_update)

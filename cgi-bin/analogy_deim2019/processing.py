@@ -58,12 +58,12 @@ for i in range(len(user_spot)):
 ## DB挿入
 ############################################################
 ## ユーザ入力とDBヘ書き込む
-sql_insert = "INSERT INTO analogy_deim(user_id, prefecture, area, start_datetime, history) VALUES(%s,%s,%s,%s,%s);"
+sql_insert = "INSERT INTO analogy_deim2019(user_id, prefecture, area, start_datetime, history) VALUES(%s,%s,%s,%s,%s);"
 cur.execute(sql_insert,(user_id, prefecture, area, start_datetime, history))
 conn.commit()
 
 ## ユーザの最新情報を得る
-cur.execute("SELECT max(id) FROM analogy_deim WHERE user_id='{user}';".format(user = user_id))
+cur.execute("SELECT max(id) FROM analogy_deim2019 WHERE user_id='{user}';".format(user = user_id))
 record_id = cur.fetchone()[0]
 
 
@@ -152,7 +152,7 @@ sql_unvis,sql_vis,sql_cossim,sql_lat,sql_lng,sql_word_h,json_harmonic = myp_res.
 random,json_random = myp_res.Response_Random()
 
 syori_finishtime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-sql_update = "UPDATE analogy_deim SET code='{code}', unvis_name='{unv}', vis_name='{vis}', cossim='{cos}', unvis_lat='{lat}', unvis_lng='{lng}', word_mean='{word_m}', word_multi='{word_k}', word_harmonic='{word_h}',syori_finishtime='{finish}' WHERE id = {record_id};".format(code=random, unv='，'.join(sql_unvis), vis='，'.join(sql_vis), cos='，'.join(sql_cossim), lat='，'.join(sql_lat), lng='，'.join(sql_lng), word_m=sql_word_m, word_k=sql_word_k , word_h=sql_word_h, finish=syori_finishtime, record_id=record_id)
+sql_update = "UPDATE analogy_deim2019 SET code='{code}', unvis_name='{unv}', vis_name='{vis}', cossim='{cos}', unvis_lat='{lat}', unvis_lng='{lng}', word_mean='{word_m}', word_multi='{word_k}', word_harmonic='{word_h}',syori_finishtime='{finish}' WHERE id = {record_id};".format(code=random, unv='，'.join(sql_unvis), vis='，'.join(sql_vis), cos='，'.join(sql_cossim), lat='，'.join(sql_lat), lng='，'.join(sql_lng), word_m=sql_word_m, word_k=sql_word_k , word_h=sql_word_h, finish=syori_finishtime, record_id=record_id)
 cur.execute(sql_update)
 conn.commit()
 

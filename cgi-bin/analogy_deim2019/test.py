@@ -53,12 +53,12 @@ for i in range(len(user_spot)):
 ## DB挿入
 ############################################################
 ## ユーザ入力とDBヘ書き込む
-sql_insert = "INSERT INTO analogy_deim(user_id, prefecture, area, start_datetime, history) VALUES(%s,%s,%s,%s,%s);"
+sql_insert = "INSERT INTO analogy_deim2019(user_id, prefecture, area, start_datetime, history) VALUES(%s,%s,%s,%s,%s);"
 cur.execute(sql_insert,(user_id, prefecture, area, start_datetime, history))
 conn.commit()
 
 ## ユーザの最新情報を得る
-cur.execute("SELECT max(id) FROM analogy_deim WHERE user_id='{user}';".format(user = user_id))
+cur.execute("SELECT max(id) FROM analogy_deim2019 WHERE user_id='{user}';".format(user = user_id))
 record_id = cur.fetchone()[0]
 
 
