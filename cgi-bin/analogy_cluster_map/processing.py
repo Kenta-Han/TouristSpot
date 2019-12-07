@@ -105,7 +105,7 @@ for i in range(len(vis_score_dic)):
 ## DB挿入
 ############################################################
 ## ユーザ入力とDBヘ書き込む
-sql_insert = "INSERT INTO analogy_sti(user_id, prefecture, area, start_datetime, history, orders) VALUES(%s,%s,%s,%s,%s,%s);"
+sql_insert = "INSERT INTO analogy_deim2020(user_id, prefecture, area, start_datetime, history, orders) VALUES(%s,%s,%s,%s,%s,%s);"
 cur.execute(sql_insert,(user_id, prefecture, area, start_datetime, history,orders))
 conn.commit()
 

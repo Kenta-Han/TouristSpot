@@ -107,12 +107,12 @@ review_score = myp_cluster.reviewScorering(center, str(vis_spot_id)[1:-1], use_c
 ## DB挿入
 ############################################################
 ## ユーザ入力とDBヘ書き込む
-sql_insert = "INSERT INTO analogy_sti(user_id, prefecture, area, start_datetime, history, orders) VALUES(%s,%s,%s,%s,%s,%s);"
+sql_insert = "INSERT INTO analogy_deim2020(user_id, prefecture, area, start_datetime, history, orders) VALUES(%s,%s,%s,%s,%s,%s);"
 cur.execute(sql_insert,(user_id, prefecture, area, start_datetime, history,orders))
 conn.commit()
 
 ## ユーザの最新情報を得る
-cur.execute("SELECT max(id) FROM analogy_sti WHERE user_id='{user}';".format(user = user_id))
+cur.execute("SELECT max(id) FROM analogy_deim2020 WHERE user_id='{user}';".format(user = user_id))
 record_id = cur.fetchone()[0]
 
 

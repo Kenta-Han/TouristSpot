@@ -146,7 +146,7 @@ def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,color,word,sql_
     response_json["cossim"] = cos
     response_json["color"] = color
     response_json["word"] = word
-    sql_insert = "UPDATE analogy_sti SET unvis_name_map_line='{unv}',vis_name_map_line='{vis}',word_map_line='{word}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis),vis='，'.join(sql_vis),word=sql_word,record_id=record_id)
+    sql_insert = "UPDATE analogy_deim2020 SET unvis_name_map_line='{unv}',vis_name_map_line='{vis}',word_map_line='{word}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis),vis='，'.join(sql_vis),word=sql_word,record_id=record_id)
     cur.execute(sql_insert)
     conn.commit()
     return response_json
