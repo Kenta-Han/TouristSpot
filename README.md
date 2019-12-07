@@ -2,7 +2,7 @@
 
 ### M2 観光情報学会
 #### 地図上における未訪問スポットの説明性向上のための観光スポットの対応関係可視化手法
-TouristSpot/analogy_sti_explanation.html
+TouristSpot/analogy_sti.html
 TouristSpot/cgi-bin/sti_html
 TouristSpot/cgi-bin/analogy_sti_map
 
