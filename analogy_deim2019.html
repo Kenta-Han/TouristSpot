@@ -3,7 +3,7 @@
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <link href="./data/stylesheet_analogy_imecs.css" rel="stylesheet" type="text/css" />
+  <link href="./data/stylesheet_analogy_deim2019.css" rel="stylesheet" type="text/css" />
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <!-- <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.min.css" /> -->
   <link href="./data/jquery_themes_cupertino_ui_kai.css" rel="stylesheet" type="text/css" />
@@ -274,7 +274,7 @@
                 $(".vector_result").html("<h1>Error：入力に問題が見つかったためもう一度入力してください</h1>");
               };
               $.ajax({ //データ送信
-                  url: "./cgi-bin/analogy_deim/processing.py",
+                  url: "./cgi-bin/analogy_deim2019/processing.py",
                   type: "post",
                   dataType: "text",
                   data: {
@@ -361,7 +361,7 @@
           idata = Insert_Data(temp);
 
           $.ajax({ //データ送信
-              url: "./cgi-bin/analogy_deim/insert_mysql.py",
+              url: "./cgi-bin/analogy_deim2019/insert_mysql.py",
               type: "post",
               dataType: "text",
               data: {
