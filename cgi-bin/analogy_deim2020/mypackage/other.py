@@ -3,6 +3,7 @@ import os, sys # 全フォルダ参照
 path = os.path.join(os.path.dirname(__file__), '../../')
 sys.path.append(path)
 from mysql_connect import jalan_ktylab_new
+import copy
 conn,cur = jalan_ktylab_new.main()
 
 ## 履歴スポットリスト作成(DBでLIKE検索するため)
@@ -33,3 +34,52 @@ def area_id_list(area):
     for i in cur:
         area_id_list.append(i[0])
     return area_id_list
+
+## ajaxデータ整形（tfidf_vis_data用）
+def stringlist_changeto_clusterset(word):
+    numlist = [i for i, x in enumerate(word) if x == '-finish-']
+
+    res = []
+    for j in range(len(numlist)):
+        if j == 0:
+            res.append(word[:numlist[j]])
+        else:
+            tmp = []
+            tmp.extend(word[numlist[j-1]+1:numlist[j]])
+            res.append(tmp)
+
+    result = []
+    for i in range(len(res)):
+        num = copy.copy(res[i][0])
+        res[i].pop(0)
+        tfidf_dic = []
+        for x,y in zip(*[iter(res[i])]*2):
+            tfidf_dic.append([x,float(y)])
+        result.append([num,tfidf_dic])
+
+    return result
+
+## ajaxデータ整形（vis_score_dic用）
+def stringlist_changeto_visscoreset(word):
+    numlist = [i for i, x in enumerate(word) if x == '-finish-']
+
+    res = []
+    for j in range(len(numlist)):
+        if j == 0:
+            res.append(word[:numlist[j]])
+        else:
+            tmp = []
+            tmp.extend(word[numlist[j-1]+1:numlist[j]])
+            res.append(tmp)
+
+    result = []
+    for i in range(len(res)):
+        num = copy.copy(res[i][0])
+        score = copy.copy(res[i][1])
+        res[i].pop(0)
+        res[i].pop(0)
+        review_id = []
+        for j in range(len(res[i])):
+            review_id.append(int(res[i][j]))
+        result.append([num,float(score),review_id])
+    return result

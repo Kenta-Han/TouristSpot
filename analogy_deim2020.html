@@ -131,7 +131,6 @@
         </h3>
       </div>
       <p style="text-align:center;font-size:20px; clear:both;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．</p>
-      <input type="text" id="orders" value="plt" hidden>
       <input type="submit" id="start" value="実験開始" />
     </form>
     <div class="cluster_result" id="cluster_result" style="text-align: center;" hidden></div>
@@ -384,7 +383,6 @@
                     visited_name: post_visited,
                     prefecture_name: $("#prefecture").val(),
                     area_name: $("#area").val(),
-                    orders: $("#orders").val(),
                   },
                   timeout: 150000,
                   error: function() {
@@ -402,7 +400,7 @@
                     document.getElementById("cluster_result").style.display="none";
                     var tablest = $("<table border='1' style='width:80%;'><tr><th style='width:10%;'>番号</th><th>内容</th></tr>");
                     for (var r = 1; r <= res["word"].length; r++) {
-                        tmp = $("<tr><td><input type='radio' name='cluster' value='" + res["word"][r-1].join("，") + "'> " + r + "</td><td class='cluster'>" + res["word"][r-1].join("，") + "</td></tr>")
+                        tmp = $("<tr><td><input type='radio' name='cluster' value='" + res["word"][r-1][0] + "'> " + r + "</td><td class='cluster'>" + res["word"][r-1][1].join("，") + "</td></tr>")
                         tablest.append(tmp)
                     }
                     var tableend = $("</table>")
@@ -433,56 +431,79 @@
         var radioNodeList = element.cluster;
         var choice_value_data = radioNodeList.value ;
         if (choice_value_data.length != 0){
+          console.log(res);
+          // console.log(choice_value_data);
+          // console.log(typeof res["tfidf_dataset"]);
+          // ajaxのためにres["tfidf_dataset"]を整形
+          var tfidf_dataset = [];
+          for(i=0;i<res["tfidf_dataset"].length;i++){
+            tfidf_dataset.push(res["tfidf_dataset"][i][0]);
+            for(j=0;j<res["tfidf_dataset"][i][1].length;j++){
+              tfidf_dataset.push(res["tfidf_dataset"][i][1][j][0]);
+              tfidf_dataset.push(res["tfidf_dataset"][i][1][j][1]);
+            }
+            tfidf_dataset.push("-finish-");
+          }
+          // ajaxのためにres["vis_score_dic"]を整形
+          var vis_scoreset = [];
+          for(i=0;i<res["vis_score_dic"].length;i++){
+            // var tmp = [];
+            vis_scoreset.push(res["vis_score_dic"][i][0]);
+            vis_scoreset.push(res["vis_score_dic"][i][1]);
+            for(j=0;j<res["vis_score_dic"][i][2].length;j++){
+              vis_scoreset.push(res["vis_score_dic"][i][2][j]);
+            }
+            vis_scoreset.push("-finish-");
+          }
+          // console.log(tfidf_dataset);
+          // console.log(vis_scoreset);
           console.log(choice_value_data);
-          console.log(res["record_id"]);
-          // var $form = $(this);
-          // $(".visited").each(function() {
-          //   if ($(this).val() != "") {
-          //     post_visited.push($(this).val());
-          //   }
-          // });
+
           // $(".loading").html("<p style='text-align:center;font-size:22px; clear:both;'>表示するまで最大150秒かかる場合があります．<br>「Timeout」が表示された場合，再読込を行なってください．</p><img src='./data/loading4.gif' style='width:30%'></img>");
           // window.onerror = function() {
           //   alert("Error：入力に問題が見つかったため，もう一度やり直してください．\nまた，目的に合致するスポットがないため，目的を変更してください．");
           //   // location.reload();
           //   // $(".loading").html("<h2>Error：入力に問題が見つかったため，もう一度やり直してください．</h2>");
           // };
-          // $.ajax({
-          //     url: "../cgi-bin/analogy_deim2020/processing.py",
-          //     type: "post",
-          //     dataType: "text",
-          //     data: {
-          //       record_id: res["record_id"],
-          //       choice: choice_value_data,
-          //     },
-          //     timeout: 150000,
-          //     error: function() {
-          //       alert("Timeout：時間を空けて，もう一度試してください．")
-          //     },
-          //   })
-          //   .done(function(response) { //データを受信
-          //     console.log(response);
-          //     res = $.parseJSON(response); //受信したデータをjson形式に変更
-          //     // console.log(res);
-          //     // console.log(typeof res);
-          //     if (res.length == 0) {
-          //       $(".loading").html("<h2>Search Result：Not found.</h2>");
-          //     } else {
-          //       document.getElementById("loading").style.display="none";
-          //       var tablest = $("<table border='1' style='width:80%;'><tr><th style='width:10%;'>番号</th><th>内容</th></tr>");
-          //       for (var r = 1; r <= res["word"].length; r++) {
-          //           tmp = $("<tr><td><input type='radio' name='cluster' value=''> " + r + "</td><td class='cluster'>"+ res["word"][r-1].join("，") + "</td></tr>")
-          //           tablest.append(tmp)
-          //       }
-          //       var tableend = $("</table>")
-          //       $('#form_cluster').append(tablest.append(tableend));
-          //       $('#form_cluster').append("<input type='submit' id='search' value='検索' >")
-          //       document.getElementById("form_cluster").style.display="block";
-          //     }
-          //   })
-          //   .fail(function() {
-          //     $(".loading").html("Failed.");
-          //   });
+          $.ajax({
+              url: "../cgi-bin/analogy_deim2020/processing2.py",
+              type: "post",
+              dataType: "text",
+              data: {
+                record_id: res["record_id"],
+                choice: choice_value_data,
+                tfidf_vis_data: tfidf_dataset,
+                visited_name: post_visited,
+                vis_score: vis_scoreset,
+              },
+              timeout: 150000,
+              error: function() {
+                alert("Timeout：時間を空けて，もう一度試してください．")
+              },
+            })
+            .done(function(response) { //データを受信
+              console.log(response);
+              res = $.parseJSON(response); //受信したデータをjson形式に変更
+              // console.log(res);
+              // console.log(typeof res);
+              // if (res.length == 0) {
+              //   $(".loading").html("<h2>Search Result：Not found.</h2>");
+              // } else {
+              //   document.getElementById("loading").style.display="none";
+              //   var tablest = $("<table border='1' style='width:80%;'><tr><th style='width:10%;'>番号</th><th>内容</th></tr>");
+              //   for (var r = 1; r <= res["word"].length; r++) {
+              //       tmp = $("<tr><td><input type='radio' name='cluster' value=''> " + r + "</td><td class='cluster'>"+ res["word"][r-1].join("，") + "</td></tr>")
+              //       tablest.append(tmp)
+              //   }
+              //   var tableend = $("</table>")
+              //   $('#form_cluster').append(tablest.append(tableend));
+              //   $('#form_cluster').append("<input type='submit' id='search' value='検索' >")
+              //   document.getElementById("form_cluster").style.display="block";
+              // }
+            })
+            .fail(function() {
+              $(".loading").html("Failed.");
+            });
         } else {
           alert('ラジオブックスを選んでください．');
         }
