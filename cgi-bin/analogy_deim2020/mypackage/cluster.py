@@ -88,6 +88,7 @@ def clusterScorering(df, input_spot_num):
         # score_dicにクラスタのスコアを追加
         score_dic[str(count)] = score
 
+    # print(score_dic, file=sys.stderr)
     # スコア0のクラスタを削除
     for key in list(score_dic):
         if score_dic[key] == 0:

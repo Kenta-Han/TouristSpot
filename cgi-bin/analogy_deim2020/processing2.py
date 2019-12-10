@@ -7,11 +7,9 @@ import numpy as np
 import mypackage.other as myp_other
 import mypackage.doc2vec_recommend as myp_doc_rec
 import mypackage.tfidf as myp_tfidf
-import mypackage.harmonic_mean as myp_hmean
+import mypackage.feature_mean as myp_feature
 import mypackage.normal_distribution_map_line as myp_norm_l
 import mypackage.cos_sim_tfidf as myp_cos_tfidf
-import pandas as pd
-import pandas.io.sql as psql
 import mypackage.cluster as myp_cluster
 
 import MySQLdb
@@ -37,8 +35,8 @@ form = cgi.FieldStorage()
 record_id = form.getvalue('record_id')
 choice_num = form.getvalue('choice')
 history = form.getlist('visited_name[]')
-tfidf_vis_data = form.getlist('tfidf_vis_data[]')
-visited_tfidf_set = myp_other.stringlist_changeto_clusterset(tfidf_vis_data)
+# tfidf_vis_data = form.getlist('tfidf_vis_data[]')
+# visited_tfidf_set = myp_other.stringlist_changeto_clusterset(tfidf_vis_data)
 vis_score = form.getlist('vis_score[]')
 vis_score_dic = myp_other.stringlist_changeto_visscoreset(vis_score)
 print('Content-type: text/html\nAccess-Control-Allow-Origin: *\n')
@@ -52,9 +50,8 @@ user_data = cur.fetchone()
 
 prefecture = user_data[4]
 area = user_data[5]
-# print(user_data, file=sys.stderr)
 
-############################################################
+# ############################################################
 ## 既訪問スポット情報
 ############################################################
 ## 既訪問を利用
@@ -88,7 +85,7 @@ for i in range(len(visited_spot_list)):
         continue
 
 vis_cate = [x for x in set(vis_cate) if vis_cate.count(x) >= 1]
-# print(vis_cate, file=sys.stderr)
+print(vis_cate, file=sys.stderr)
 
 ############################################################
 ## 未訪問エリア情報
@@ -123,7 +120,6 @@ if len(unvisited_spot_list_map_l) != len(unvisited_spot_list_map_t) or len(unvis
     unvisited_spot_list_map_l = unvisited_spot_list_map_l[:a]
     unvisited_spot_list_map_t = unvisited_spot_list_map_t[:a]
 
-
 ## 未訪問エリア内スポットIDリスト
 unvisited_spot_id_list = []
 ## GoogleMapの表示
@@ -142,84 +138,113 @@ for i in range(len(unvisited_spot_list_map_l)):
             continue
 
 ############################################################
-## 未訪問スポット 階層的クラスタリング
+## 平均類以度
 ############################################################
-start_time = time.time()
-threshold = 0.7 ## クラスタ分けの閾値
+def cos_sim(v1, v2):
+    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
+## 既訪問スポットのレビューベクトルを得る
+vis_cluster_review_vectors = []
+for i in range(len(vis_score_dic)):
+    select_vis_spot_vectors = "SELECT * FROM review_vectors_spotname WHERE id IN {};".format(tuple(vis_score_dic[i][2]))
+    cur.execute(select_vis_spot_vectors)
+    review_set = []
+    for j in cur:
+        review_set.append([j[0],list(j[1:-2])])
+    vis_cluster_review_vectors.append([vis_score_dic[i][0],review_set])
+
 ## 未訪問スポットのレビューベクトルを得る
 select_unvis_spot_vectors = "SELECT * FROM review_vectors_spotname WHERE spot_id IN ({});".format(str(unvis_spot_id)[1:-1])
-unvis_review_vectors = myp_cluster.review_vectors_list(select_unvis_spot_vectors)
+unvis_review_vectors = myp_other.review_id_and_vectors_list(select_unvis_spot_vectors)
 
-unvis_res = myp_cluster.kaisoClustering(select_unvis_spot_vectors,threshold)
-## 階層的クラスタリングの結果から，各クラスタの重心を求める
-unvis_center = myp_cluster.calculateCenter(unvis_res)
-## 階層的クラスタリングの結果から，各クラスタのスコアを求める
-unvis_score_dic = myp_cluster.clusterScorering(unvis_res, len(unvisited_spot_list))
+## 計算時間大体2分~3分
+unvis_review_groupby_vis_cluster = []
+for i in tqdm(range(len(unvis_review_vectors))): ## r1
+    unvis_review_cluster_avg = []
+    for j in range(len(vis_cluster_review_vectors)): ## A
+        tmp = []
+        for k in range(len(vis_cluster_review_vectors[j][1])): ## a1,a2
+            tmp.append(cos_sim(np.array(unvis_review_vectors[i][1]),np.array(vis_cluster_review_vectors[j][1][k][1])))
+        unvis_review_cluster_avg.append([vis_cluster_review_vectors[j][0],np.mean(np.array(tmp))])
+    ## 類似度が一番大きいのクラスタを出す
+    short = max(unvis_review_cluster_avg,key=lambda x:x[1])
+    if short[1] > 0.125:
+        unvis_review_groupby_vis_cluster.append([short,unvis_review_vectors[i][0]])
+unvis_use_index_num = [i for i, x in enumerate(unvis_review_groupby_vis_cluster) if x[0][0] == str(choice_num)]
+unvis_use_review_id = []
+for i in unvis_use_index_num:
+    unvis_use_review_id.append(unvis_review_groupby_vis_cluster[i][1])
 
-unvis_reviews = []
-for i in range(len(unvis_score_dic)):
-    select_review = "SELECT wakachi_neologd5 FROM review_all WHERE review_id IN ({}) ;".format(str(unvis_score_dic[i][2])[1:-1])
-    cur.execute(select_review)
-    tmp = []
-    for i in cur:
-        tmp.extend(list(i)[0].split())
-    unvis_reviews.append(tmp)
-unvisited_tfidf,unvisited_mean = myp_tfidf.tfidf_hm(unvis_reviews)
-unvisited_tfidf_set = []
-for i in range(len(unvis_score_dic)):
-    unvisited_tfidf_set.append([unvis_score_dic[i][0],unvisited_tfidf[i]])
-## 類似度降順でソート，各クラスタの上位10件
-unvisited_tfidf_top = []
-for i in range(len(unvisited_tfidf)):
-    unvisited_tfidf_top.append(sorted(unvisited_tfidf[i],key=lambda x:x[1],reverse=True)[:10])
-
-print("処理時間：{} sec".format(time.time() - start_time), file=sys.stderr)
-
-# print("==既訪問スポットtfidf==\n{}".format(visited_tfidf_set), file=sys.stderr)
-# print("==未訪問スポットtfidf==\n{}".format(unvisited_tfidf_set), file=sys.stderr)
+# start_time = time.time()
+# print("処理時間：{} sec".format(time.time() - start_time), file=sys.stderr)
 
 ############################################################
-## クラスタ間のコサイン類似度を測る
+## ここから観光情報学会の処理と同じ
+## 既訪問スポットと未訪問スポットのベクトル計算
 ############################################################
+## クラスタに属する既訪問スポットレビューの単語に重みつけ
+vis_use_index_num = [i[0] for i in vis_score_dic].index(str(choice_num))
+select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(vis_score_dic[vis_use_index_num][2]))
+visited_spot_reviews = myp_tfidf.spot_list_tfidf(select_visited_spot_reviews)
+visited_tfidf = myp_tfidf.tfidf(visited_spot_reviews)
+
+## クラスタに属する未訪問スポットレビューの単語に重みつけ
+select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(unvis_use_review_id))
+unvisited_spot_reviews = myp_tfidf.spot_list_tfidf(select_unvisited_spot_reviews)
+unvisited_tfidf = myp_tfidf.tfidf(unvisited_spot_reviews)
+
+## TFIDFの結果にスポット名を追加
+# select_visited_spot_name =
+cur.execute("SELECT name FROM review_all WHERE review_id IN {} GROUP BY name;".format(tuple(vis_score_dic[vis_use_index_num][2])))
+visited_spot_name_all = []
+for i in cur.fetchall():
+    visited_spot_name_all.append(i[0])
+cur.execute("SELECT name FROM review_all WHERE review_id IN {} GROUP BY name;".format(tuple(unvis_use_review_id)))
+unvisited_spot_name_all = []
+for i in cur.fetchall():
+    unvisited_spot_name_all.append(i[0])
+
+vis_spot,unvis_spot = [],[]
+for i in range(len(visited_spot_name_all)):
+    vis_spot.append([visited_spot_name_all[i],visited_tfidf[i]])
+for i in range(len(unvisited_spot_name_all)):
+    unvis_spot.append([unvisited_spot_name_all[i],unvisited_tfidf[i]])
+
+print("vis_spot", file=sys.stderr)
+print(vis_spot, file=sys.stderr)
+print("unvis_spot", file=sys.stderr)
+print(unvis_spot, file=sys.stderr)
+
+# TFIDF コサイン類似度
 sctfidf = myp_cos_tfidf.SimCalculator()
 result_cos_tfidf = []
-for i in range(len(visited_tfidf_set)):
-    for j in range(len(unvisited_tfidf_set)):
-        cos_tfidf = sctfidf.sim_cos(visited_tfidf_set[i],unvisited_tfidf_set[j])
-        result_cos_tfidf.append([unvisited_tfidf_set[j][0],visited_tfidf_set[i][0],cos_tfidf])
+for i in range(len(vis_spot)):
+    for j in range(len(unvis_spot)):
+        cos_tfidf = sctfidf.sim_cos(vis_spot[i],unvis_spot[j])
+        result_cos_tfidf.append([unvis_spot[j][0],vis_spot[i][0],cos_tfidf])
 
-## result_cos_tfidfの構造 -> [未訪問スポットのクラスタ，既訪問スポットのクラスタ，類似度]
-result_cos_tfidf = sorted(result_cos_tfidf,key= lambda x:x[2],reverse=True)
-print("Cos類似度\n{}".format(result_cos_tfidf), file=sys.stderr)
+print("パターン数：vis({}) * unvis({}) = {}".format(len(visited_tfidf),len(unvisited_tfidf),len(result_cos_tfidf)),file=sys.stderr)
+print("~~ tfidfによるコサイン類似度計算結果：\n{}".format(sorted(result_cos_tfidf,key=lambda x:x[2],reverse=True)), file=sys.stderr)
 
-############################################################
-############################################################
-## ユーザが選んだクラスタのレビューIDとレビューが含んでいる既訪問スポット
-# print("==vis_score_dic==\n{}".format(vis_score_dic), file=sys.stderr)
-target_vis_review_id = vis_score_dic[([i[0] for i in vis_score_dic]).index(str(choice_num))][2]
-select_target_vis_spot = "SELECT spot_id FROM review_all WHERE review_id IN {} GROUP BY spot_id;".format(tuple(target_vis_review_id))
-cur.execute(select_target_vis_spot)
-target_vis_spot = []
-for row in cur.fetchall():
-    target_vis_spot.append(row[0])
+## 既訪問と未訪問スポット特徴語 tfidfcos
+UtoV_top10_tfidfcos = myp_feature.sort_tfidf_UtoV_tfidfcos(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_cos_tfidf)
+print("~~ UtoV_top10_tfidfcos:\n{}".format(UtoV_top10_tfidfcos), file=sys.stderr)
 
-## 既訪問スポットベクトル
-select_visited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(target_vis_spot))
-visited_spot_vectors = myp_doc_rec.spot_list(select_visited_spot_vectors)
-visited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(visited_spot_vectors)
+try:
+    result,json_data_map_line = myp_norm_l.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_relative,record_id,unvis_url,result_cos_tfidf,result_UtoV_top_doc2)
+except:
+    import traceback
+    traceback.print_exc()
 
-############################################################
-############################################################
-## result_cos_tfidfにおいてユーザ選択クラスとと類似度がもっとも大きいクラスタのレビューIDとレビューが含んでいる未訪問スポット
-tmp = result_cos_tfidf[([i[1] for i in result_cos_tfidf]).index(str(choice_num))][0]
-target_unvis_review_id = unvis_score_dic[([i[0] for i in unvis_score_dic]).index(tmp)][2]
-select_target_unvis_spot = "SELECT spot_id FROM review_all WHERE review_id IN {} GROUP BY spot_id;".format(tuple(target_unvis_review_id))
-cur.execute(select_target_unvis_spot)
-target_unvis_spot = []
-for row in cur.fetchall():
-    target_unvis_spot.append(row[0])
+random,json_random = Response_Random()
+json_data = [json_data_map_line] + [json_random]
 
-## 未訪問スポットベクトル
-select_unvisited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(target_unvis_spot))
-unvisited_spot_vectors = myp_doc_rec.spot_list(select_unvisited_spot_vectors)
-unvisited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(unvisited_spot_vectors)
+random,json_random = Response_Random()
+json_data = [json_data_map_line] + [json_random]
+
+finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+sql_insert = "UPDATE analogy_sti SET category='{cate}', code='{rand}',finish_datetime='{finish}' WHERE id = {record_id};".format(cate='，'.join(vis_cate),rand=random,finish=finish_datetime,record_id=record_id)
+cur.execute(sql_insert)
+conn.commit()
+# print(json_data, file=sys.stderr)
+print(json.dumps(json_data))
