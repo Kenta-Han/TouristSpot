@@ -81,7 +81,7 @@ select_vis_spot_vectors = "SELECT * FROM review_vectors_spotname WHERE spot_id I
 vis_review_vectors = myp_cluster.review_vectors_list(select_vis_spot_vectors)
 # print(vis_review_vectors, file=sys.stderr)
 
-threshold = 0.7 ## クラスタ分けの閾値
+threshold = 0.65 ## クラスタ分けの閾値
 vis_res = myp_cluster.kaisoClustering(select_vis_spot_vectors,threshold)
 ## 階層的クラスタリングの結果から，各クラスタの重心を求める
 # vis_center = np.array(myp_cluster.calculateCenter(vis_res))

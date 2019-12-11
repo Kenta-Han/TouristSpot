@@ -109,6 +109,7 @@ def clusterScorering(df, input_spot_num):
     #     result_dic = {}
     #     for i in range(int(input_spot_num / 2)):
     #         result_dic[sort_score_dic[i][0]] = sort_score_dic[i][1]
+    # print(result_dic, file=sys.stderr)
     # return result_dic
 
 # 検索スポットのレビューをクラスタのスコアとレビューとの類似度によってスコアリングする関数

@@ -168,7 +168,7 @@ for i in tqdm(range(len(unvis_review_vectors))): ## r1
         unvis_review_cluster_avg.append([vis_cluster_review_vectors[j][0],np.mean(np.array(tmp))])
     ## 類似度が一番大きいのクラスタを出す
     short = max(unvis_review_cluster_avg,key=lambda x:x[1])
-    if short[1] > 0.125:
+    if short[1] >= 0.125:
         unvis_review_groupby_vis_cluster.append([short,unvis_review_vectors[i][0]])
 unvis_use_index_num = [i for i, x in enumerate(unvis_review_groupby_vis_cluster) if x[0][0] == str(choice_num)]
 unvis_use_review_id = []
@@ -179,8 +179,7 @@ for i in unvis_use_index_num:
 # print("処理時間：{} sec".format(time.time() - start_time), file=sys.stderr)
 
 ############################################################
-## ここから観光情報学会の処理と同じ
-## 既訪問スポットと未訪問スポットのベクトル計算
+## 既訪問スポットと未訪問スポットの計算
 ############################################################
 ## クラスタに属する既訪問スポットレビューの単語に重みつけ
 vis_use_index_num = [i[0] for i in vis_score_dic].index(str(choice_num))
@@ -215,7 +214,7 @@ print(vis_spot, file=sys.stderr)
 print("unvis_spot", file=sys.stderr)
 print(unvis_spot, file=sys.stderr)
 
-# TFIDF コサイン類似度
+## TFIDFによるコサイン類似度計算
 sctfidf = myp_cos_tfidf.SimCalculator()
 result_cos_tfidf = []
 for i in range(len(vis_spot)):
@@ -231,13 +230,10 @@ UtoV_top10_tfidfcos = myp_feature.sort_tfidf_UtoV_tfidfcos(visited_tfidf,unvisit
 print("~~ UtoV_top10_tfidfcos:\n{}".format(UtoV_top10_tfidfcos), file=sys.stderr)
 
 try:
-    result,json_data_map_line = myp_norm_l.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_relative,record_id,unvis_url,result_cos_tfidf,result_UtoV_top_doc2)
+    json_data_map_line = myp_norm_l.calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,UtoV_top10_tfidfcos,record_id,unvis_url)
 except:
     import traceback
     traceback.print_exc()
-
-random,json_random = Response_Random()
-json_data = [json_data_map_line] + [json_random]
 
 random,json_random = Response_Random()
 json_data = [json_data_map_line] + [json_random]

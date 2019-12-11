@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <link href="../data/stylesheet_analogy_sti_map.css" rel="stylesheet" type="text/css" />
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+  <script type="text/javascript" src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <title>観光スポット説明向上の可視化地図</title>
+  <script>
+    $(function () {
+    $.ajax({
+      url:'../data/txt/spot.txt',
+      success: function(data){
+        var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+        $('.visited').autocomplete({
+          source: datam,
+          autoFocus: true,
+          delay: 300,
+          minLength: 2
+        });
+      }
+    })
+    $.ajax({
+      url:'../data/txt/area2.txt',
+      success: function(data){
+        var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+        $('#area').autocomplete({
+          source: datam,
+          // autoFocus: true,
+          delay: 300,
+          minLength: 2
+        });
+      }
+    })
+    // $.ajax({
+    //   url:'../data/txt/category.txt',
+    //   success: function(data){
+    //     var datam = data.split(/\r\n|\r|\n/);  // 改行コードで分割
+    //     $('#purpose').autocomplete({
+    //       source: datam,
+    //       // autoFocus: true,
+    //       delay: 300,
+    //       minLength: 2
+    //     });
+    //   }
+    // })
+  });
+  </script>
+</head>
+
+<body>
+  <!-- <header>
+    <h1 style="text-align:center;">観光スポット説明向上の可視化地図</h1>
+  </header> -->
+  <div id="main_top">
+    <form id="form_main" name="form_main">
+      <div id="familiar">
+        <h3>CrowdWorksID：
+          <input type="text" id="user_id" name="user_id" maxlength="40" />
+        </h3>
+        <h3>
+          <ul id="setumei">
+            <li>これまで訪れたことがあり，気に入った観光スポットを3つ以上入力してください</li>
+            <li>入力すると候補が表示されるので，その中から選択ください</li>
+          </ul>
+        </h3>
+        <table class="visited">
+          <tr>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+          </tr>
+          <tr>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+          </tr>
+          <tr>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+          </tr>
+        </table>
+      </div>
+      <div id="unfamiliar">
+        <img src="../data/crowdworks_id_img.png" style="width:20%;"></img>
+        <h3>これから行ってみたい都道府県・エリアを入力してください</h3>
+
+        <h3>都道府県：
+          <select name="prefecture" id="prefecture">
+            <option value="北海道">北海道</option>
+            <option value="青森">青森</option>
+            <option value="岩手">岩手</option>
+            <option value="宮城">宮城</option>
+            <option value="秋田">秋田</option>
+            <option value="山形">山形</option>
+            <option value="福島">福島</option>
+            <option value="茨城">茨城</option>
+            <option value="栃木">栃木</option>
+            <option value="群馬">群馬</option>
+            <option value="埼玉">埼玉</option>
+            <option value="千葉">千葉</option>
+            <option value="東京">東京</option>
+            <option value="神奈川">神奈川</option>
+            <option value="新潟">新潟</option>
+            <option value="富山">富山</option>
+            <option value="石川">石川</option>
+            <option value="福井">福井</option>
+            <option value="山梨">山梨</option>
+            <option value="長野">長野</option>
+            <option value="岐阜">岐阜</option>
+            <option value="静岡">静岡</option>
+            <option value="愛知">愛知</option>
+            <option value="三重">三重</option>
+            <option value="滋賀">滋賀</option>
+            <option value="京都">京都</option>
+            <option value="大阪">大阪</option>
+            <option value="兵庫">兵庫</option>
+            <option value="奈良">奈良</option>
+            <option value="和歌山">和歌山</option>
+            <option value="鳥取">鳥取</option>
+            <option value="島根">島根</option>
+            <option value="岡山">岡山</option>
+            <option value="広島">広島</option>
+            <option value="山口">山口</option>
+            <option value="徳島">徳島</option>
+            <option value="香川">香川</option>
+            <option value="愛媛">愛媛</option>
+            <option value="高知">高知</option>
+            <option value="福岡">福岡</option>
+            <option value="佐賀">佐賀</option>
+            <option value="長崎">長崎</option>
+            <option value="熊本">熊本</option>
+            <option value="大分">大分</option>
+            <option value="宮崎">宮崎</option>
+            <option value="鹿児島">鹿児島</option>
+            <option value="沖縄">沖縄</option>
+          </select>
+        </h3>
+
+        <h3>エリア(任意)：
+          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" />
+        </h3>
+      </div>
+      <p style="text-align:center;font-size:22px; clear:both;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大150秒かかる場合があります，「Timeout」が表示された場合，再読込を行なってください．）</p>
+      <input type="text" id="orders" value="plt" hidden>
+      <input type="submit" id="start" value="実験開始" />
+    </form>
+
+  </div>
+
+  <div class="vector_result" id="vector_result" style="text-align: center;"></div>
+
+  <div id="result_position" hidden>
+    <div id="map_position">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
+    </div>
+    <div id="right">
+      <h2 id="map_position_title">Position_Map</h2>
+      <ol>
+        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．<br>関係性が低いとキーワードが「なし」と表示されます．</p>
+        <li>黒いピン：入力した既訪問スポット</li><p>既訪問スポット名は実際の座標ではなく，未訪問スポットと類似度の距離を意味しています．</p>
+      </ol>
+      <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_p_text"></p>
+      <input type="button" id="next_p" value="次へ" >
+    </div>
+  </div>
+
+  <div id="result_line" hidden>
+    <h2 id="map_line_title">↓ Line_Map ↓</h2>
+    <!-- <h3 id="color"><span style="float:left; width:30%;">低い</span><span style="width:40%;">← 既訪問スポットと未訪問スポットの似ている度合い →</span><span style="float:right; width:30%;">高い</span><svg id="myGraph"></svg></h3> -->
+    <h3 id="color"><img src="../data/sti/color3.png" ></img></h3>
+    <div id="map_line">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
+    </div>
+    <div id="right">
+      <h2 id="map_line_title">Line_Map</h2>
+      <ol>
+        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．<br>関係性が低いとキーワードが「なし」と表示されます．</p>
+        <li>黒いピン：入力した既訪問スポット</li>
+        <li>カラーマップ：</li><p>カラーマップは赤いピンと黒いピンの類似度（似ている度合い）を示しています．</p>
+        <p>緑色は既訪問スポットと未訪問スポットの類似度が低いこと意味します．<br>赤色は既訪問スポットと未訪問スポットの類似度が高いこと意味します．</p>
+      </ol>
+      <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_l_text"></p>
+      <input type="button" id="next_l" value="次へ" >
+    </div>
+  </div>
+
+  <div id="result_table" hidden>
+    <div id="map_table" >
+      <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
+    </div>
+    <div id="right">
+      <h2 id="map_table_title">Table_Map</h2>
+      <ol>
+        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワード，類似度です．<br>関係性が低いとキーワードが「なし」と表示されます．</p>
+        <li>類似度（似ている度合い）の値は「-1.0 から 1.0」の間になります．「-1.0」は最も類似せず，「1.0」は最も類似することを意味します．</li>
+      </ol>
+      <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_t_text"></p>
+      <input type="button" id="next_t" value="次へ" >
+    </div>
+  </div>
+
+  <div id="main_last" hidden>
+    <!-- <h2 style='margin:20% auto 0; text-align:center;'>承認コード：<span id="code"></span></h2> -->
+    <h1 class='title' style='margin:20% auto; text-align:center;'>承認コード：<span id="code"></span><br>実験にご協力頂きありがとうございました．</h1>
+  </div>
+
+  <script type="text/javascript">
+    var temp_vis = [];
+    //未入力チェック
+    function check() {
+      var flag = 0;
+      var visited_list = [];
+      $("input[name='visited']").each(function() {
+        if ($(this).val() != "") {
+          visited_list.push($(this).val());
+        }
+      });
+      temp_vis = visited_list.filter(function() {
+        return $("this").val() != ""
+      });
+
+      if (document.form_main.user_id.value == "") {
+        flag = 1;
+      } else if (temp_vis.length < 3) {
+        flag = 1;
+      } else if (document.form_main.prefecture.value == "") {
+        flag = 1;
+      }
+
+      if (flag == 1) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    //既訪問スポットの重複チェック
+    function jyufuku() {
+      var counts = {};
+      for (var i = 0; i < temp_vis.length; i++) {
+        var key = temp_vis[i];
+        counts[key] = (counts[key]) ? counts[key] + 1 : 1;
+      }
+
+      var flag1 = []
+      for (var key in counts) {
+        // console.log(key + " : " + counts[key]);
+        if (counts[key] == 1) {
+          flag = 0
+        } else {
+          flag1.push(1)
+        }
+      }
+
+      if (flag1.length == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    //既訪問スポットが"---"入っているか
+    function word_check() {
+      var flag = 0;
+      // console.log((temp_vis));
+      var flag1 = [];
+      for (var i = 0; i < temp_vis.length; i++) {
+        if (temp_vis[i].indexOf("---") != -1) { //入っている時は-1ではない
+          flag = 0;
+        } else {
+          flag1.push(1);
+        }
+      }
+      // console.log(flag1);
+      if (flag1.length == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    // 積集合（wordの中身をチェックするため）
+    Set.prototype.intersection = function(setB) {
+      var intersection = new Set();
+      for (var elem of setB) {
+        if (this.has(elem)) {
+          intersection.add(elem);
+        }
+      }
+      return intersection;
+    }
+
+    // // SVGの描画サイズとマージン
+    // var margin = {
+    //   top: 10,
+    //   right: 20,
+    //   bottom: 20,
+    //   left: 10
+    // };
+    // var container = document.querySelector('#myGraph');
+    // // var width = 1000;
+    // var width = getStyleSheetValue(container, 'width') - margin.left - margin.right;
+    // var height = getStyleSheetValue(container, 'height') - margin.left - margin.right;
+    // // var height = 10;
+    //
+    // function getStyleSheetValue(element, property) {
+    //   if (!element || !property) {
+    //     return null;
+    //   }
+    //   var style = window.getComputedStyle(element);
+    //   var value = style.getPropertyValue(property);
+    //   return value.slice(0, -2);
+    // }
+    //
+    // // SVGの表示領域を生成
+    // var svg = d3.select("#myGraph")
+    //   // .attr("width", width + margin.left + margin.right)
+    //   // .attr("height", height + margin.top + margin.bottom)
+    //   .append("g")
+    //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    //
+    // // オリジナルのグラデーション設定
+    // var color = d3.scaleLinear()
+    //   .domain([0, 0.5 ,1])
+    //   // .range(['cyan', 'yellow', 'orange']);
+    //   // .range(['blue', 'orange', 'red']);
+    //   // .range(['blue', 'purple', 'red']);
+    //   .range(['rgb(0, 255, 0)', 'rgb(230, 255, 0)','rgb(255,0,0)']);
+    //
+    // // データ
+    // var data = d3.ticks(0, 1, 100);
+    //
+    // svg.selectAll("rect")
+    //   .data(data)
+    //   .enter()
+    //   .append("rect")
+    //   .attr("class", "bar")
+    //   .attr("x", width * 1.1)
+    //   .attr("y", 0)
+    //   .attr("width", width / data.length + 1)
+    //   .attr("height", height)
+    //   .attr("fill", function(d, i) {
+    //     // console.log(color(d));
+    //     return color(d);
+    //   })
+    //   .transition()
+    //   .delay(function(d,i){
+    //     return i; // return i*40;
+    //   })
+    //   .duration(300) //300
+    //   .attr("x", function(d, i) {
+    //     return width / data.length * i;
+    //   });
+
+    // マップ作成 Start
+    var map_P,bounds_P;
+    var unvis_markerLatLng_P, vis_markerLatLng_P ;
+    var unvis_marker_P = [], vis_marker_P = [];
+    var unvis_infoWindow_P = [], vis_infoWindow_P = [];
+    var infoLines_P = [];
+    var markerData_P;
+    function initMap_Position(data) {
+      markerData_P = data;
+      // 地図の作成
+      // var cnt = 0,
+      //   sum_lat = 0,
+      //   sum_lng = 0;
+      // for (var i = 0; i < markerData_P.length; i++) {
+      //   sum_lat = sum_lat + Number(markerData_P[i]["unvis_lat"]);
+      //   sum_lng = sum_lng + Number(markerData_P[i]["unvis_lng"]);
+      //   ll =
+      //     cnt += 1;
+      // }
+      // map_P = new google.maps.Map(document.getElementById("map_position"), { // #mapに地図を埋め込む
+      //   center: {
+      //     lat: sum_lat / cnt,
+      //     lng: sum_lng / cnt
+      //   },
+      //   zoom: 13 // 地図のズームを指定
+      // });
+      map_P = new google.maps.Map(document.getElementById("map_position"));
+      bounds_P = new google.maps.LatLngBounds();
+
+      // マーカー毎の処理
+      for (var i = 0; i < markerData_P.length; i++) {
+        unvis_markerLatLng_P = new google.maps.LatLng({
+          lat: Number(markerData_P[i]["unvis_lat"]),
+          lng: Number(markerData_P[i]["unvis_lng"])
+        }); // 緯度経度のデータ作成
+        vis_markerLatLng_P = new google.maps.LatLng({
+          lat: Number(markerData_P[i]["vis_lat"]),
+          lng: Number(markerData_P[i]["vis_lng"])
+        }); // 緯度経度のデータ作成
+
+        unvis_marker_P[i] = new google.maps.Marker({ // マーカーの追加
+          position: unvis_markerLatLng_P, // マーカーを立てる位置を指定
+          map: map_P, // マーカーを立てる地図を指定
+        });
+        vis_marker_P[i] = new MarkerWithLabel({ // マーカーの追加
+          position: vis_markerLatLng_P, // マーカーを立てる位置を指定
+          map: map_P, // マーカーを立てる地図を指定
+          icon:{
+            url:"../data/vis_spot_marker.png",
+            scaledSize: new google.maps.Size(40, 40) //サイズ
+          },
+          // text: markerData_P[i]["vis_name"],
+          labelContent: markerData_P[i]["vis_name"],       //ラベル文字
+          labelAnchor: new google.maps.Point(38, 0),   //ラベル文字の基点
+          labelClass: 'labels',                        //CSSのクラス名
+          labelStyle: {opacity: 0.8}   //スタイル定義
+        });
+        bounds_P.extend(unvis_marker_P[i].position);
+        bounds_P.extend(vis_marker_P[i].position);
+
+        if ((Math.sign(markerData_P[i]["cossim"]) == -1) || (markerData_P[i]["cossim"] == 0)){
+          markerData_P[i]["word"] = "なし";
+        }
+        var table_P = "<h2 style='text-align:center;'><a href = '" + markerData_P[i]["unvis_url"] + "'target='_blank'>" + markerData_P[i]["unvis_name"] + "</a></h2><table border='1' id='window2'><tr><th>既訪問スポット名</th><th>関係を表現するキーワード</th></tr>"
+        for (var j = 0; j < markerData_P.length; j++){
+          if (markerData_P[i]["unvis_name"] == markerData_P[j]["unvis_name"]){
+            table_P += "<tr><td>" + markerData_P[j]["vis_name"] + "</td><td>" + markerData_P[j]["word"] + "</td></tr>"
+          }
+        }
+        table_P = table_P + "</table>"
+        unvis_infoWindow_P[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+          content: table_P,
+        });
+        vis_infoWindow_P[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+          content: "<h2 style='text-align:center; font-size:22px;'>" + markerData_P[i]["vis_name"] +
+         "</h2>",
+        });
+
+        infoLines_P[i] = new google.maps.Polyline({
+          path: [unvis_markerLatLng_P,vis_markerLatLng_P],
+        });
+        markerEvent_Position(i,markerData_P); // マーカーにクリックイベントを追加
+      }
+    }
+    var currentInfoWindow_P = null;
+    var currentInfoWindow_P2 = null;
+    var currentInfoLines_P = [];
+    function markerEvent_Position(i,markerData) {
+      vis_marker_P[i].addListener("click", function() { // マーカーをクリックしたとき
+        // if (currentInfoLines_P.length == 0){
+        //   alert("未訪問スポット(赤色のピン)の座標をクリックしてください");
+        // }
+        // else {
+        if (currentInfoWindow_P) {
+          currentInfoWindow_P.close();
+        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+        vis_infoWindow_P[i].open(map_P, vis_marker_P[i]); // 吹き出しの表示
+        // vis_infoWindow_P[i].setZIndex(1200);
+        currentInfoWindow_P = vis_infoWindow_P[i];
+        // }
+      });
+
+      unvis_marker_P[i].addListener("click", function() { // マーカーをクリックしたとき
+        if (currentInfoWindow_P2 != null && currentInfoWindow_P == null) {
+          currentInfoWindow_P2.close();
+        }
+        else if (currentInfoWindow_P2 != null && currentInfoWindow_P != null){
+          currentInfoWindow_P2.close();
+          currentInfoWindow_P.close();
+        }
+        unvis_infoWindow_P[i].open(map_P, unvis_marker_P[i]); // 吹き出しの表示
+        // for (var k = 0; k < markerData_P.length; k++){
+        //   vis_marker_P[k].setZIndex(0);
+        //   if ((infoLines_P[i].getPath().getArray()[0].lat() === infoLines_P[k].getPath().getArray()[0].lat()) && (infoLines_P[i].getPath().getArray()[0].lng() === infoLines_P[k].getPath().getArray()[0].lng())) {
+        //     vis_marker_P[k].setZIndex(1000);
+        //     currentInfoLines_P.push(infoLines_P[k]);
+        //   }
+        // }
+        // unvis_infoWindow_P[i].setZIndex(1100);
+        currentInfoWindow_P2 = unvis_infoWindow_P[i];
+      });
+    }
+    // マップ作成 Finish
+
+    // マップ作成 Start
+    var map_L, bounds_L;
+    var unvis_markerLatLng_L, vis_markerLatLng_L ;
+    var unvis_marker_L = [], vis_marker_L = [];
+    var unvis_infoWindow_L = [], vis_infoWindow_L = [];
+    var infoLines_L = [];
+    var markerData_L;
+    function initMap_Line(data) {
+      markerData_L = data;
+      // 地図の作成
+      // var cnt = 0,
+      //   sum_lat = 0,
+      //   sum_lng = 0;
+      // for (var i = 0; i < markerData_L.length; i++) {
+      //   sum_lat = sum_lat + Number(markerData_L[i]["unvis_lat"]);
+      //   sum_lng = sum_lng + Number(markerData_L[i]["unvis_lng"]);
+      //   ll =
+      //     cnt += 1;
+      // }
+      // map_L = new google.maps.Map(document.getElementById("map_line"), { // #mapに地図を埋め込む
+      //   center: {
+      //     lat: sum_lat / cnt,
+      //     lng: sum_lng / cnt
+      //   },
+      //   zoom: 13 // 地図のズームを指定
+      // });
+      map_L = new google.maps.Map(document.getElementById("map_line"));
+      bounds_L = new google.maps.LatLngBounds();
+
+      // マーカー毎の処理
+      for (var i = 0; i < markerData_L.length; i++) {
+        unvis_markerLatLng_L = new google.maps.LatLng({
+          lat: Number(markerData_L[i]["unvis_lat"]),
+          lng: Number(markerData_L[i]["unvis_lng"])
+        }); // 緯度経度のデータ作成
+        vis_markerLatLng_L = new google.maps.LatLng({
+          lat: Number(markerData_L[i]["vis_lat"]),
+          lng: Number(markerData_L[i]["vis_lng"])
+        }); // 緯度経度のデータ作成
+
+        unvis_marker_L[i] = new google.maps.Marker({ // マーカーの追加
+          position: unvis_markerLatLng_L, // マーカーを立てる位置を指定
+          map: map_L, // マーカーを立てる地図を指定
+        });
+        vis_marker_L[i] = new MarkerWithLabel({ // マーカーの追加
+          position: vis_markerLatLng_L, // マーカーを立てる位置を指定
+          map: map_L, // マーカーを立てる地図を指定
+          icon:{
+            // fillcolor:"#FF0000",//塗り潰し色
+            // fillOpacity: 0,                    //塗り潰し透過率
+            // path: google.maps.SymbolPath.CIRCLE, //円を指定
+            // scale: 12,                           //円のサイズ
+            // strokeColor: "#FF0000",              //枠の色
+            // strokeWeight: 0                    //枠の透過率
+            url:"../data/vis_spot_marker.png",
+            scaledSize: new google.maps.Size(40, 40) //サイズ
+          },
+          // label: {
+          // text: markerData_L[i]["vis_name"],          //ラベル文字
+          //   // color: '#FFFFFF',                    //文字の色
+          //   fontSize: '26px'                     //文字のサイズ
+          // }
+          labelContent: markerData_L[i]["vis_name"],       //ラベル文字
+          labelAnchor: new google.maps.Point(38, 0),   //ラベル文字の基点
+          labelClass: 'labels',                        //CSSのクラス名
+          labelStyle: {opacity: 0.8}   //スタイル定義
+        });
+        bounds_L.extend(unvis_marker_L[i].position);
+        bounds_L.extend(vis_marker_L[i].position);
+
+        if ((Math.sign(markerData_L[i]["cossim"]) == -1) || (markerData_L[i]["cossim"] == 0)){
+          markerData_L[i]["word"] = "なし";
+        }
+        var table_L = "<h2 style='text-align:center;'><a href = '" + markerData_L[i]["unvis_url"] + "'target='_blank'>" + markerData_L[i]["unvis_name"] + "</a></h2><table border='1' id='window2'><tr><th>既訪問スポット名</th><th>関係を表現するキーワード</th></tr>"
+        for (var j = 0; j < markerData_L.length; j++){
+          if (markerData_L[i]["unvis_name"] == markerData_L[j]["unvis_name"]){
+            table_L += "<tr><td>" + markerData_L[j]["vis_name"] + "</td><td>" + markerData_L[j]["word"] + "</td></tr>"
+          }
+        }
+        table_L = table_L + "</table>"
+        unvis_infoWindow_L[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+          content: table_L,
+        });
+        vis_infoWindow_L[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+          content: "<h2 style='text-align:center; font-size:22px;'>" + markerData_L[i]["vis_name"] +
+         "</h2>",
+        });
+
+        infoLines_L[i] = new google.maps.Polyline({
+          path: [unvis_markerLatLng_L,vis_markerLatLng_L],
+          strokeColor: markerData_L[i]["color"],
+          // strokeOpacity: .7, //透過率
+          strokeWeight: 7, // cossim * 20にする
+        });
+        markerEvent_Line(i,markerData_L); // マーカーにクリックイベントを追加
+      }
+    }
+    // マーカーにクリックイベントを追加
+    var currentInfoWindow_L = null;
+    var currentInfoLines_L = [];
+    function markerEvent_Line(i,markerData) {
+      vis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
+        // if (currentInfoLines_L.length == 0){
+        //   alert("未訪問スポット(赤色のピン)の座標をクリックしてください");
+        // }
+        // else {
+        if (currentInfoWindow_L) {
+          currentInfoWindow_L.close();
+        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+        vis_infoWindow_L[i].open(map_L, vis_marker_L[i]); // 吹き出しの表示
+        currentInfoWindow_L = vis_infoWindow_L[i];
+        // }
+      });
+
+      unvis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
+        if (currentInfoWindow_L) {
+          currentInfoWindow_L.close();
+          for (var k = 0; k < currentInfoLines_L.length;k++){
+            currentInfoLines_L[k].setMap(null);
+          }
+        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+        unvis_infoWindow_L[i].open(map_L, unvis_marker_L[i]); // 吹き出しの表示
+        for (var k = 0; k < markerData_L.length; k++){
+          vis_marker_L[k].setZIndex(0);
+          if ((infoLines_L[i].getPath().getArray()[0].lat() === infoLines_L[k].getPath().getArray()[0].lat()) && (infoLines_L[i].getPath().getArray()[0].lng() === infoLines_L[k].getPath().getArray()[0].lng())) {
+            infoLines_L[k].setMap(map_L);
+            vis_marker_L[k].setZIndex(1000);
+            currentInfoLines_L.push(infoLines_L[k]);
+          }
+        }
+        currentInfoWindow_L = unvis_infoWindow_L[i];
+      });
+    }
+    // マップ作成 Finish
+
+    // マップ作成 Start
+    var map_T, bounds_T;
+    var unvis_markerLatLng_T;
+    var unvis_marker_T = [], unvis_infoWindow_T = [];
+    var markerData_T, set_data = [];
+    function initMap_Table(data) {
+      markerData_T = data;
+      // var cnt = 0,
+      //   sum_lat = 0,
+      //   sum_lng = 0;
+      // for (var i = 0; i < markerData_T.length; i++) {
+      //   sum_lat = sum_lat + Number(markerData_T[i]["unvis_lat"]);
+      //   sum_lng = sum_lng + Number(markerData_T[i]["unvis_lng"]);
+      //   ll =
+      //     cnt += 1;
+      // }
+      // map_T = new google.maps.Map(document.getElementById("map_table"), {
+      //   center: {
+      //     lat: sum_lat / cnt,
+      //     lng: sum_lng / cnt
+      //   },
+      //   zoom: 13 // 地図のズームを指定
+      // });
+      map_T = new google.maps.Map(document.getElementById("map_table"));
+      bounds_T = new google.maps.LatLngBounds();
+
+      // マーカー毎の処理
+      var memo = []
+      for (var i = 0; i < markerData_T.length; i++) {
+        var tmp = []
+        for (var j = 0; j < markerData_T.length; j++){
+          if ((markerData_T[i]["unvis_name"] == markerData_T[j]["unvis_name"]) && (memo.indexOf(markerData_T[i]["unvis_name"]) == -1)){
+            tmp.push(markerData_T[j]);
+          }
+        }
+        if (memo.indexOf(markerData_T[i]["unvis_name"]) == -1){
+          memo.push(markerData_T[i]["unvis_name"]);
+        }
+        if (set_data.length < memo.length){
+          set_data.push(tmp);
+        }
+      }
+
+      for (var i = 0; i < set_data.length; i++) {
+        unvis_markerLatLng_T = new google.maps.LatLng({
+          lat: Number(set_data[i][0]["unvis_lat"]),
+          lng: Number(set_data[i][0]["unvis_lng"])
+        });
+        unvis_marker_T[i] = new google.maps.Marker({
+          position: unvis_markerLatLng_T,
+          map: map_T,
+        });
+        bounds_T.extend(unvis_marker_T[i].position);
+
+        var table_data = "<h2 style='text-align:center;'><a href = '" + set_data[i][0]["unvis_url"] + "' target='_blank'>" + set_data[i][0]["unvis_name"] + "</a></h2><table border='1' id='window2'><tr><th>既訪問スポット名</th><th>関係を表現するキーワード</th><th>類似度</th></tr>"
+        for (var j = 0; j < set_data[i].length; j++){
+          if ((Math.sign(set_data[i][j]["cossim"]) == -1) || (set_data[i][j]["cossim"] == 0)){
+            set_data[i][j]["word"] = "なし";
+          }
+          table_data += "<tr><td>" + set_data[i][j]["vis_name"] + "</td><td>" + set_data[i][j]["word"] + "</td><td>" + Math.round(set_data[i][j]["cossim"] * 1000)/1000 +"</td></tr>"
+        }
+        table_data = table_data + "</table>"
+        unvis_infoWindow_T[i] = new google.maps.InfoWindow({
+          content: table_data,
+        })
+        markerEvent_Table(i);
+      }
+    }
+    var currentInfoWindow_T = null;
+    function markerEvent_Table(i) {
+      unvis_marker_T[i].addListener("click", function() {
+        if (currentInfoWindow_T) {
+          currentInfoWindow_T.close();
+        }
+        unvis_infoWindow_T[i].open(map_T, unvis_marker_T[i]);
+        currentInfoWindow_T = unvis_infoWindow_T[i];
+      });
+    }
+    // マップ作成 Finish
+
+    var post_visited = [];
+    var res;
+    // データの送信Ajax
+    $(document).ready(function() {
+      $("#form_main").submit(function() {
+        event.preventDefault();
+        if (check() == true) {
+          if (jyufuku() == true) {
+            if (word_check() == true) {
+              var $form = $(this);
+              $(".visited").each(function() {
+                if ($(this).val() != "") {
+                  post_visited.push($(this).val());
+                }
+              });
+              document.getElementById("main_top").style.display="none";
+              location.href = "#vector_result"
+              $(".vector_result").html("<h2>Loading...<br>表示するまで最大150秒かかる場合があります．<br>「Timeout」が表示された場合，再読込を行なってください．</h2>");
+              window.onerror = function() {
+                alert("Error：入力に問題が見つかったため，もう一度やり直してください．\nまた，目的に合致するスポットがないため，目的を変更してください．");
+                location.reload();
+                // $(".vector_result").html("<h2>Error：入力に問題が見つかったため，もう一度やり直してください．</h2>");
+              };
+              $.ajax({
+                  url: "../cgi-bin/analogy_sti_map/processing.py",
+                  type: "post",
+                  dataType: "text",
+                  data: {
+                    user_id: $("#user_id").val(),
+                    visited_name: post_visited,
+                    prefecture_name: $("#prefecture").val(),
+                    area_name: $("#area").val(),
+                    orders: $("#orders").val(),
+                  },
+                  timeout: 150000,
+                  error: function() {
+                    alert("Timeout：時間を空けて，もう一度試してください．")
+                  },
+                })
+                .done(function(response) { //データを受信
+                  console.log(response);
+                  res = $.parseJSON(response); //受信したデータをjson形式に変更
+                  console.log(res); // resは相対(差分+調和)
+                  // console.log(typeof res);
+                  if (res.length == 0) {
+                    $(".vector_result").html("<h2>Search Result：Not found.</h2>");
+                  } else {
+                    // $(".vector_result").html("<p style='font-size:20px; margin: 10px auto;'>検索結果が密集していたり，画面外にもあるかもしれません．ズームイン/アウトしながら見てください．</p>");
+                    $(".vector_result").html("");
+                    initMap_Position(res[0]);
+                    initMap_Line(res[1]);
+                    initMap_Table(res[2]);
+                    document.getElementById("result_position").style.display="block";
+                    map_P.fitBounds(bounds_P);
+                    $("#code").html(res[3]["randomname"]);
+                  }
+                })
+                .fail(function() {
+                  $(".result_position").html("Failed.");
+                });
+                $("#next_p").click(function(){
+                  $.when(
+                    document.getElementById("result_position").style.display="none",
+                    document.getElementById("result_line").style.display="block",
+                    location.href = "#result_line"
+                  ).done(function(){
+                    map_L.fitBounds(bounds_L);
+                  });
+                });
+                $("#next_l").click(function(){
+                  $.when(
+                    document.getElementById("result_line").style.display="none",
+                    document.getElementById("result_table").style.display="block",
+                    location.href = "#result_table"
+                  ).done(function(){
+                    map_T.fitBounds(bounds_T);
+                  });
+                });
+                $("#next_t").click(function(){
+                  document.getElementById("result_table").style.display="none";
+                  document.getElementById("vector_result").style.display="none";
+                  document.getElementById("main_last").style.display="block";
+                });
+            } else {
+              alert('検索候補から選んでください．');
+            }
+          } else {
+            alert('入力に重複がありました．');
+          }
+        } else {
+          alert('必須項目に未記入欄がありました．');
+        }
+      });
+    });
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBzLtrdLAR0doAuGVk0HDIRkZJ1CkmDelo"></script>
+  <script src="../data/markerwithlabel.js"></script>
+</body>
+
+</html>
