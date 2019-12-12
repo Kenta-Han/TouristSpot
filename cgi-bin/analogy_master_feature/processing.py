@@ -82,12 +82,12 @@ vis_cate = [x for x in set(vis_cate) if vis_cate.count(x) >= 1]
 ## DB挿入
 ############################################################
 ## ユーザ入力とDBヘ書き込む
-sql_insert = "INSERT INTO analogy_sti(user_id, prefecture, area, start_datetime, history, orders) VALUES(%s,%s,%s,%s,%s,%s);"
+sql_insert = "INSERT INTO analogy_master_feature(user_id, prefecture, area, start_datetime, history, orders) VALUES(%s,%s,%s,%s,%s,%s);"
 cur.execute(sql_insert,(user_id, prefecture, area, start_datetime, history,orders))
 conn.commit()
 
 ## ユーザの最新情報を得る
-cur.execute("SELECT max(id) FROM analogy_sti WHERE user_id='{user}';".format(user = user_id))
+cur.execute("SELECT max(id) FROM analogy_master_feature WHERE user_id='{user}';".format(user = user_id))
 record_id = cur.fetchone()[0]
 
 
@@ -347,7 +347,7 @@ random,json_random = Response_Random()
 json_data = [json_data_map_position] + [json_data_map_line] + [json_data_map_table] + [json_random]
 
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-sql_insert = "UPDATE analogy_sti SET category='{cate}', code='{rand}',finish_datetime='{finish}' WHERE id = {record_id};".format(cate='，'.join(vis_cate),rand=random,finish=finish_datetime,record_id=record_id)
+sql_insert = "UPDATE analogy_master_feature SET category='{cate}', code='{rand}',finish_datetime='{finish}' WHERE id = {record_id};".format(cate='，'.join(vis_cate),rand=random,finish=finish_datetime,record_id=record_id)
 cur.execute(sql_insert)
 conn.commit()
 # print(json_data, file=sys.stderr)

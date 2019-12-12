@@ -146,7 +146,7 @@ def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,color,word,sql_
     response_json["cossim"] = cos
     response_json["color"] = color
     response_json["word"] = word
-    sql_insert = "UPDATE analogy_sti SET unvis_name_map_line='{unv}',vis_name_map_line='{vis}',word_map_line='{word}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis),vis='，'.join(sql_vis),word=sql_word,record_id=record_id)
+    sql_insert = "UPDATE analogy_master_feature SET unvis_name_map_line='{unv}',vis_name_map_line='{vis}',word_map_line='{word}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis),vis='，'.join(sql_vis),word=sql_word,record_id=record_id)
     cur.execute(sql_insert)
     conn.commit()
     return response_json
@@ -202,7 +202,7 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,rec
             if vis_list[i][0] == cluster[j][4]:
                 tmp.append(cluster[j])
         result.append(tmp)
-    print(result, file=sys.stderr)
+    # print(result, file=sys.stderr)
     data = normal_distribution(result) ## 正規分布計算
     # for num in range(2):
     #         data = normal_distribution_before2(data) ## 正規分布（範囲1回目計算後の既訪問）

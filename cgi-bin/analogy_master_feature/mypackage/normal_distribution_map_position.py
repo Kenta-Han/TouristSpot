@@ -109,7 +109,7 @@ def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,word,sql_unvis,
     response_json["vis_lng"] = vislng
     response_json["cossim"] = cos
     response_json["word"] = word
-    sql_insert = "UPDATE analogy_sti SET unvis_name_map_position='{unv}',vis_name_map_position='{vis}',word_map_position='{word}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis),vis='，'.join(sql_vis),word=sql_word,record_id=record_id)
+    sql_insert = "UPDATE analogy_master_feature SET unvis_name_map_position='{unv}',vis_name_map_position='{vis}',word_map_position='{word}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis),vis='，'.join(sql_vis),word=sql_word,record_id=record_id)
     cur.execute(sql_insert)
     conn.commit()
     return response_json

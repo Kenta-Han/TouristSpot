@@ -61,7 +61,7 @@ def tfidf(review_all):
 ## TFIDFを求める(単語に重み付け)，差分ベクトル用
 def tfidf_hm(review_all):
     dictionary = corpora.Dictionary(review_all)
-    print(sorted([[dictionary[key],value] for key,value in dictionary.dfs.items()],key=lambda x:x[1],reverse=True)[:100], file=sys.stderr)
+    # print(sorted([[dictionary[key],value] for key,value in dictionary.dfs.items()],key=lambda x:x[1],reverse=True)[:100], file=sys.stderr)
     dictionary_inv = {}
     for dic in dictionary.token2id.items():
         dictionary_inv[dic[1]]=dic[0]
