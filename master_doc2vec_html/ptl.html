@@ -40,15 +40,13 @@
 </head>
 
 <body>
-  <!-- <header>
-    <h1 style="text-align:center;">観光スポット説明向上の可視化地図</h1>
-  </header> -->
   <div id="main_top">
     <form id="form_main" name="form_main">
       <div id="familiar">
         <h3>CrowdWorksID：
-          <input type="text" id="user_id" name="user_id" maxlength="40" />
+          <input type="text" id="user_id" name="user_id" maxlength="40"/>
         </h3>
+        <br>
         <h3>
           <ul id="setumei">
             <li>これまで訪れたことがあり，気に入った観光スポットを3つ以上入力してください</li>
@@ -134,7 +132,7 @@
         </h3>
       </div>
       <p style="text-align:center;font-size:22px; clear:both;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大150秒かかる場合があります，「Timeout」が表示された場合，再読込を行なってください．）</p>
-      <input type="text" id="orders" value="ltp" hidden>
+      <input type="text" id="orders" value="ptl" hidden>
       <input type="submit" id="start" value="実験開始" />
     </form>
   </div>
@@ -550,13 +548,13 @@
               });
               document.getElementById("main_top").style.display="none";
               location.href = "#vector_result"
-              $(".vector_result").html("<h2>Loading...<br>表示するまで最大150秒かかる場合があります．<br>「Timeout」が表示された場合，再読込を行なってください．</h2>");
+              $(".vector_result").html("<h2>表示するまで最大150秒かかる場合があります．<br>「Timeout」が表示された場合，再読込を行なってください．</h2><img src='../data/loading4.gif' style='width:30%'></img>");
               window.onerror = function() {
                 alert("Error：入力に問題が見つかったため，もう一度やり直してください．\nまた，目的に合致するスポットがないため，目的を変更してください．");
                 location.reload();
               };
               $.ajax({
-                  url: "../cgi-bin/analogy_sti_map/processing.py",
+                  url: "../cgi-bin/analogy_master_doc2vec/processing.py",
                   type: "post",
                   dataType: "text",
                   data: {
@@ -575,7 +573,6 @@
                   console.log(response);
                   res = $.parseJSON(response); //受信したデータをjson形式に変更
                   console.log(res); // resは相対(差分+調和)
-                  // console.log(typeof res);
                   if (res.length == 0) {
                     $(".vector_result").html("<h2>Search Result：Not found.</h2>");
                   } else {
@@ -584,35 +581,35 @@
                     initMap_Position(res[0]);
                     initMap_Line(res[1]);
                     initMap_Table(res[2]);
-                    document.getElementById("result_line").style.display="block";
-                    map_L.fitBounds(bounds_L);
+                    document.getElementById("result_position").style.display="block";
+                    map_P.fitBounds(bounds_P);
                     $("#code").html(res[3]["randomname"]);
                   }
                 })
                 .fail(function() {
-                  $(".result_line").html("Failed.");
+                  $(".result_position").html("Failed.");
                 });
                 $("#next_p").click(function(){
-                  document.getElementById("result_position").style.display="none";
-                  document.getElementById("vector_result").style.display="none";
-                  document.getElementById("main_last").style.display="block";
-                });
-                $("#next_l").click(function(){
                   $.when(
-                    document.getElementById("result_line").style.display="none",
+                    document.getElementById("result_position").style.display="none",
                     document.getElementById("result_table").style.display="block",
                     location.href = "#result_table"
                   ).done(function(){
                     map_T.fitBounds(bounds_T);
                   });
                 });
+                $("#next_l").click(function(){
+                  document.getElementById("result_line").style.display="none";
+                  document.getElementById("vector_result").style.display="none";
+                  document.getElementById("main_last").style.display="block";
+                });
                 $("#next_t").click(function(){
                   $.when(
                     document.getElementById("result_table").style.display="none",
-                    document.getElementById("result_position").style.display="block",
-                    location.href = "#result_position"
+                    document.getElementById("result_line").style.display="block",
+                    location.href = "#result_line",
                   ).done(function(){
-                    map_P.fitBounds(bounds_P);
+                    map_L.fitBounds(bounds_L);
                   });
                 });
             } else {

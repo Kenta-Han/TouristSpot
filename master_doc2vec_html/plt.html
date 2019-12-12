@@ -40,14 +40,11 @@
 </head>
 
 <body>
-  <!-- <header>
-    <h1 style="text-align:center;">観光スポット説明向上の可視化地図</h1>
-  </header> -->
   <div id="main_top">
     <form id="form_main" name="form_main">
       <div id="familiar">
         <h3>CrowdWorksID：
-          <input type="text" id="user_id" name="user_id" maxlength="40"/>
+          <input type="text" id="user_id" name="user_id" maxlength="40" />
         </h3>
         <h3>
           <ul id="setumei">
@@ -130,13 +127,14 @@
         </h3>
 
         <h3>エリア(任意)：
-          <input type="text" id="area" name="area" placeholder="函館・大沼・松前"/>
+          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" />
         </h3>
       </div>
       <p style="text-align:center;font-size:22px; clear:both;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大150秒かかる場合があります，「Timeout」が表示された場合，再読込を行なってください．）</p>
-      <input type="text" id="orders" value="tpl" hidden>
+      <input type="text" id="orders" value="plt" hidden>
       <input type="submit" id="start" value="実験開始" />
     </form>
+
   </div>
 
   <div class="vector_result" id="vector_result" style="text-align: center;"></div>
@@ -157,8 +155,8 @@
   </div>
 
   <div id="result_line" hidden>
+    <h2 id="map_line_title">↓ Line_Map ↓</h2>
     <h3 id="color"><img src="../data/sti/color3.png" ></img></h3>
-    <!-- style="width:840px; float:left; margin:0 5px;" -->
     <div id="map_line">
       <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
     </div>
@@ -286,8 +284,10 @@
     var markerData_P;
     function initMap_Position(data) {
       markerData_P = data;
+      // 地図の作成
       map_P = new google.maps.Map(document.getElementById("map_position"));
       bounds_P = new google.maps.LatLngBounds();
+
       // マーカー毎の処理
       for (var i = 0; i < markerData_P.length; i++) {
         unvis_markerLatLng_P = new google.maps.LatLng({
@@ -310,6 +310,7 @@
             url:"../data/vis_spot_marker.png",
             scaledSize: new google.maps.Size(40, 40) //サイズ
           },
+          // text: markerData_P[i]["vis_name"],
           labelContent: markerData_P[i]["vis_name"],       //ラベル文字
           labelAnchor: new google.maps.Point(38, 0),   //ラベル文字の基点
           labelClass: 'labels',                        //CSSのクラス名
@@ -352,6 +353,7 @@
         } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
         vis_infoWindow_P[i].open(map_P, vis_marker_P[i]); // 吹き出しの表示
         currentInfoWindow_P = vis_infoWindow_P[i];
+        // }
       });
 
       unvis_marker_P[i].addListener("click", function() { // マーカーをクリックしたとき
@@ -377,6 +379,7 @@
     var markerData_L;
     function initMap_Line(data) {
       markerData_L = data;
+      // 地図の作成
       map_L = new google.maps.Map(document.getElementById("map_line"));
       bounds_L = new google.maps.LatLngBounds();
 
@@ -437,6 +440,7 @@
         markerEvent_Line(i,markerData_L); // マーカーにクリックイベントを追加
       }
     }
+    // マーカーにクリックイベントを追加
     var currentInfoWindow_L = null;
     var currentInfoLines_L = [];
     function markerEvent_Line(i,markerData) {
@@ -446,6 +450,7 @@
         } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
         vis_infoWindow_L[i].open(map_L, vis_marker_L[i]); // 吹き出しの表示
         currentInfoWindow_L = vis_infoWindow_L[i];
+        // }
       });
 
       unvis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
@@ -550,13 +555,14 @@
               });
               document.getElementById("main_top").style.display="none";
               location.href = "#vector_result"
-              $(".vector_result").html("<h2>Loading...<br>表示するまで最大150秒かかる場合があります．<br>「Timeout」が表示された場合，再読込を行なってください．</h2>");
+              $(".vector_result").html("<h2>表示するまで最大150秒かかる場合があります．<br>「Timeout」が表示された場合，再読込を行なってください．</h2><img src='../data/loading4.gif' style='width:30%'></img>");
               window.onerror = function() {
                 alert("Error：入力に問題が見つかったため，もう一度やり直してください．\nまた，目的に合致するスポットがないため，目的を変更してください．");
                 location.reload();
+                // $(".vector_result").html("<h2>Error：入力に問題が見つかったため，もう一度やり直してください．</h2>");
               };
               $.ajax({
-                  url: "../cgi-bin/analogy_sti_map/processing.py",
+                  url: "../cgi-bin/analogy_master_doc2vec/processing.py",
                   type: "post",
                   dataType: "text",
                   data: {
@@ -579,18 +585,17 @@
                   if (res.length == 0) {
                     $(".vector_result").html("<h2>Search Result：Not found.</h2>");
                   } else {
-                    // $(".vector_result").html("<p style='font-size:20px; margin: 10px auto;'>検索結果が密集していたり，画面外にもあるかもしれません．ズームイン/アウトしながら見てください．</p>");
                     $(".vector_result").html("");
                     initMap_Position(res[0]);
                     initMap_Line(res[1]);
                     initMap_Table(res[2]);
-                    document.getElementById("result_table").style.display="block";
-                    map_T.fitBounds(bounds_T);
+                    document.getElementById("result_position").style.display="block";
+                    map_P.fitBounds(bounds_P);
                     $("#code").html(res[3]["randomname"]);
                   }
                 })
                 .fail(function() {
-                  $(".result_table").html("Failed.");
+                  $(".result_position").html("Failed.");
                 });
                 $("#next_p").click(function(){
                   $.when(
@@ -602,18 +607,18 @@
                   });
                 });
                 $("#next_l").click(function(){
-                  document.getElementById("result_line").style.display="none";
-                  document.getElementById("vector_result").style.display="none";
-                  document.getElementById("main_last").style.display="block";
+                  $.when(
+                    document.getElementById("result_line").style.display="none",
+                    document.getElementById("result_table").style.display="block",
+                    location.href = "#result_table"
+                  ).done(function(){
+                    map_T.fitBounds(bounds_T);
+                  });
                 });
                 $("#next_t").click(function(){
-                  $.when(
-                    document.getElementById("result_table").style.display="none",
-                    document.getElementById("result_position").style.display="block",
-                    location.href = "#result_position"
-                  ).done(function(){
-                    map_P.fitBounds(bounds_P);
-                  });
+                  document.getElementById("result_table").style.display="none";
+                  document.getElementById("vector_result").style.display="none";
+                  document.getElementById("main_last").style.display="block";
                 });
             } else {
               alert('検索候補から選んでください．');
