@@ -145,10 +145,11 @@
     </div>
     <div id="right">
       <h2 id="map_position_title">Position_Map</h2>
-      <ol>
-        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．<br>関係性が低いとキーワードが「なし」と表示されます．</p>
-        <li>黒いピン：入力した既訪問スポット</li><p>既訪問スポット名は実際の座標ではなく，未訪問スポットと類似度の距離を意味しています．</p>
-      </ol>
+      <ul>
+        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．関係性が低いとキーワードが「なし」と表示されます．</p>
+        <li>黒いピン：入力した既訪問スポット</li><p>既訪問スポット名は<span style="color: #ff0000">実際の座標ではなく</span>，未訪問スポットと類似度の距離を意味しています．</p>
+        <li>「既訪問スポット意味座標(表示/非表示)」ボタン：</li><p>黒いピンの表示/非表示を切り替えることができます．</p>
+      </ul>
       <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_p_text"></p>
       <input type="button" id="next_p" value="次へ" >
     </div>
@@ -156,19 +157,19 @@
 
   <div id="result_line" hidden>
     <h2 id="map_line_title">↓ Line_Map ↓</h2>
-    <!-- <h3 id="color"><span style="float:left; width:30%;">低い</span><span style="width:40%;">← 既訪問スポットと未訪問スポットの似ている度合い →</span><span style="float:right; width:30%;">高い</span><svg id="myGraph"></svg></h3> -->
     <h3 id="color"><img src="../data/sti/color3.png" ></img></h3>
     <div id="map_line">
       <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d13271.045898004142!2d139.69292184601608!3d35.690589482984!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1z5bel5a2m6Zmi5aSn5a2m!5e0!3m2!1sja!2sjp!4v1541602248205" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
     </div>
     <div id="right">
       <h2 id="map_line_title">Line_Map</h2>
-      <ol>
-        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．<br>関係性が低いとキーワードが「なし」と表示されます．</p>
+      <ul>
+        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．関係性が低いとキーワードが「なし」と表示されます．</p>
         <li>黒いピン：入力した既訪問スポット</li>
         <li>カラーマップ：</li><p>カラーマップは赤いピンと黒いピンの類似度（似ている度合い）を示しています．</p>
         <p>緑色は既訪問スポットと未訪問スポットの類似度が低いこと意味します．<br>赤色は既訪問スポットと未訪問スポットの類似度が高いこと意味します．</p>
-      </ol>
+        <li>「既訪問スポット意味座標(表示/非表示)」ボタン：</li><p>黒いピンの表示/非表示を切り替えることができます．黒いピンの表示時に，赤いピンクリックするとピン同士の類似度を示す線が表示されます．</p>
+      </ul>
       <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_l_text"></p>
       <input type="button" id="next_l" value="次へ" >
     </div>
@@ -180,8 +181,8 @@
     </div>
     <div id="right">
       <h2 id="map_table_title">Table_Map</h2>
-      <ol>
-        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワード，類似度です．<br>関係性が低いとキーワードが「なし」と表示されます．</p>
+      <ul>
+        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワード，類似度です．関係性が低いとキーワードが「なし」と表示されます．</p>
         <li>類似度（似ている度合い）の値は「-1.0 から 1.0」の間になります．「-1.0」は最も類似せず，「1.0」は最も類似することを意味します．</li>
       </ol>
       <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_t_text"></p>
@@ -304,7 +305,7 @@
       var insertButtonDiv = document.createElement("div");
       var insertButton = new insert_ButtonControl_Position(insertButtonDiv, map_P);
       insertButtonDiv.index = 1;
-      map_P.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(insertButtonDiv);
+      map_P.controls[google.maps.ControlPosition.TOP_CENTER].push(insertButtonDiv);
     }
     function unvis_markerEvent_Position(i,markerData) {
       unvis_marker_P[i].addListener("click", function() { // マーカーをクリックしたとき
@@ -442,7 +443,7 @@
         var removeButtonDiv = document.createElement("div");
         var removeButton = new remove_ButtonControl_Position(removeButtonDiv,buttonUI,bermudaTriangle);
         removeButtonDiv.index = 1;
-        map_P.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(removeButtonDiv);
+        map_P.controls[google.maps.ControlPosition.TOP_CENTER].push(removeButtonDiv);
       });
     }
     function remove_ButtonControl_Position(buttonDiv, insertbuttonUI,bermudaTriangle) {
@@ -513,7 +514,7 @@
       var insertButtonDiv = document.createElement("div");
       var insertButton = new insert_ButtonControl_Line(insertButtonDiv, map_L);
       insertButtonDiv.index = 1;
-      map_L.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(insertButtonDiv);
+      map_L.controls[google.maps.ControlPosition.TOP_CENTER].push(insertButtonDiv);
     }
     function unvis_markerEvent_Line(i,markerData){
       unvis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
@@ -658,8 +659,8 @@
       buttonUI.style.fontSize = "18px";
       buttonUI.style.textAlign = "center";
 
-      buttonUI.title = "既訪問スポット意味座標非表示";
-      buttonUI.innerHTML = "既訪問スポット意味座標非表示";
+      buttonUI.title = "既訪問スポット意味座標表示";
+      buttonUI.innerHTML = "既訪問スポット意味座標表示";
       buttonDiv.style.padding = "5px";
       buttonDiv.appendChild(buttonUI);
 
@@ -699,7 +700,7 @@
         var removeButtonDiv = document.createElement("div");
         var removeButton = new remove_ButtonControl_Line(removeButtonDiv,buttonUI,bermudaTriangle);
         removeButtonDiv.index = 1;
-        map_L.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(removeButtonDiv);
+        map_L.controls[google.maps.ControlPosition.TOP_CENTER].push(removeButtonDiv);
       });
     }
     function remove_ButtonControl_Line(buttonDiv, insertbuttonUI,bermudaTriangle) {
