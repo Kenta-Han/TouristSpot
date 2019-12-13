@@ -1,5 +1,6 @@
 from gensim import corpora
 from gensim import models
+import math
 
 import os, sys # 全フォルダ参照
 path = os.path.join(os.path.dirname(__file__), '../../')
@@ -37,6 +38,7 @@ def spot_list_tfidf(select_spot):
 ## TFIDFを求める(単語に重み付け)，特徴ベクトル用
 def tfidf(review_all):
     dictionary = corpora.Dictionary(review_all)
+    # print(sorted([[dictionary[key],math.log2(len(review_all)/value)] for key,value in dictionary.dfs.items()],key=lambda x:x[1],reverse=True)[:100], file=sys.stderr)
     dictionary_inv = {}
     for dic in dictionary.token2id.items():
         dictionary_inv[dic[1]]=dic[0]
