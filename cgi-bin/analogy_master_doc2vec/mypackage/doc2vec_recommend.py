@@ -19,25 +19,10 @@ def spot_list(select_spot):
 def cossim(x, y):
     return np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))
 
-def doc2vec_feature(spot_vectors): ## doc2vecを使ってスポットベクトルの差を求める
-    result_list = []
-    for i in range(len(spot_vectors)):
-        x = copy.deepcopy(spot_vectors)
-        target = list(x[i][2:302])
-        name = x[i][1]
-        x.pop(i)
-        temp = []
-        for j in range(len(x)):
-            temp.append(list(x[j][2:302]))
-        temp = np.array(temp)
-        result = np.round((target-sum(temp)/len(temp)),3)
-        result_list.append([name, list(result)])
-        target = []
-        result = []
-    return result_list
-
 def recommend_all(visited_name,unvisited_name,visited_review,unvisited_review):
     value_UtoV = []
+    # print(unvisited_review, file=sys.stderr)
+    # print(visited_review, file=sys.stderr)
     for i in range(len(unvisited_name)):
         temp_UtoV = []
         for j in range(len(visited_name)):

@@ -44,7 +44,7 @@
     <form id="form_main" name="form_main">
       <div id="familiar">
         <h3>CrowdWorksID：
-          <input type="text" id="user_id" name="user_id" maxlength="40" />
+          <input type="text" id="user_id" name="user_id" maxlength="40" value="test" />
         </h3>
         <h3>
           <ul id="setumei">
@@ -54,12 +54,12 @@
         </h3>
         <table class="visited">
           <tr>
-            <td><input type="text" class="visited" name="visited" /></td>
-            <td><input type="text" class="visited" name="visited" /></td>
-            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" value="鹿苑寺（金閣寺）---京都" /></td>
+            <td><input type="text" class="visited" name="visited" value="ナゴヤドーム---愛知" /></td>
+            <td><input type="text" class="visited" name="visited" value="宇野港---岡山" /></td>
           </tr>
           <tr>
-            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" value="万博記念公園---大阪" /></td>
             <td><input type="text" class="visited" name="visited" /></td>
             <td><input type="text" class="visited" name="visited" /></td>
           </tr>
@@ -76,6 +76,7 @@
 
         <h3>都道府県：
           <select name="prefecture" id="prefecture">
+            <option value="東京">東京</option>
             <option value="北海道">北海道</option>
             <option value="青森">青森</option>
             <option value="岩手">岩手</option>
@@ -88,7 +89,6 @@
             <option value="群馬">群馬</option>
             <option value="埼玉">埼玉</option>
             <option value="千葉">千葉</option>
-            <option value="東京">東京</option>
             <option value="神奈川">神奈川</option>
             <option value="新潟">新潟</option>
             <option value="富山">富山</option>
@@ -127,14 +127,13 @@
         </h3>
 
         <h3>エリア(任意)：
-          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" />
+          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" value="渋谷・目黒・世田谷" />
         </h3>
       </div>
       <p style="text-align:center;font-size:22px; clear:both;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大150秒かかる場合があります，「Timeout」が表示された場合，再読込を行なってください．）</p>
       <input type="text" id="orders" value="plt" hidden>
       <input type="submit" id="start" value="実験開始" />
     </form>
-
   </div>
 
   <div class="vector_result" id="vector_result" style="text-align: center;"></div>
@@ -852,7 +851,7 @@
               $(".vector_result").html("<h2>表示するまで最大150秒かかる場合があります．<br>「Timeout」が表示された場合，再読込を行なってください．</h2><img src='../data/loading4.gif' style='width:30%'></img>");
               window.onerror = function() {
                 alert("Error：入力に問題が見つかったため，もう一度やり直してください．\nまた，目的に合致するスポットがないため，目的を変更してください．");
-                location.reload();
+                // location.reload();
               };
               $.ajax({
                   url: "../cgi-bin/analogy_master_doc2vec/processing.py",
@@ -871,9 +870,9 @@
                   },
                 })
                 .done(function(response) { //データを受信
-                  // console.log(response);
+                  console.log(response);
                   res = $.parseJSON(response); //受信したデータをjson形式に変更
-                  // console.log(res); // resは相対(差分+調和)
+                  console.log(res); // resは相対(差分+調和)
                   // console.log(typeof res);
                   if (res.length == 0) {
                     $(".vector_result").html("<h2>Search Result：Not found.</h2>");

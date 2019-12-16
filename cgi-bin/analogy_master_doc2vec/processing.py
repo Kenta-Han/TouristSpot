@@ -12,7 +12,6 @@ import mypackage.harmonic_mean as myp_hmean
 import mypackage.normal_distribution_map_position as myp_norm_p
 import mypackage.normal_distribution_map_line as myp_norm_l
 import mypackage.normal_distribution_map_table as myp_norm_t
-import mypackage.color as myp_color
 
 import MySQLdb
 import os, sys ## 全フォルダ参照
@@ -82,12 +81,12 @@ vis_cate = [x for x in set(vis_cate) if vis_cate.count(x) >= 1]
 ## DB挿入
 ############################################################
 ## ユーザ入力とDBヘ書き込む
-sql_insert = "INSERT INTO analogy_sti(user_id, prefecture, area, start_datetime, history, orders) VALUES(%s,%s,%s,%s,%s,%s);"
+sql_insert = "INSERT INTO analogy_master_doc2vec(user_id, prefecture, area, start_datetime, history, orders) VALUES(%s,%s,%s,%s,%s,%s);"
 cur.execute(sql_insert,(user_id, prefecture, area, start_datetime, history,orders))
 conn.commit()
 
 ## ユーザの最新情報を得る
-cur.execute("SELECT max(id) FROM analogy_sti WHERE user_id='{user}';".format(user = user_id))
+cur.execute("SELECT max(id) FROM analogy_master_doc2vec WHERE user_id='{user}';".format(user = user_id))
 record_id = cur.fetchone()[0]
 
 
@@ -126,8 +125,6 @@ if len(unvisited_spot_list_map_l) != len(unvisited_spot_list_map_t) or len(unvis
     unvisited_spot_list_map_l = unvisited_spot_list_map_l[:a]
     unvisited_spot_list_map_t = unvisited_spot_list_map_t[:a]
 
-## 線の色
-color_res = myp_color.color_bpr()
 
 #################  map_line  #######################
 #################  map_line  #######################
@@ -154,26 +151,22 @@ for i in range(len(unvisited_spot_list_map_l)):
 select_visited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(visited_spot_id_list))
 ## 特徴ベクトル
 visited_spot_vectors = myp_doc_rec.spot_list(select_visited_spot_vectors)
-## 特徴ベクトル差分
-visited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(visited_spot_vectors)
 
 ## 未訪問スポットベクトル
 select_unvisited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(unvisited_spot_id_list))
 unvisited_spot_vectors = myp_doc_rec.spot_list(select_unvisited_spot_vectors)
-unvisited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(unvisited_spot_vectors)
 
 ############################################################
-## 相対的な特徴（差分ベクトル）
 ############################################################
-## 既訪問と未訪問スポットベクトルの差の類似度計算
+## 既訪問と未訪問スポットベクトルの類似度計算
 visited_spot_name_all,unvisited_spot_name_all = [],[]
 visited_spot_review_all,unvisited_spot_review_all = [],[]
-for i in range(len(visited_spot_vectors_doc)):
-    visited_spot_name_all.append(visited_spot_vectors_doc[i][0])
-    visited_spot_review_all.append(visited_spot_vectors_doc[i][1])
-for i in range(len(unvisited_spot_vectors_doc)):
-    unvisited_spot_name_all.append(unvisited_spot_vectors_doc[i][0])
-    unvisited_spot_review_all.append(unvisited_spot_vectors_doc[i][1])
+for i in range(len(visited_spot_vectors)):
+    visited_spot_name_all.append(visited_spot_vectors[i][1])
+    visited_spot_review_all.append(visited_spot_vectors[i][2:])
+for i in range(len(unvisited_spot_vectors)):
+    unvisited_spot_name_all.append(unvisited_spot_vectors[i][1])
+    unvisited_spot_review_all.append(unvisited_spot_vectors[i][2:])
 result_UtoV_top = myp_doc_rec.recommend_all(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
 
 ## 類似度高い順でソート
@@ -182,12 +175,12 @@ result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 ## 既訪問スポットの単語に重みつけ
 select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(visited_spot_id_list))
 visited_spot_reviews = myp_tfidf.spot_list_tfidf(select_visited_spot_reviews)
-visited_tfidf,visited_mean = myp_tfidf.tfidf_hm(visited_spot_reviews)
+visited_tfidf = myp_tfidf.tfidf(visited_spot_reviews)
 
 ## 未訪問スポットの単語に重みつけ
 select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(unvisited_spot_id_list))
 unvisited_spot_reviews = myp_tfidf.spot_list_tfidf(select_unvisited_spot_reviews)
-unvisited_tfidf,unvisited_mean = myp_tfidf.tfidf_hm(unvisited_spot_reviews)
+unvisited_tfidf = myp_tfidf.tfidf(unvisited_spot_reviews)
 
 ## 既訪問と未訪問スポット特徴語(調和平均)
 UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
@@ -225,26 +218,22 @@ for i in range(len(unvisited_spot_list_map_p)):
 select_visited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(visited_spot_id_list))
 ## 特徴ベクトル
 visited_spot_vectors = myp_doc_rec.spot_list(select_visited_spot_vectors)
-## 特徴ベクトル差分
-visited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(visited_spot_vectors)
 
 ## 未訪問スポットベクトル
 select_unvisited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(unvisited_spot_id_list))
 unvisited_spot_vectors = myp_doc_rec.spot_list(select_unvisited_spot_vectors)
-unvisited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(unvisited_spot_vectors)
 
 ############################################################
-## 相対的な特徴（差分ベクトル）
 ############################################################
-## 既訪問と未訪問スポットベクトルの差の類似度計算
+## 既訪問と未訪問スポットベクトルの類似度計算
 visited_spot_name_all,unvisited_spot_name_all = [],[]
 visited_spot_review_all,unvisited_spot_review_all = [],[]
-for i in range(len(visited_spot_vectors_doc)):
-    visited_spot_name_all.append(visited_spot_vectors_doc[i][0])
-    visited_spot_review_all.append(visited_spot_vectors_doc[i][1])
-for i in range(len(unvisited_spot_vectors_doc)):
-    unvisited_spot_name_all.append(unvisited_spot_vectors_doc[i][0])
-    unvisited_spot_review_all.append(unvisited_spot_vectors_doc[i][1])
+for i in range(len(visited_spot_vectors)):
+    visited_spot_name_all.append(visited_spot_vectors[i][1])
+    visited_spot_review_all.append(visited_spot_vectors[i][2:])
+for i in range(len(unvisited_spot_vectors)):
+    unvisited_spot_name_all.append(unvisited_spot_vectors[i][1])
+    unvisited_spot_review_all.append(unvisited_spot_vectors[i][2:])
 result_UtoV_top = myp_doc_rec.recommend_all(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
 
 ## 類似度高い順でソート
@@ -253,12 +242,12 @@ result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 ## 既訪問スポットの単語に重みつけ
 select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(visited_spot_id_list))
 visited_spot_reviews = myp_tfidf.spot_list_tfidf(select_visited_spot_reviews)
-visited_tfidf,visited_mean = myp_tfidf.tfidf_hm(visited_spot_reviews)
+visited_tfidf = myp_tfidf.tfidf(visited_spot_reviews)
 
 ## 未訪問スポットの単語に重みつけ
 select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(unvisited_spot_id_list))
 unvisited_spot_reviews = myp_tfidf.spot_list_tfidf(select_unvisited_spot_reviews)
-unvisited_tfidf,unvisited_mean = myp_tfidf.tfidf_hm(unvisited_spot_reviews)
+unvisited_tfidf = myp_tfidf.tfidf(unvisited_spot_reviews)
 
 ## 既訪問と未訪問スポット特徴語(調和平均)
 UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
@@ -269,8 +258,6 @@ try:
 except:
     import traceback
     traceback.print_exc()
-
-
 
 
 #################  map_table  #######################
@@ -298,26 +285,22 @@ for i in range(len(unvisited_spot_list_map_t)):
 select_visited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(visited_spot_id_list))
 ## 特徴ベクトル
 visited_spot_vectors = myp_doc_rec.spot_list(select_visited_spot_vectors)
-## 特徴ベクトル差分
-visited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(visited_spot_vectors)
 
 ## 未訪問スポットベクトル
 select_unvisited_spot_vectors = "SELECT * FROM spot_vectors_name WHERE id IN {};".format(tuple(unvisited_spot_id_list))
 unvisited_spot_vectors = myp_doc_rec.spot_list(select_unvisited_spot_vectors)
-unvisited_spot_vectors_doc = myp_doc_rec.doc2vec_feature(unvisited_spot_vectors)
 
 ############################################################
-## 相対的な特徴（差分ベクトル）
 ############################################################
-## 既訪問と未訪問スポットベクトルの差の類似度計算
+## 既訪問と未訪問スポットベクトルの類似度計算
 visited_spot_name_all,unvisited_spot_name_all = [],[]
 visited_spot_review_all,unvisited_spot_review_all = [],[]
-for i in range(len(visited_spot_vectors_doc)):
-    visited_spot_name_all.append(visited_spot_vectors_doc[i][0])
-    visited_spot_review_all.append(visited_spot_vectors_doc[i][1])
-for i in range(len(unvisited_spot_vectors_doc)):
-    unvisited_spot_name_all.append(unvisited_spot_vectors_doc[i][0])
-    unvisited_spot_review_all.append(unvisited_spot_vectors_doc[i][1])
+for i in range(len(visited_spot_vectors)):
+    visited_spot_name_all.append(visited_spot_vectors[i][1])
+    visited_spot_review_all.append(visited_spot_vectors[i][2:])
+for i in range(len(unvisited_spot_vectors)):
+    unvisited_spot_name_all.append(unvisited_spot_vectors[i][1])
+    unvisited_spot_review_all.append(unvisited_spot_vectors[i][2:])
 result_UtoV_top = myp_doc_rec.recommend_all(visited_spot_name_all,unvisited_spot_name_all,visited_spot_review_all,unvisited_spot_review_all)
 
 ## 類似度高い順でソート
@@ -326,12 +309,12 @@ result_UtoV_top.sort(key=lambda x:x[1][1],reverse=True)
 ## 既訪問スポットの単語に重みつけ
 select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(visited_spot_id_list))
 visited_spot_reviews = myp_tfidf.spot_list_tfidf(select_visited_spot_reviews)
-visited_tfidf,visited_mean = myp_tfidf.tfidf_hm(visited_spot_reviews)
+visited_tfidf = myp_tfidf.tfidf(visited_spot_reviews)
 
 ## 未訪問スポットの単語に重みつけ
 select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE spot_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(unvisited_spot_id_list))
 unvisited_spot_reviews = myp_tfidf.spot_list_tfidf(select_unvisited_spot_reviews)
-unvisited_tfidf,unvisited_mean = myp_tfidf.tfidf_hm(unvisited_spot_reviews)
+unvisited_tfidf = myp_tfidf.tfidf(unvisited_spot_reviews)
 
 ## 既訪問と未訪問スポット特徴語(調和平均)
 UtoV_top10_harmonic = myp_hmean.sort_tfidf_UtoV_harmonic(visited_tfidf,unvisited_tfidf,visited_spot_name_all,unvisited_spot_name_all,result_UtoV_top)
@@ -347,8 +330,7 @@ random,json_random = Response_Random()
 json_data = [json_data_map_position] + [json_data_map_line] + [json_data_map_table] + [json_random]
 
 finish_datetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-sql_insert = "UPDATE analogy_sti SET category='{cate}', code='{rand}',finish_datetime='{finish}' WHERE id = {record_id};".format(cate='，'.join(vis_cate),rand=random,finish=finish_datetime,record_id=record_id)
+sql_insert = "UPDATE analogy_master_doc2vec SET category='{cate}', code='{rand}',finish_datetime='{finish}' WHERE id = {record_id};".format(cate='，'.join(vis_cate),rand=random,finish=finish_datetime,record_id=record_id)
 cur.execute(sql_insert)
 conn.commit()
-# print(json_data, file=sys.stderr)
 print(json.dumps(json_data))

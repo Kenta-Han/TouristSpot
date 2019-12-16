@@ -23,7 +23,6 @@ def euclid_distance(x,t):
     return np.linalg.norm(x-t)
 
 def normal_distribution(data):
-    # print("data:{}".format(len(data)), file=sys.stderr)
     for i in range(len(data)):
         ## ランダム座標作成
         min_lat, max_lat = float(min([j[1] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
@@ -40,48 +39,14 @@ def normal_distribution(data):
                 x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
                 dis = euclid_distance(x_latlng, t_latlng)
                 P_xt = norm.pdf(dis, average, standard_deviation)
-                if cossim < 0:
+                if cossim < 0.65:
                     tmp.append(-0.5 * P_xt)
-                elif cossim > 0:
-                    tmp.append(1 * P_xt)
-                else :
-                    tmp.append(0)
-                # print(tmp, file=sys.stderr)
-            res.append([t_latlng, sum(tmp)])
-        # print("min:{},{}".format(min_lat,min_lng), file=sys.stderr)
-        # print("max:{},{}".format(max_lat,max_lng), file=sys.stderr)
-        sortedRes = sorted(res, key=lambda x: x[1], reverse=True)
-        for j in range(len(data[i])):
-            data[i][j][5] = str(sortedRes[0][0][0])
-            data[i][j][6] = str(sortedRes[0][0][1])
-            # print(data[i][j][4], file=sys.stderr)
-            # print(data[i][j][5], file=sys.stderr)
-    return data
-
-def normal_distribution_before2(data):
-    for i in range(len(data)):
-        ## ランダム座標作成
-        min_lat, max_lat = float(min([j[5] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
-        min_lng, max_lng = float(min([j[6] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
-        latlng = []
-        rlatlng = random_latlng(latlng, 50, min_lat, max_lat, min_lng, max_lng)
-
-        res = []
-        for t_latlng in rlatlng:
-            tmp = []
-            for j in range(len(data[i])):
-                cossim, average, alpha = data[i][j][7], 0, 1
-                standard_deviation = (1 - abs(cossim)) * alpha
-                x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
-                dis = euclid_distance(x_latlng, t_latlng)
-                P_xt = norm.pdf(dis, average, standard_deviation)
-                if cossim < 0:
-                    tmp.append(-0.5 * P_xt)
-                elif cossim > 0:
+                elif cossim > 0.65:
                     tmp.append(1 * P_xt)
                 else :
                     tmp.append(0)
             res.append([t_latlng, sum(tmp)])
+        print(res, file=sys.stderr)
         sortedRes = sorted(res, key=lambda x: x[1], reverse=True)
         for j in range(len(data[i])):
             data[i][j][5] = str(sortedRes[0][0][0])
@@ -99,22 +64,18 @@ def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
         res.append(tmp)
     # print("\nselect_data:{}".format(res), file=sys.stderr)
     ## 類似度に応じて色ずけ
-    max_cossim = max([j[6] for i in res for j in i])
-    min_cossim = min([j[6] for i in res for j in i])
+    max_cossim = max([j[7] for i in res for j in i])
+    min_cossim = min([j[7] for i in res for j in i])
     for i in range(len(res)):
         for j in range(len(res[i])):
             c = 0
-            # for k in range(len(color)):
-                ## 正規化（最大値を1，最小値を0）
-                # cossim = (res[i][j][6] - min_cossim) / (max_cossim - min_cossim)
-                # if color[k][0] == round(cossim,2):
-                #     c = color[k][1]
-                # cossim = (res[i][j][7] + 1) / 2
-            if np.sign(res[i][j][7]) == -1:
-                tmp = res[i][j][7] * -1
-                cossim = ((math.sqrt(tmp) * (-1)) + 1) / 2
-            else:
-                cossim = (math.sqrt(res[i][j][7]) + 1) / 2
+            ## 正規化（最大値を1，最小値を0）
+            cossim = (res[i][j][7] - min_cossim) / (max_cossim - min_cossim)
+            # if np.sign(res[i][j][7]) == -1:
+            #     tmp = res[i][j][7] * -1
+            #     cossim = ((math.sqrt(tmp) * (-1)) + 1) / 2
+            # else:
+            #     cossim = (math.sqrt(res[i][j][7]) + 1) / 2
 
             if round(cossim,2) > 0 and round(cossim,2) <= 0.17:
                 c = "rgb(0, 255, 0)"
@@ -146,7 +107,7 @@ def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,color,word,sql_
     response_json["cossim"] = cos
     response_json["color"] = color
     response_json["word"] = word
-    sql_insert = "UPDATE analogy_sti SET unvis_name_map_line='{unv}',vis_name_map_line='{vis}',word_map_line='{word}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis),vis='，'.join(sql_vis),word=sql_word,record_id=record_id)
+    sql_insert = "UPDATE analogy_master_doc2vec SET unvis_name_map_line='{unv}',vis_name_map_line='{vis}',word_map_line='{word}' WHERE id = {record_id};".format(unv='，'.join(sql_unvis),vis='，'.join(sql_vis),word=sql_word,record_id=record_id)
     cur.execute(sql_insert)
     conn.commit()
     return response_json
@@ -202,11 +163,7 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,rec
             if vis_list[i][0] == cluster[j][4]:
                 tmp.append(cluster[j])
         result.append(tmp)
-    print(result, file=sys.stderr)
+    # print(result, file=sys.stderr)
     data = normal_distribution(result) ## 正規分布計算
-    # for num in range(2):
-    #         data = normal_distribution_before2(data) ## 正規分布（範囲1回目計算後の既訪問）
-    #         if num == 1:
-    #             break
     json_data = select_and_resp_data(data, record_id, sql_unvis, sql_vis, sql_word)
     return json_data
