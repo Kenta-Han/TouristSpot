@@ -54,12 +54,12 @@
         </h3>
         <table class="visited">
           <tr>
-            <td><input type="text" class="visited" name="visited" value="鹿苑寺（金閣寺）---京都"/></td>
-            <td><input type="text" class="visited" name="visited" value="ナゴヤドーム---愛知" /></td>
-            <td><input type="text" class="visited" name="visited" value="宇野港---岡山" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
           </tr>
           <tr>
-            <td><input type="text" class="visited" name="visited" value="万博記念公園---大阪" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
             <td><input type="text" class="visited" name="visited" /></td>
             <td><input type="text" class="visited" name="visited" /></td>
           </tr>
@@ -76,7 +76,6 @@
 
         <h3>都道府県：
           <select name="prefecture" id="prefecture">
-            <option value="東京">東京</option>
             <option value="北海道">北海道</option>
             <option value="青森">青森</option>
             <option value="岩手">岩手</option>
@@ -89,6 +88,7 @@
             <option value="群馬">群馬</option>
             <option value="埼玉">埼玉</option>
             <option value="千葉">千葉</option>
+            <option value="東京">東京</option>
             <option value="神奈川">神奈川</option>
             <option value="新潟">新潟</option>
             <option value="富山">富山</option>
@@ -127,7 +127,7 @@
         </h3>
 
         <h3>エリア(任意)：
-          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" value="渋谷・目黒・世田谷" />
+          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" />
         </h3>
       </div>
       <p style="text-align:center;font-size:22px; clear:both;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．<br>（表示するまで最大150秒かかる場合があります，「Timeout」が表示された場合，再読込を行なってください．）</p>
@@ -283,6 +283,8 @@
     function F (n) {
       if ( n === 0 || n === 1 ) {
         return 18;
+      } else if (n < 10) {
+        return 50;
       } else {
         return n*2+F(n-1);
       }

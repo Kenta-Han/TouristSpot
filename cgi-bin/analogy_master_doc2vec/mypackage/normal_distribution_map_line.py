@@ -29,6 +29,11 @@ def normal_distribution(data):
         min_lng, max_lng = float(min([j[2] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
         latlng = []
         rlatlng = random_latlng(latlng, 200, min_lat, max_lat, min_lng, max_lng)
+        min_cossim, max_cossim = min([j[7] for j in data[i]]), max([j[7] for j in data[i]])
+
+        cos_all = []
+        cos_all.extend([((j[7]-min_cossim)/(max_cossim-min_cossim)) for j in data[i]])
+        print(cos_all,sum(cos_all)/len(cos_all), file=sys.stderr)
 
         res = []
         for t_latlng in rlatlng:
@@ -39,6 +44,7 @@ def normal_distribution(data):
                 x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
                 dis = euclid_distance(x_latlng, t_latlng)
                 P_xt = norm.pdf(dis, average, standard_deviation)
+                # cossim = (data[i][j][7] - min_cossim) / (max_cossim - min_cossim) ## 正規化
                 if cossim < 0.65:
                     tmp.append(-0.5 * P_xt)
                 elif cossim > 0.65:
@@ -46,7 +52,7 @@ def normal_distribution(data):
                 else :
                     tmp.append(0)
             res.append([t_latlng, sum(tmp)])
-        print(res, file=sys.stderr)
+        # print(res, file=sys.stderr)
         sortedRes = sorted(res, key=lambda x: x[1], reverse=True)
         for j in range(len(data[i])):
             data[i][j][5] = str(sortedRes[0][0][0])
