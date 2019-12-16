@@ -90,11 +90,11 @@
       <div id="left">
         <h4>赤いピン：未訪問エリア内のスポット<br/>黒いピン：入力した既訪問スポット</h4>
         <!-- <p>Map_Positionの表示図は以下になります．</p> -->
-        <img src="./data/master/map_position_image.png"></img>
+        <img src="./data/master/map_position_image2.png"></img>
       </div>
       <div id="right">
         <h4>操作方法：</h4>
-        <p>「既訪問スポット意味座標(表示/非表示)」ボタン：黒いピンの表示/非表示を切り替えることができます．</p>
+        <p>「既訪問スポット意味座標(非表示/表示)」ボタン：黒いピンの非表示/表示を切り替えることができます．</p>
         <p>黒いピンをクリックすると既訪問スポット名が表示されます．<br>既訪問スポット名は実際の座標ではなく，未訪問スポットと類似度の距離を意味しています．</p>
         <p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．<br>関係性が低いとキーワードが「なし」と表示されます．</p>
       </div>
@@ -104,16 +104,15 @@
       <h3>Line_Mapについての説明</h3>
       <div id="left">
         <h4>赤いピン：未訪問エリア内のスポット<br />黒いピン：入力した既訪問スポット</h4>
-        <!-- <p>Map_Lineの表示図は以下になります．</p> -->
         <img src="./data/master/map_line_color.png"></img>
-        <img src="./data/master/map_line_image.png"></img>
+        <img src="./data/master/map_line_image2.png"></img>
       </div>
       <div id="right">
         <h4>カラーマップ：</h4>
         <p>カラーマップは赤いピンと黒いピンの類似度（似ている度合い）を示しています．</p>
         <p>緑色は既訪問スポットと未訪問スポットの類似度が低いこと意味します．<br>赤色は既訪問スポットと未訪問スポットの類似度が高いこと意味します．</p>
         <h4>操作方法：</h4>
-        <p>「既訪問スポット意味座標(表示/非表示)」ボタン：黒いピンの表示/非表示を切り替えることができます．黒いピンの表示時に，赤いピンクリックするとピン同士の類似度を示す線が表示されます．</p>
+        <p>「既訪問スポット意味座標(非表示/表示)」ボタン：黒いピンの表示/非表示を切り替えることができます．黒いピンの表示時に，赤いピンクリックするとピン同士の類似度を示す線が表示されます．</p>
         <p>黒いピンをクリックすると既訪問スポット名が表示されます．<br>既訪問スポット名は実際の座標ではなく，未訪問スポットと類似度の距離を意味しています．</p>
         <p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．<br>関係性が低いとキーワードが「なし」と表示されます．</p>
       </div>
@@ -142,26 +141,26 @@
   </div>
   <script>
     function button_click(){
-      var a = 1 + Math.floor(Math.random()*1);
+      var a = 1 + Math.floor(Math.random()*6);
       var target = document.getElementById("change");
       if(a==1){
         target.href = "master_feature_html/plt.html";
       }
-      // if(a==2){
-      //   target.href = "master_feature_html/ptl.html";
-      // }
-      // if(a==3){
-      //   target.href = "master_feature_html/lpt.html";
-      // }
-      // if(a==4){
-      //   target.href = "master_feature_html/ltp.html";
-      // }
-      // if(a==5){
-      //   target.href = "master_feature_html/tpl.html";
-      // }
-      // if(a==6){
-      //   target.href = "master_feature_html/tlp.html";
-      // }
+      if(a==2){
+        target.href = "master_feature_html/ptl.html";
+      }
+      if(a==3){
+        target.href = "master_feature_html/lpt.html";
+      }
+      if(a==4){
+        target.href = "master_feature_html/ltp.html";
+      }
+      if(a==5){
+        target.href = "master_feature_html/tpl.html";
+      }
+      if(a==6){
+        target.href = "master_feature_html/tlp.html";
+      }
     }
   </script>
 </body>

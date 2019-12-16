@@ -31,6 +31,7 @@ def normal_distribution(data):
         latlng = []
         rlatlng = random_latlng(latlng, 200, min_lat, max_lat, min_lng, max_lng)
 
+        # cossim = (res[i][j][7] - min_cossim) / (max_cossim - min_cossim)
         res = []
         for t_latlng in rlatlng:
             tmp = []
@@ -48,8 +49,6 @@ def normal_distribution(data):
                     tmp.append(0)
                 # print(tmp, file=sys.stderr)
             res.append([t_latlng, sum(tmp)])
-        # print("min:{},{}".format(min_lat,min_lng), file=sys.stderr)
-        # print("max:{},{}".format(max_lat,max_lng), file=sys.stderr)
         sortedRes = sorted(res, key=lambda x: x[1], reverse=True)
         for j in range(len(data[i])):
             data[i][j][5] = str(sortedRes[0][0][0])
@@ -104,12 +103,6 @@ def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
     for i in range(len(res)):
         for j in range(len(res[i])):
             c = 0
-            # for k in range(len(color)):
-                ## 正規化（最大値を1，最小値を0）
-                # cossim = (res[i][j][6] - min_cossim) / (max_cossim - min_cossim)
-                # if color[k][0] == round(cossim,2):
-                #     c = color[k][1]
-                # cossim = (res[i][j][7] + 1) / 2
             if np.sign(res[i][j][7]) == -1:
                 tmp = res[i][j][7] * -1
                 cossim = ((math.sqrt(tmp) * (-1)) + 1) / 2

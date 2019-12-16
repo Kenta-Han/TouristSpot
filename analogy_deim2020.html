@@ -48,19 +48,19 @@
         </h3>
         <h3>
           <ul id="setumei">
-            <li>これまで訪れたことがあり，気に入った観光スポットを5つ以上入力してください</li>
+            <li>これまで訪れたことがあり，気に入った観光スポットを4つ以上入力してください</li>
             <li>入力すると候補が表示されるので，その中から選択ください</li>
           </ul>
         </h3>
         <table class="visited">
           <tr>
             <td><input type="text" class="visited" name="visited" value="鹿苑寺（金閣寺）---京都" /></td>
-            <td><input type="text" class="visited" name="visited" value="岡山後楽園---岡山" /></td>
+            <td><input type="text" class="visited" name="visited" value="浅草寺---東京" /></td>
             <td><input type="text" class="visited" name="visited" value="龍安寺---京都" /></td>
           </tr>
           <tr>
             <td><input type="text" class="visited" name="visited" value="万博記念公園---大阪" /></td>
-            <td><input type="text" class="visited" name="visited" value="大倉山---北海道" /></td>
+            <td><input type="text" class="visited" name="visited" value="岡山後楽園---岡山" /></td>
             <td><input type="text" class="visited" name="visited" /></td>
           </tr>
           <tr>
@@ -148,12 +148,13 @@
     </div>
     <div id="right">
       <h2 id="map_line_title">Line_Map</h2>
-      <ol>
-        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．<br>関係性が低いとキーワードが「なし」と表示されます．</p>
+      <ul>
+        <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．関係性が低いとキーワードが「なし」と表示されます．</p>
         <li>黒いピン：入力した既訪問スポット</li>
         <li>カラーマップ：</li><p>カラーマップは赤いピンと黒いピンの類似度（似ている度合い）を示しています．</p>
         <p>緑色は既訪問スポットと未訪問スポットの類似度が低いこと意味します．<br>赤色は既訪問スポットと未訪問スポットの類似度が高いこと意味します．</p>
-      </ol>
+        <li>「既訪問スポット意味座標(表示/非表示)」ボタン：</li><p>黒いピンの表示/非表示を切り替えることができます．黒いピンの表示時に，赤いピンクリックするとピン同士の類似度を示す線が表示されます．</p>
+      </ul>
       <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_l_text"></p>
       <input type="button" id="next_l" value="次へ" >
     </div>
@@ -246,6 +247,14 @@
       return intersection;
     }
 
+    // Mapのラベル座標を計算するため
+    function F (n) {
+      if ( n === 0 || n === 1 ) {
+        return 18;
+      } else {
+        return n*2+F(n-1);
+      }
+    }
     // マップ作成 Start
     var map_L, bounds_L;
     var unvis_markerLatLng_L, vis_markerLatLng_L ;
@@ -253,11 +262,91 @@
     var unvis_infoWindow_L = [], vis_infoWindow_L = [];
     var infoLines_L = [];
     var markerData_L;
+    var currentInfoWindow_L = null;
+    var currentInfoWindow_L2 = null;
+    var currentInfoLines_L = [];
     function initMap_Line(data) {
       markerData_L = data;
       map_L = new google.maps.Map(document.getElementById("map_line"));
       bounds_L = new google.maps.LatLngBounds();
+      var bounds_L_unvis = insert_unvis_marker_Line();
+      var insertButtonDiv = document.createElement("div");
+      var insertButton = new insert_ButtonControl_Line(insertButtonDiv, map_L);
+      insertButtonDiv.index = 1;
+      map_L.controls[google.maps.ControlPosition.TOP_CENTER].push(insertButtonDiv);
+    }
+    function unvis_markerEvent_Line(i,markerData){
+      unvis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
+        if (currentInfoWindow_L2 != null && currentInfoWindow_L == null) {
+          currentInfoWindow_L2.close();
+        }
+        else if (currentInfoWindow_L2 != null && currentInfoWindow_L != null){
+          currentInfoWindow_L2.close();
+          currentInfoWindow_L.close();
+        }
+        unvis_infoWindow_L[i].open(map_L, unvis_marker_L[i]); // 吹き出しの表示
+        currentInfoWindow_L2 = unvis_infoWindow_L[i];
+      });
+    }
+    function markerEvent_Line(i,markerData) {
+      vis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
+        if (currentInfoWindow_L) {
+          currentInfoWindow_L.close();
+        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+        vis_infoWindow_L[i].open(map_L, vis_marker_L[i]); // 吹き出しの表示
+        currentInfoWindow_L = vis_infoWindow_L[i];
+      });
 
+      unvis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
+        if (currentInfoWindow_L) {
+          currentInfoWindow_L.close();
+          for (var k = 0; k < currentInfoLines_L.length;k++){
+            currentInfoLines_L[k].setMap(null);
+          }
+        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
+        unvis_infoWindow_L[i].open(map_L, unvis_marker_L[i]); // 吹き出しの表示
+        for (var k = 0; k < markerData_L.length; k++){
+          vis_marker_L[k].setZIndex(0);
+          if ((infoLines_L[i].getPath().getArray()[0].lat() === infoLines_L[k].getPath().getArray()[0].lat()) && (infoLines_L[i].getPath().getArray()[0].lng() === infoLines_L[k].getPath().getArray()[0].lng())) {
+            infoLines_L[k].setMap(map_L);
+            vis_marker_L[k].setZIndex(1000);
+            currentInfoLines_L.push(infoLines_L[k]);
+          }
+        }
+        currentInfoWindow_L = unvis_infoWindow_L[i];
+      });
+    }
+    function insert_unvis_marker_Line(){
+      // マーカー毎の処理
+      for (var i = 0; i < markerData_L.length; i++) {
+        unvis_markerLatLng_L = new google.maps.LatLng({
+          lat: Number(markerData_L[i]["unvis_lat"]),
+          lng: Number(markerData_L[i]["unvis_lng"])
+        }); // 緯度経度のデータ作成
+
+        unvis_marker_L[i] = new google.maps.Marker({ // マーカーの追加
+          position: unvis_markerLatLng_L, // マーカーを立てる位置を指定
+          map: map_L, // マーカーを立てる地図を指定
+        });
+        bounds_L.extend(unvis_marker_L[i].position);
+
+        if ((Math.sign(markerData_L[i]["cossim"]) == -1) || (markerData_L[i]["cossim"] == 0)){
+          markerData_L[i]["word"] = "なし";
+        }
+        var table_L = "<h2 style='text-align:center;'><a href = '" + markerData_L[i]["unvis_url"] + "'target='_blank'>" + markerData_L[i]["unvis_name"] + "</a></h2><table border='1' id='window2'><tr><th>既訪問スポット名</th><th>関係を表現するキーワード</th></tr>"
+        for (var j = 0; j < markerData_L.length; j++){
+          if (markerData_L[i]["unvis_name"] == markerData_L[j]["unvis_name"]){
+            table_L += "<tr><td>" + markerData_L[j]["vis_name"] + "</td><td>" + markerData_L[j]["word"] + "</td></tr>"
+          }
+        }
+        table_L = table_L + "</tsable>"
+        unvis_infoWindow_L[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+          content: table_L,
+        });
+        unvis_markerEvent_Line(i,markerData_L); // マーカーにクリックイベントを追加
+      }
+    }
+    function insert_vis_unvis_marker_Line(){
       // マーカー毎の処理
       for (var i = 0; i < markerData_L.length; i++) {
         unvis_markerLatLng_L = new google.maps.LatLng({
@@ -277,11 +366,12 @@
           position: vis_markerLatLng_L, // マーカーを立てる位置を指定
           map: map_L, // マーカーを立てる地図を指定
           icon:{
-            url:"../data/vis_spot_marker.png",
-            scaledSize: new google.maps.Size(40, 40) //サイズ
+            url:"../data/icon/spot_marker9.png",
+            scaledSize: new google.maps.Size(60, 45) //サイズ
           },
-          labelContent: markerData_L[i]["vis_name"],       //ラベル文字
-          labelAnchor: new google.maps.Point(38, 0),   //ラベル文字の基点
+          text: markerData_L[i]["vis_name"],
+          labelContent: markerData_L[i]["vis_name"], //ラベル文字
+          labelAnchor: new google.maps.Point(F(markerData_L[i]["vis_name"].length),0), //文字基点
           labelClass: 'labels',                        //CSSのクラス名
           labelStyle: {opacity: 0.8}   //スタイル定義
         });
@@ -309,43 +399,132 @@
         infoLines_L[i] = new google.maps.Polyline({
           path: [unvis_markerLatLng_L,vis_markerLatLng_L],
           strokeColor: markerData_L[i]["color"],
-          // strokeOpacity: .7, //透過率
           strokeWeight: 7, // cossim * 20にする
         });
         markerEvent_Line(i,markerData_L); // マーカーにクリックイベントを追加
       }
     }
-    // マーカーにクリックイベントを追加
-    var currentInfoWindow_L = null;
-    var currentInfoLines_L = [];
-    function markerEvent_Line(i,markerData) {
-      vis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
-        if (currentInfoWindow_L) {
-          currentInfoWindow_L.close();
-        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
-        vis_infoWindow_L[i].open(map_L, vis_marker_L[i]); // 吹き出しの表示
-        currentInfoWindow_L = vis_infoWindow_L[i];
-        // }
+    function insert_ButtonControl_Line(buttonDiv) {
+      var buttonUI = document.createElement("div");
+      buttonUI.style.backgroundColor = "#000066";
+      buttonUI.style.border = "2px solid #000066";
+      buttonUI.style.boxShadow = "6px 6px 3px #666666";
+      buttonUI.style.cursor = "pointer";
+      buttonUI.style.padding = "3px 17px";
+      buttonUI.style.hober = "3px 17px";
+
+      buttonUI.style.color = "#ffffff";
+      buttonUI.style.fontFamily = "Roboto, Arial,sans-serif";
+      buttonUI.style.fontSize = "18px";
+      buttonUI.style.textAlign = "center";
+
+      buttonUI.title = "既訪問スポット意味座標表示";
+      buttonUI.innerHTML = "既訪問スポット意味座標表示";
+      buttonDiv.style.padding = "5px";
+      buttonDiv.appendChild(buttonUI);
+
+      google.maps.event.addDomListener(buttonUI,"mouseover", function() {
+        buttonUI.style.backgroundColor = "#ffffff";
+        buttonUI.style.boxShadow = "none";
+        buttonUI.style.color = "#000066";
+        google.maps.event.addDomListener(buttonUI,'mouseout', function() {
+            if(buttonUI.style.backgroundColor = "#ffffff"){
+                buttonUI.style.backgroundColor = "#000066";
+                buttonUI.style.boxShadow = "6px 6px 3px #666666";
+                buttonUI.style.color = "#ffffff";
+            }
+        });
       });
 
-      unvis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
-        if (currentInfoWindow_L) {
-          currentInfoWindow_L.close();
-          for (var k = 0; k < currentInfoLines_L.length;k++){
-            currentInfoLines_L[k].setMap(null);
-          }
-        } // 別の吹き出しを開くとき，前の吹き出しが自動に閉じる
-        unvis_infoWindow_L[i].open(map_L, unvis_marker_L[i]); // 吹き出しの表示
-        for (var k = 0; k < markerData_L.length; k++){
-          vis_marker_L[k].setZIndex(0);
-          if ((infoLines_L[i].getPath().getArray()[0].lat() === infoLines_L[k].getPath().getArray()[0].lat()) && (infoLines_L[i].getPath().getArray()[0].lng() === infoLines_L[k].getPath().getArray()[0].lng())) {
-            infoLines_L[k].setMap(map_L);
-            vis_marker_L[k].setZIndex(1000);
-            currentInfoLines_L.push(infoLines_L[k]);
-          }
-        }
-        currentInfoWindow_L = unvis_infoWindow_L[i];
+      google.maps.event.addDomListener(buttonUI, "click", function() {
+        // Construct the polygon
+        var triangleCoords = [
+            new google.maps.LatLng(20, 120),
+            new google.maps.LatLng(20, 160),
+            new google.maps.LatLng(50, 160),
+            new google.maps.LatLng(50, 120)
+        ];
+        bermudaTriangle = new google.maps.Polygon({
+          paths: triangleCoords,
+          strokeColor: "#FFFFFF",
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: "#FFFFFF",
+          fillOpacity: 0.35,
+          zIndex: 1000,
+        });
+        bermudaTriangle.setMap(map_L);
+        delete_unvis_Makers_Line();
+        insert_vis_unvis_marker_Line();
+        var removeButtonDiv = document.createElement("div");
+        var removeButton = new remove_ButtonControl_Line(removeButtonDiv,buttonUI,bermudaTriangle);
+        removeButtonDiv.index = 1;
+        map_L.controls[google.maps.ControlPosition.TOP_CENTER].push(removeButtonDiv);
       });
+    }
+    function remove_ButtonControl_Line(buttonDiv, insertbuttonUI,bermudaTriangle) {
+      insertbuttonUI.style.display ="none";
+      var buttonUI = document.createElement("div");
+      buttonUI.style.backgroundColor = "#000066";
+      buttonUI.style.border = "2px solid #000066";
+      buttonUI.style.boxShadow = "6px 6px 3px #666666";
+      buttonUI.style.cursor = "pointer";
+      buttonUI.style.padding = "3px 17px";
+      buttonUI.style.hober = "3px 17px";
+
+      buttonUI.style.color = "#ffffff";
+      buttonUI.style.fontFamily = "Roboto, Arial,sans-serif";
+      buttonUI.style.fontSize = "18px";
+      buttonUI.style.textAlign = "center";
+
+      buttonUI.title = "既訪問スポット意味座標非表示";
+      buttonUI.innerHTML = "既訪問スポット意味座標非表示";
+      buttonDiv.style.padding = "5px";
+      buttonDiv.appendChild(buttonUI);
+
+      google.maps.event.addDomListener(buttonUI,"mouseover", function() {
+        buttonUI.style.backgroundColor = "#ffffff";
+        buttonUI.style.boxShadow = "none";
+        buttonUI.style.color = "#000066";
+        google.maps.event.addDomListener(buttonUI,'mouseout', function() {
+            if(buttonUI.style.backgroundColor = "#ffffff"){
+                buttonUI.style.backgroundColor = "#000066";
+                buttonUI.style.boxShadow = "6px 6px 3px #666666";
+                buttonUI.style.color = "#ffffff";
+            }
+        });
+      });
+
+      google.maps.event.addDomListener(buttonUI, "click", function() {
+        insertbuttonUI.style.display ="block";
+        buttonUI.style.display ="none";
+        delete_vis_Makers_Line();
+        delete_unvis_Makers_Line();
+        delete_line_Makers_Line();
+        bermudaTriangle.setVisible(false);
+        insert_unvis_marker_Line();
+      });
+    }
+    function delete_vis_Makers_Line() {
+      if(vis_marker_L.length != 0){
+        for (var i = 0; i < vis_marker_L.length; i++) {
+          vis_marker_L[i].setMap(null);
+        }
+      }
+    }
+    function delete_unvis_Makers_Line() {
+      if(unvis_marker_L.length != 0){
+        for (var i = 0; i < unvis_marker_L.length; i++) {
+          unvis_marker_L[i].setMap(null);
+        }
+      }
+    }
+    function delete_line_Makers_Line() {
+      if(infoLines_L.length != 0){
+        for (var i = 0; i < infoLines_L.length; i++) {
+          infoLines_L[i].setMap(null);
+        }
+      }
     }
     // マップ作成 Finish
 
@@ -371,7 +550,6 @@
               window.onerror = function() {
                 alert("Error：入力に問題が見つかったため，異なるスポットを入力して，もう一度やり直してください．");
                 // location.reload();
-                // $(".cluster_result").html("<h2>Error：入力に問題が見つかったため，異なるスポットを入力して，もう一度やり直してください．</h2>");
               };
               $.ajax({
                   url: "../cgi-bin/analogy_deim2020/processing.py",

@@ -150,7 +150,7 @@
       <ul>
         <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワードです．関係性が低いとキーワードが「なし」と表示されます．</p>
         <li>黒いピン：入力した既訪問スポット</li><p>既訪問スポット名は<span style="color: #ff0000">実際の座標ではなく</span>，未訪問スポットと類似度の距離を意味しています．</p>
-        <li>「既訪問スポット意味座標(表示/非表示)」ボタン：</li><p>黒いピンの表示/非表示を切り替えることができます．</p>
+        <li>「既訪問スポット意味座標(非表示/表示)」ボタン：</li><p>黒いピンの非表示/表示を切り替えることができます．</p>
       </ul>
       <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_p_text"></p>
       <input type="button" id="next_p" value="次へ" >
@@ -170,7 +170,7 @@
         <li>黒いピン：入力した既訪問スポット</li>
         <li>カラーマップ：</li><p>カラーマップは赤いピンと黒いピンの類似度（似ている度合い）を示しています．</p>
         <p>緑色は既訪問スポットと未訪問スポットの類似度が低いこと意味します．<br>赤色は既訪問スポットと未訪問スポットの類似度が高いこと意味します．</p>
-        <li>「既訪問スポット意味座標(表示/非表示)」ボタン：</li><p>黒いピンの表示/非表示を切り替えることができます．黒いピンの表示時に，赤いピンクリックするとピン同士の類似度を示す線が表示されます．</p>
+        <li>「既訪問スポット意味座標(非表示/表示)」ボタン：</li><p>黒いピンの非表示/表示を切り替えることができます．黒いピンの表示時に，赤いピンクリックするとピン同士の類似度を示す線が表示されます．</p>
       </ul>
       <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_l_text"></p>
       <input type="button" id="next_l" value="次へ" >
@@ -301,12 +301,13 @@
       map_P = new google.maps.Map(document.getElementById("map_position"));
       bounds_P = new google.maps.LatLngBounds();
 
-      var bounds_P_unvis = insert_unvis_marker_Position();
+      insert_unvis_marker_Position();
+      insert_vis_marker_Position();
       // googlemap上のボタン
-      var insertButtonDiv = document.createElement("div");
-      var insertButton = new insert_ButtonControl_Position(insertButtonDiv, map_P);
-      insertButtonDiv.index = 1;
-      map_P.controls[google.maps.ControlPosition.TOP_CENTER].push(insertButtonDiv);
+      var removeButtonDiv = document.createElement("div");
+      var removeButton = new remove_ButtonControl_Position(removeButtonDiv,map_P);
+      removeButtonDiv.index = 1;
+      map_P.controls[google.maps.ControlPosition.TOP_CENTER].push(removeButtonDiv);
     }
     function unvis_markerEvent_Position(i,markerData) {
       unvis_marker_P[i].addListener("click", function() { // マーカーをクリックしたとき
@@ -390,7 +391,8 @@
         vis_markerEvent_Position(i,markerData_P); // マーカーにクリックイベントを追加
       }
     }
-    function insert_ButtonControl_Position(buttonDiv) {
+    function insert_ButtonControl_Position(buttonDiv,removebuttonUI) {
+      removebuttonUI.style.display = "none";
       var buttonUI = document.createElement("div");
       buttonUI.style.backgroundColor = "#000066";
       buttonUI.style.border = "2px solid #000066";
@@ -423,32 +425,12 @@
       });
 
       google.maps.event.addDomListener(buttonUI, "click", function() {
-        // Construct the polygon
-        var triangleCoords = [
-            new google.maps.LatLng(20, 120),
-            new google.maps.LatLng(20, 160),
-            new google.maps.LatLng(50, 160),
-            new google.maps.LatLng(50, 120)
-        ];
-        bermudaTriangle = new google.maps.Polygon({
-          paths: triangleCoords,
-          strokeColor: "#FFFFFF",
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: "#FFFFFF",
-          fillOpacity: 0.35,
-          zIndex: 1000,
-        });
-        bermudaTriangle.setMap(map_P);
+        removebuttonUI.style.display = "block";
+        buttonUI.style.display = "none";
         insert_vis_marker_Position();
-        var removeButtonDiv = document.createElement("div");
-        var removeButton = new remove_ButtonControl_Position(removeButtonDiv,buttonUI,bermudaTriangle);
-        removeButtonDiv.index = 1;
-        map_P.controls[google.maps.ControlPosition.TOP_CENTER].push(removeButtonDiv);
       });
     }
-    function remove_ButtonControl_Position(buttonDiv, insertbuttonUI,bermudaTriangle) {
-      insertbuttonUI.style.display ="none";
+    function remove_ButtonControl_Position(buttonDiv) {
       var buttonUI = document.createElement("div");
       buttonUI.style.backgroundColor = "#000066";
       buttonUI.style.border = "2px solid #000066";
@@ -481,12 +463,12 @@
       });
 
       google.maps.event.addDomListener(buttonUI, "click", function() {
-        insertbuttonUI.style.display ="block";
-        buttonUI.style.display ="none";
-        deleteMakers_Position()
-        bermudaTriangle.setVisible(false);
+        deleteMakers_Position();
+        var insertButtonDiv = document.createElement("div");
+        var insertButton = new insert_ButtonControl_Position(insertButtonDiv, buttonUI);
+        insertButtonDiv.index = 1;
+        map_P.controls[google.maps.ControlPosition.TOP_CENTER].push(insertButtonDiv);
       });
-
     }
     function deleteMakers_Position() {
       if(vis_marker_P.length != 0){
@@ -511,11 +493,12 @@
       markerData_L = data;
       map_L = new google.maps.Map(document.getElementById("map_line"));
       bounds_L = new google.maps.LatLngBounds();
-      var bounds_L_unvis = insert_unvis_marker_Line();
-      var insertButtonDiv = document.createElement("div");
-      var insertButton = new insert_ButtonControl_Line(insertButtonDiv, map_L);
-      insertButtonDiv.index = 1;
-      map_L.controls[google.maps.ControlPosition.TOP_CENTER].push(insertButtonDiv);
+      insert_unvis_marker_Line();
+      insert_vis_unvis_marker_Line();
+      var removeButtonDiv = document.createElement("div");
+      var removeButton = new remove_ButtonControl_Line(removeButtonDiv,map_L);
+      removeButtonDiv.index = 1;
+      map_L.controls[google.maps.ControlPosition.TOP_CENTER].push(removeButtonDiv);
     }
     function unvis_markerEvent_Line(i,markerData){
       unvis_marker_L[i].addListener("click", function() { // マーカーをクリックしたとき
@@ -646,7 +629,8 @@
         markerEvent_Line(i,markerData_L); // マーカーにクリックイベントを追加
       }
     }
-    function insert_ButtonControl_Line(buttonDiv) {
+    function insert_ButtonControl_Line(buttonDiv,removebuttonUI) {
+      removebuttonUI.style.display = "none";
       var buttonUI = document.createElement("div");
       buttonUI.style.backgroundColor = "#000066";
       buttonUI.style.border = "2px solid #000066";
@@ -679,33 +663,13 @@
       });
 
       google.maps.event.addDomListener(buttonUI, "click", function() {
-        // Construct the polygon
-        var triangleCoords = [
-            new google.maps.LatLng(20, 120),
-            new google.maps.LatLng(20, 160),
-            new google.maps.LatLng(50, 160),
-            new google.maps.LatLng(50, 120)
-        ];
-        bermudaTriangle = new google.maps.Polygon({
-          paths: triangleCoords,
-          strokeColor: "#FFFFFF",
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: "#FFFFFF",
-          fillOpacity: 0.35,
-          zIndex: 1000,
-        });
-        bermudaTriangle.setMap(map_L);
-        delete_unvis_Makers_Line();
+        removebuttonUI.style.display = "block";
+        buttonUI.style.display = "none";
+        insert_unvis_marker_Line();
         insert_vis_unvis_marker_Line();
-        var removeButtonDiv = document.createElement("div");
-        var removeButton = new remove_ButtonControl_Line(removeButtonDiv,buttonUI,bermudaTriangle);
-        removeButtonDiv.index = 1;
-        map_L.controls[google.maps.ControlPosition.TOP_CENTER].push(removeButtonDiv);
       });
     }
-    function remove_ButtonControl_Line(buttonDiv, insertbuttonUI,bermudaTriangle) {
-      insertbuttonUI.style.display ="none";
+    function remove_ButtonControl_Line(buttonDiv) {
       var buttonUI = document.createElement("div");
       buttonUI.style.backgroundColor = "#000066";
       buttonUI.style.border = "2px solid #000066";
@@ -738,13 +702,13 @@
       });
 
       google.maps.event.addDomListener(buttonUI, "click", function() {
-        insertbuttonUI.style.display ="block";
-        buttonUI.style.display ="none";
         delete_vis_Makers_Line();
         delete_unvis_Makers_Line();
         delete_line_Makers_Line();
-        bermudaTriangle.setVisible(false);
-        insert_unvis_marker_Line();
+        var insertButtonDiv = document.createElement("div");
+        var insertButton = new insert_ButtonControl_Line(insertButtonDiv, buttonUI);
+        insertButtonDiv.index = 1;
+        map_L.controls[google.maps.ControlPosition.TOP_CENTER].push(insertButtonDiv);
       });
     }
     function delete_vis_Makers_Line() {
