@@ -113,17 +113,25 @@ def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
             else:
                 cossim = (math.sqrt(res[i][j][7]) + 1) / 2
 
-            if round(cossim,2) > 0 and round(cossim,2) <= 0.17:
+            if round(cossim,2) > 0 and round(cossim,2) <= 0.1:
                 c = "rgb(0, 255, 0)"
-            if round(cossim,2) > 0.17 and round(cossim,2) <= 0.34:
-                c = "rgb(115, 255, 0)"
-            if round(cossim,2) > 0.34 and round(cossim,2) <= 0.51:
-                c = "rgb(230, 255, 0)"
-            if round(cossim,2) > 0.51 and round(cossim,2) <= 0.68:
-                c = "rgb(255, 209, 0)"
-            if round(cossim,2) > 0.68 and round(cossim,2) <= 0.85:
-                c = "rgb(255, 94, 0)"
-            if round(cossim,2) > 0.85 and round(cossim,2) <= 1:
+            if round(cossim,2) > 0.1 and round(cossim,2) <= 0.2:
+                c = "rgb(60, 255, 0)"
+            if round(cossim,2) > 0.2 and round(cossim,2) <= 0.3:
+                c = "rgb(120, 255, 0)"
+            if round(cossim,2) > 0.3 and round(cossim,2) <= 0.4:
+                c = "rgb(180, 255, 0)"
+            if round(cossim,2) > 0.4 and round(cossim,2) <= 0.5:
+                c = "rgb(240, 255, 0)"
+            if round(cossim,2) > 0.5 and round(cossim,2) <= 0.6:
+                c = "rgb(255, 200, 0)"
+            if round(cossim,2) > 0.6 and round(cossim,2) <= 0.7:
+                c = "rgb(255, 150, 0)"
+            if round(cossim,2) > 0.7 and round(cossim,2) <= 0.8:
+                c = "rgb(255, 100, 0)"
+            if round(cossim,2) > 0.8 and round(cossim,2) <= 0.9:
+                c = "rgb(255, 50, 0)"
+            if round(cossim,2) > 0.9 and round(cossim,2) <= 1:
                 c = "rgb(255,0,0)"
             response_json = resp(record_id,res[i][j][0],res[i][j][1],res[i][j][2],res[i][j][3],res[i][j][4],res[i][j][5],res[i][j][6],res[i][j][7],c,res[i][j][8],sql_unvis,sql_vis,sql_word)
             json_data.append(response_json)
