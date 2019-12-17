@@ -182,7 +182,7 @@
       <h2 id="map_table_title">Table_Map</h2>
       <ul>
         <li>赤いピン：未訪問エリア内のスポット</li><p>赤いピンをクリックすると詳細情報が表示されます．<br>詳細情報は，対象のスポット名と，既訪問スポット名，対象スポットと既訪問スポットの関係を表現するキーワード，類似度です．関係性が低いとキーワードが「なし」と表示されます．</p>
-        <li>類似度（似ている度合い）の値は「-1.0 から 1.0」の間になります．「-1.0」は最も類似せず，「1.0」は最も類似することを意味します．</li>
+        <li>類似度（似ている度合い）の値は「0.0 から 1.0」の間になります．「0.0」は最も類似せず，「1.0」は最も類似することを意味します．</li>
       </ul>
       <p style="text-align:center; font-size:16px;">行きたいと感じた赤いピンのスポット名1つを入力：<br><input type="text" id="next_t_text"></p>
       <input type="button" id="next_t" value="次へ" >
@@ -345,7 +345,10 @@
         });
         bounds_P.extend(unvis_marker_P[i].position);
 
-        if ((Math.sign(markerData_P[i]["cossim"]) == -1) || (markerData_P[i]["cossim"] == 0)){
+        // if ((Math.sign(markerData_P[i]["cossim"]) == -1) || (markerData_P[i]["cossim"] == 0)){
+        //   markerData_P[i]["word"] = "なし";
+        // }
+        if (markerData_P[i]["cossim"] <= 0.65){
           markerData_P[i]["word"] = "なし";
         }
         var table_P = "<h2 style='text-align:center;'><a href = '" + markerData_P[i]["unvis_url"] + "'target='_blank'>" + markerData_P[i]["unvis_name"] + "</a></h2><table border='1' id='window2'><tr><th>既訪問スポット名</th><th>関係を表現するキーワード</th></tr>"
@@ -554,7 +557,10 @@
         });
         bounds_L.extend(unvis_marker_L[i].position);
 
-        if ((Math.sign(markerData_L[i]["cossim"]) == -1) || (markerData_L[i]["cossim"] == 0)){
+        // if ((Math.sign(markerData_L[i]["cossim"]) == -1) || (markerData_L[i]["cossim"] == 0)){
+        //   markerData_L[i]["word"] = "なし";
+        // }
+        if (markerData_L[i]["cossim"] <= 0.65){
           markerData_L[i]["word"] = "なし";
         }
         var table_L = "<h2 style='text-align:center;'><a href = '" + markerData_L[i]["unvis_url"] + "'target='_blank'>" + markerData_L[i]["unvis_name"] + "</a></h2><table border='1' id='window2'><tr><th>既訪問スポット名</th><th>関係を表現するキーワード</th></tr>"
@@ -602,7 +608,10 @@
         bounds_L.extend(unvis_marker_L[i].position);
         bounds_L.extend(vis_marker_L[i].position);
 
-        if ((Math.sign(markerData_L[i]["cossim"]) == -1) || (markerData_L[i]["cossim"] == 0)){
+        // if ((Math.sign(markerData_L[i]["cossim"]) == -1) || (markerData_L[i]["cossim"] == 0)){
+        //   markerData_L[i]["word"] = "なし";
+        // }
+        if (markerData_L[i]["cossim"] <= 0.65){
           markerData_L[i]["word"] = "なし";
         }
         var table_L = "<h2 style='text-align:center;'><a href = '" + markerData_L[i]["unvis_url"] + "'target='_blank'>" + markerData_L[i]["unvis_name"] + "</a></h2><table border='1' id='window2'><tr><th>既訪問スポット名</th><th>関係を表現するキーワード</th></tr>"
@@ -773,8 +782,11 @@
 
         var table_data = "<h2 style='text-align:center;'><a href = '" + set_data[i][0]["unvis_url"] + "' target='_blank'>" + set_data[i][0]["unvis_name"] + "</a></h2><table border='1' id='window2'><tr><th>既訪問スポット名</th><th>関係を表現するキーワード</th><th>類似度</th></tr>"
         for (var j = 0; j < set_data[i].length; j++){
-          if ((Math.sign(set_data[i][j]["cossim"]) == -1) || (set_data[i][j]["cossim"] == 0)){
-            set_data[i][j]["word"] = "なし";
+          // if ((Math.sign(set_data[i][j]["cossim"]) == -1) || (set_data[i][j]["cossim"] == 0)){
+          //   set_data[i][j]["word"] = "なし";
+          // }
+          if (set_data[i][j]["cossim"] <= 0.65){
+            set_data[i][j]["word"]  = "なし";
           }
           table_data += "<tr><td>" + set_data[i][j]["vis_name"] + "</td><td>" + set_data[i][j]["word"] + "</td><td>" + Math.round(set_data[i][j]["cossim"] * 1000)/1000 +"</td></tr>"
         }

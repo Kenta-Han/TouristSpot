@@ -70,9 +70,9 @@ def normal_distribution_before2(data):
                 x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
                 dis = euclid_distance(x_latlng, t_latlng)
                 P_xt = norm.pdf(dis, average, standard_deviation)
-                if cossim < 0:
+                if cossim < 0.65:
                     tmp.append(-0.5 * P_xt)
-                elif cossim > 0:
+                elif cossim > 0.65:
                     tmp.append(1 * P_xt)
                 else :
                     tmp.append(0)

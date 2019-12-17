@@ -29,11 +29,10 @@ def normal_distribution(data):
         min_lng, max_lng = float(min([j[2] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
         latlng = []
         rlatlng = random_latlng(latlng, 200, min_lat, max_lat, min_lng, max_lng)
-        min_cossim, max_cossim = min([j[7] for j in data[i]]), max([j[7] for j in data[i]])
-
-        cos_all = []
-        cos_all.extend([((j[7]-min_cossim)/(max_cossim-min_cossim)) for j in data[i]])
-        print(cos_all,sum(cos_all)/len(cos_all), file=sys.stderr)
+        # min_cossim, max_cossim = min([j[7] for j in data[i]]), max([j[7] for j in data[i]])
+        # cos_all = []
+        # cos_all.extend([((j[7]-min_cossim)/(max_cossim-min_cossim)) for j in data[i]])
+        # print(cos_all,sum(cos_all)/len(cos_all), file=sys.stderr)
 
         res = []
         for t_latlng in rlatlng:
@@ -76,24 +75,36 @@ def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
         for j in range(len(res[i])):
             c = 0
             ## 正規化（最大値を1，最小値を0）
-            cossim = (res[i][j][7] - min_cossim) / (max_cossim - min_cossim)
-            # if np.sign(res[i][j][7]) == -1:
-            #     tmp = res[i][j][7] * -1
-            #     cossim = ((math.sqrt(tmp) * (-1)) + 1) / 2
-            # else:
-            #     cossim = (math.sqrt(res[i][j][7]) + 1) / 2
+            # cossim = (res[i][j][7] - min_cossim) / (max_cossim - min_cossim)
+            cos = -0.65 + res[i][j][7]
+            if np.sign(cos) == -1:
+                tmp = cos * -1
+                cossim = ((math.sqrt(tmp) * (-1)) + 1) / 2
+            else:
+                cossim = (math.sqrt(cos) + 1) / 2
+            ## 正規化（最大値と最小値の間）
+            # tmp = (res[i][j][7] - min_cossim) / (max_cossim - min_cossim)
+            # cossim = tmp * (max_cossim-min_cossim) + min_cossim
 
-            if round(cossim,2) > 0 and round(cossim,2) <= 0.17:
+            if round(cossim,2) > 0 and round(cossim,2) <= 0.1:
                 c = "rgb(0, 255, 0)"
-            if round(cossim,2) > 0.17 and round(cossim,2) <= 0.34:
-                c = "rgb(115, 255, 0)"
-            if round(cossim,2) > 0.34 and round(cossim,2) <= 0.51:
-                c = "rgb(230, 255, 0)"
-            if round(cossim,2) > 0.51 and round(cossim,2) <= 0.68:
-                c = "rgb(255, 209, 0)"
-            if round(cossim,2) > 0.68 and round(cossim,2) <= 0.85:
-                c = "rgb(255, 94, 0)"
-            if round(cossim,2) > 0.85 and round(cossim,2) <= 1:
+            if round(cossim,2) > 0.1 and round(cossim,2) <= 0.2:
+                c = "rgb(60, 255, 0)"
+            if round(cossim,2) > 0.2 and round(cossim,2) <= 0.3:
+                c = "rgb(120, 255, 0)"
+            if round(cossim,2) > 0.3 and round(cossim,2) <= 0.4:
+                c = "rgb(180, 255, 0)"
+            if round(cossim,2) > 0.4 and round(cossim,2) <= 0.5:
+                c = "rgb(240, 255, 0)"
+            if round(cossim,2) > 0.5 and round(cossim,2) <= 0.6:
+                c = "rgb(255, 200, 0)"
+            if round(cossim,2) > 0.6 and round(cossim,2) <= 0.7:
+                c = "rgb(255, 150, 0)"
+            if round(cossim,2) > 0.7 and round(cossim,2) <= 0.8:
+                c = "rgb(255, 100, 0)"
+            if round(cossim,2) > 0.8 and round(cossim,2) <= 0.9:
+                c = "rgb(255, 50, 0)"
+            if round(cossim,2) > 0.9 and round(cossim,2) <= 1:
                 c = "rgb(255,0,0)"
             response_json = resp(record_id,res[i][j][0],res[i][j][1],res[i][j][2],res[i][j][3],res[i][j][4],res[i][j][5],res[i][j][6],res[i][j][7],c,res[i][j][8],sql_unvis,sql_vis,sql_word)
             json_data.append(response_json)
