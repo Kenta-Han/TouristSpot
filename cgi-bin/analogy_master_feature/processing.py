@@ -12,7 +12,6 @@ import mypackage.harmonic_mean as myp_hmean
 import mypackage.normal_distribution_map_position as myp_norm_p
 import mypackage.normal_distribution_map_line as myp_norm_l
 import mypackage.normal_distribution_map_table as myp_norm_t
-import mypackage.color as myp_color
 
 import MySQLdb
 import os, sys ## 全フォルダ参照
@@ -126,8 +125,6 @@ if len(unvisited_spot_list_map_l) != len(unvisited_spot_list_map_t) or len(unvis
     unvisited_spot_list_map_l = unvisited_spot_list_map_l[:a]
     unvisited_spot_list_map_t = unvisited_spot_list_map_t[:a]
 
-## 線の色
-color_res = myp_color.color_bpr()
 
 #################  map_line  #######################
 #################  map_line  #######################
