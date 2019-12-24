@@ -52,7 +52,7 @@ history = "---".join(history)
 history_list = re.split("---", history)
 like_spot_list,like_area_list = myp_other.make_history_list(history_list)
 for i in range(len(like_spot_list[0])):
-    select_user_history = "SELECT id,name,lat,lng,area_id,url,description,category1 from spot_mst2 where name like '{spot}' AND address like '{area}' AND review=(SELECT max(review) FROM spot_mst WHERE name like '{spot}' AND address like '{area}' AND review != 0);".format(spot=like_spot_list[0][i],area=like_area_list[0][i])
+    select_user_history = "SELECT id,name,lat,lng,area_id,url,description,category1 from spot_mst2 where name like '{spot}' AND address like '{area}' AND (lat!=0 or lng!=0) AND review=(SELECT max(review) FROM spot_mst WHERE name like '{spot}' AND address like '{area}' AND review != 0);".format(spot=like_spot_list[0][i],area=like_area_list[0][i])
     cur.execute(select_user_history)
     spot_data = cur.fetchone()
     if spot_data is None:
@@ -64,15 +64,12 @@ visited_spot_id_list = []
 vis_name,vis_lat,vis_lng,vis_url,vis_description,vis_cate = [],[],[],[],[],[]
 for i in range(len(visited_spot_list)):
     visited_spot_id_list.append(visited_spot_list[i][0])
-    if visited_spot_list[i][2]!=0 and visited_spot_list[i][3]!=0:
-        vis_name.append(visited_spot_list[i][1])
-        vis_lat.append(str(visited_spot_list[i][2]))
-        vis_lng.append(str(visited_spot_list[i][3]))
-        vis_url.append(str(visited_spot_list[i][5]))
-        vis_description.append(str(visited_spot_list[i][6]))
-        vis_cate.append(str(visited_spot_list[i][7]))
-    else:
-        continue
+    vis_name.append(visited_spot_list[i][1])
+    vis_lat.append(str(visited_spot_list[i][2]))
+    vis_lng.append(str(visited_spot_list[i][3]))
+    vis_url.append(str(visited_spot_list[i][5]))
+    vis_description.append(str(visited_spot_list[i][6]))
+    vis_cate.append(str(visited_spot_list[i][7]))
 
 vis_cate = [x for x in set(vis_cate) if vis_cate.count(x) >= 1]
 # print(vis_cate, file=sys.stderr)
@@ -96,7 +93,6 @@ record_id = cur.fetchone()[0]
 ## 未訪問エリアIDリスト
 if area == None:
     select_unvisited_area_id = "SELECT DISTINCT id FROM area_mst WHERE area1 LIKE '%{pre}%' AND id < 30435;".format(pre = prefecture)
-    unvisited_area_id_list = myp_other.area_id_list(select_unvisited_area_id)
     unvisited_area_id_list = myp_other.area_id_list(select_unvisited_area_id)
 else:
     select_unvisited_area_id = "SELECT DISTINCT id FROM area_mst WHERE area1 LIKE '%{pre}%' AND (area2 LIKE '%{area}%' OR area3 LIKE '%{area}%') AND id < 30435;".format(pre = prefecture, area = area)
