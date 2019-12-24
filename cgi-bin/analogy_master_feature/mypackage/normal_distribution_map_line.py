@@ -12,12 +12,14 @@ sys.path.append(path)
 from mysql_connect import jalan_ktylab_new
 conn,cur = jalan_ktylab_new.main()
 
-def random_latlng(list, n, lat_s, lat_f, lng_s, lng_f):
-    i = 0
-    while i < n:
-       list.append([random.uniform(lat_s, lat_f),random.uniform(lng_s, lng_f)])
-       i += 1
-    return list
+def random_latlng(lat_s, lat_f, lng_s, lng_f):
+    lis = []
+    for lat in range(17):
+        tmp = lat_s + (lat_f - lat_s) / 17 * lat
+        for lng in range(17):
+            tmp2 = lng_s + (lng_f -lng_s) / 17 * lng
+            lis.append([tmp,tmp2])
+    return lis
 
 def euclid_distance(x,t):
     return np.linalg.norm(x-t)
@@ -29,7 +31,7 @@ def normal_distribution(data):
         min_lat, max_lat = float(min([j[1] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
         min_lng, max_lng = float(min([j[2] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
         latlng = []
-        rlatlng = random_latlng(latlng, 200, min_lat, max_lat, min_lng, max_lng)
+        rlatlng = random_latlng(min_lat, max_lat, min_lng, max_lng)
 
         res = []
         for t_latlng in rlatlng:
