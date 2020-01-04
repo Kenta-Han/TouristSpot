@@ -1,5 +1,5 @@
 import sys
-import collections, copy
+import collections, copy, math
 import numpy as np
 import json, random, string
 from scipy.stats import norm
@@ -12,37 +12,57 @@ sys.path.append(path)
 from mysql_connect import jalan_ktylab_new
 conn,cur = jalan_ktylab_new.main()
 
-def random_latlng(list, n, lat_s, lat_f, lng_s, lng_f):
-    i = 0
-    while i < n:
-       list.append([random.uniform(lat_s, lat_f),random.uniform(lng_s, lng_f)])
-       i += 1
-    return list
+def random_latlng(lat_s, lat_f, lng_s, lng_f):
+    lis = []
+    for lat in range(17):
+        tmp = lat_s + (lat_f - lat_s) / 17 * lat
+        for lng in range(17):
+            tmp2 = lng_s + (lng_f -lng_s) / 17 * lng
+            lis.append([tmp,tmp2])
+    return lis
 
 def euclid_distance(x,t):
     return np.linalg.norm(x-t)
 
+def zscore(x):
+    xmean = x.mean()
+    xstd  = np.std(x)
+
+    zscore = (x-xmean)/xstd
+    return zscore
+
 def normal_distribution(data):
-    # print("data:{}".format(len(data)), file=sys.stderr)
+    data_cp = copy.deepcopy(data)
+    cossim_score = []
+    for i in range(len(data)):
+        for j in range(len(data[i])):
+            cossim_score.append(data[i][j][7])
+    c = zscore(np.array(cossim_score))
+    max_cossim = max(max(c),abs(min(c)))
+    c = c.reshape([len(data),len(data[0])])
     for i in range(len(data)):
         ## ランダム座標作成
         min_lat, max_lat = float(min([j[1] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
         min_lng, max_lng = float(min([j[2] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
-        latlng = []
-        rlatlng = random_latlng(latlng, 200, min_lat, max_lat, min_lng, max_lng)
-
+        rlatlng = random_latlng(min_lat, max_lat, min_lng, max_lng)
+        for j in range(len(data[i])):
+            data[i][j][7] = c[i][j]
         res = []
         for t_latlng in rlatlng:
             tmp = []
             for j in range(len(data[i])):
                 cossim, average, alpha = data[i][j][7], 0, 1
-                standard_deviation = (1 - abs(cossim)) * alpha
+                if abs(cossim)/max_cossim == 1:
+                    temp = abs(cossim)/max_cossim - 0.00000000001
+                else:
+                    temp = abs(cossim)/max_cossim
+                standard_deviation = (1 - temp) * alpha
                 x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
                 dis = euclid_distance(x_latlng, t_latlng)
                 P_xt = norm.pdf(dis, average, standard_deviation)
-                if cossim < 0.65:
+                if cossim < 0:
                     tmp.append(-0.5 * P_xt)
-                elif cossim > 0.65:
+                elif cossim > 0:
                     tmp.append(1 * P_xt)
                 else :
                     tmp.append(0)
@@ -51,36 +71,7 @@ def normal_distribution(data):
         for j in range(len(data[i])):
             data[i][j][5] = str(sortedRes[0][0][0])
             data[i][j][6] = str(sortedRes[0][0][1])
-    return data
-
-def normal_distribution_before2(data):
-    for i in range(len(data)):
-        ## ランダム座標作成
-        min_lat, max_lat = float(min([j[5] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
-        min_lng, max_lng = float(min([j[6] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
-        latlng = []
-        rlatlng = random_latlng(latlng, 50, min_lat, max_lat, min_lng, max_lng)
-
-        res = []
-        for t_latlng in rlatlng:
-            tmp = []
-            for j in range(len(data[i])):
-                cossim, average, alpha = data[i][j][7], 0, 1
-                standard_deviation = (1 - abs(cossim)) * alpha
-                x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
-                dis = euclid_distance(x_latlng, t_latlng)
-                P_xt = norm.pdf(dis, average, standard_deviation)
-                if cossim < 0.65:
-                    tmp.append(-0.5 * P_xt)
-                elif cossim > 0.65:
-                    tmp.append(1 * P_xt)
-                else :
-                    tmp.append(0)
-            res.append([t_latlng, sum(tmp)])
-        sortedRes = sorted(res, key=lambda x: x[1], reverse=True)
-        for j in range(len(data[i])):
-            data[i][j][5] = str(sortedRes[0][0][0])
-            data[i][j][6] = str(sortedRes[0][0][1])
+            data[i][j][7] = data_cp[i][j][7]
     return data
 
 def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
@@ -166,9 +157,5 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,rec
                 tmp.append(cluster[j])
         result.append(tmp)
     data = normal_distribution(result) ## 正規分布計算（範囲未訪問）
-    # for num in range(2):
-    #         data = normal_distribution_before2(data) ## 正規分布（範囲1回目計算後の既訪問）
-    #         if num == 1:
-    #             break
     json_data = select_and_resp_data(data, record_id, sql_unvis, sql_vis, sql_word)
     return json_data

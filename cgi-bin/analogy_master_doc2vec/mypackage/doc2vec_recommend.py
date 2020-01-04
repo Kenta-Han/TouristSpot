@@ -21,8 +21,6 @@ def cossim(x, y):
 
 def recommend_all(visited_name,unvisited_name,visited_review,unvisited_review):
     value_UtoV = []
-    # print(unvisited_review, file=sys.stderr)
-    # print(visited_review, file=sys.stderr)
     for i in range(len(unvisited_name)):
         temp_UtoV = []
         for j in range(len(visited_name)):

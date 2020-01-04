@@ -12,103 +12,113 @@ sys.path.append(path)
 from mysql_connect import jalan_ktylab_new
 conn,cur = jalan_ktylab_new.main()
 
-def random_latlng(list, n, lat_s, lat_f, lng_s, lng_f):
-    i = 0
-    while i < n:
-       list.append([random.uniform(lat_s, lat_f),random.uniform(lng_s, lng_f)])
-       i += 1
-    return list
+def random_latlng(lat_s, lat_f, lng_s, lng_f):
+    lis = []
+    for lat in range(17):
+        tmp = lat_s + (lat_f - lat_s) / 17 * lat
+        for lng in range(17):
+            tmp2 = lng_s + (lng_f -lng_s) / 17 * lng
+            lis.append([tmp,tmp2])
+    return lis
 
 def euclid_distance(x,t):
     return np.linalg.norm(x-t)
 
+def zscore(x):
+    xmean = x.mean()
+    xstd  = np.std(x)
+    zscore = (x-xmean)/xstd
+    return zscore
+
 def normal_distribution(data):
+    data_cp = copy.deepcopy(data)
+    cossim_score = []
+    for i in range(len(data)):
+        for j in range(len(data[i])):
+            cossim_score.append(data[i][j][7])
+    c = zscore(np.array(cossim_score))
+    max_cossim = max(max(c),abs(min(c)))
+    c = c.reshape([len(data),len(data[0])])
     for i in range(len(data)):
         ## ランダム座標作成
         min_lat, max_lat = float(min([j[1] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
         min_lng, max_lng = float(min([j[2] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
-        latlng = []
-        rlatlng = random_latlng(latlng, 200, min_lat, max_lat, min_lng, max_lng)
-        # min_cossim, max_cossim = min([j[7] for j in data[i]]), max([j[7] for j in data[i]])
-        # cos_all = []
-        # cos_all.extend([((j[7]-min_cossim)/(max_cossim-min_cossim)) for j in data[i]])
-        # print(cos_all,sum(cos_all)/len(cos_all), file=sys.stderr)
-
+        rlatlng = random_latlng(min_lat, max_lat, min_lng, max_lng)
+        for j in range(len(data[i])):
+            data[i][j][7] = c[i][j]
         res = []
         for t_latlng in rlatlng:
             tmp = []
             for j in range(len(data[i])):
-                cossim, average, alpha = data[i][j][7], 0, 1
-                standard_deviation = (1 - abs(cossim)) * alpha
+                cossim, average, alpha = data[i][j][7], 0,1
+                if abs(cossim)/max_cossim == 1:
+                    temp = abs(cossim)/max_cossim - 0.00000000001
+                else:
+                    temp = abs(cossim)/max_cossim
+                standard_deviation = (1 - temp) * alpha
                 x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
                 dis = euclid_distance(x_latlng, t_latlng)
                 P_xt = norm.pdf(dis, average, standard_deviation)
-                # cossim = (data[i][j][7] - min_cossim) / (max_cossim - min_cossim) ## 正規化
-                if cossim < 0.65:
+                if cossim < 0:
                     tmp.append(-0.5 * P_xt)
-                elif cossim > 0.65:
+                elif cossim > 0:
                     tmp.append(1 * P_xt)
                 else :
                     tmp.append(0)
             res.append([t_latlng, sum(tmp)])
-        # print(res, file=sys.stderr)
         sortedRes = sorted(res, key=lambda x: x[1], reverse=True)
         for j in range(len(data[i])):
             data[i][j][5] = str(sortedRes[0][0][0])
             data[i][j][6] = str(sortedRes[0][0][1])
+            data[i][j][7] = data_cp[i][j][7]
     return data
 
 def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
-    res, json_data = [], []
-    ## 単語2つ以下切り捨て
-    for i in range(len(data)):
-        tmp = []
-        for j in range(len(data[i])):
-            if len(data[i][j][8]) >= 2:
-                tmp.append(data[i][j])
-        res.append(tmp)
-    # print("\nselect_data:{}".format(res), file=sys.stderr)
-    ## 類似度に応じて色ずけ
-    max_cossim = max([j[7] for i in res for j in i])
+    res, json_data = data, []
+    res_cp = copy.deepcopy(res)
+    cossim_score = []
+    for i in range(len(res)):
+        for j in range(len(res[i])):
+            cossim_score.append(res[i][j][7])
+    c = zscore(np.array(cossim_score))
+    c = c.reshape([len(res),len(res[0])])
+    for i in range(len(res)):
+        for j in range(len(res[i])):
+            res[i][j][7] = c[i][j]
     min_cossim = min([j[7] for i in res for j in i])
     for i in range(len(res)):
         for j in range(len(res[i])):
-            c = 0
-            ## 正規化（最大値を1，最小値を0）
-            # cossim = (res[i][j][7] - min_cossim) / (max_cossim - min_cossim)
-            cos = -0.65 + res[i][j][7]
-            if np.sign(cos) == -1:
-                tmp = cos * -1
-                cossim = ((math.sqrt(tmp) * (-1)) + 1) / 2
-            else:
-                cossim = (math.sqrt(cos) + 1) / 2
-            ## 正規化（最大値と最小値の間）
-            # tmp = (res[i][j][7] - min_cossim) / (max_cossim - min_cossim)
-            # cossim = tmp * (max_cossim-min_cossim) + min_cossim
-
-            if round(cossim,2) > 0 and round(cossim,2) <= 0.1:
-                c = "rgb(0, 255, 0)"
+            res[i][j][7] = res[i][j][7] + abs(min_cossim)
+    max_cossim = max([j[7] for i in res for j in i])
+    for i in range(len(res)):
+        for j in range(len(res[i])):
+            color = 0
+            cossim = res[i][j][7] / max_cossim
+            if round(cossim,2) >= 0 and round(cossim,2) <= 0.1:
+                color = "rgb(0, 255, 0)"
             if round(cossim,2) > 0.1 and round(cossim,2) <= 0.2:
-                c = "rgb(60, 255, 0)"
+                color = "rgb(60, 255, 0)"
             if round(cossim,2) > 0.2 and round(cossim,2) <= 0.3:
-                c = "rgb(120, 255, 0)"
+                color = "rgb(120, 255, 0)"
             if round(cossim,2) > 0.3 and round(cossim,2) <= 0.4:
-                c = "rgb(180, 255, 0)"
+                color = "rgb(180, 255, 0)"
             if round(cossim,2) > 0.4 and round(cossim,2) <= 0.5:
-                c = "rgb(240, 255, 0)"
+                color = "rgb(240, 255, 0)"
             if round(cossim,2) > 0.5 and round(cossim,2) <= 0.6:
-                c = "rgb(255, 200, 0)"
+                color = "rgb(255, 200, 0)"
             if round(cossim,2) > 0.6 and round(cossim,2) <= 0.7:
-                c = "rgb(255, 150, 0)"
+                color = "rgb(255, 150, 0)"
             if round(cossim,2) > 0.7 and round(cossim,2) <= 0.8:
-                c = "rgb(255, 100, 0)"
+                color = "rgb(255, 100, 0)"
             if round(cossim,2) > 0.8 and round(cossim,2) <= 0.9:
-                c = "rgb(255, 50, 0)"
+                color = "rgb(255, 50, 0)"
             if round(cossim,2) > 0.9 and round(cossim,2) <= 1:
-                c = "rgb(255,0,0)"
-            response_json = resp(record_id,res[i][j][0],res[i][j][1],res[i][j][2],res[i][j][3],res[i][j][4],res[i][j][5],res[i][j][6],res[i][j][7],c,res[i][j][8],sql_unvis,sql_vis,sql_word)
+                color = "rgb(255,0,0)"
+            ## 単語2つ以下切り捨て
+            if len(res[i][j][8]) <= 2:
+                pass
+            response_json = resp(record_id,res[i][j][0],res[i][j][1],res[i][j][2],res[i][j][3],res[i][j][4],res[i][j][5],res[i][j][6],res_cp[i][j][7],color,res[i][j][8],sql_unvis,sql_vis,sql_word)
             json_data.append(response_json)
-    # print(json.dumps(json_data)) ## 送信
     return json_data
 
 def resp(record_id,unvis,unlat,unlng,unurl,vis,vislat,vislng,cos,color,word,sql_unvis,sql_vis,sql_word):
@@ -172,7 +182,6 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,rec
     sql_word = sql_word[:-2]
 
     vis_list = collections.Counter(visname_tmp).most_common()
-    # print(vis_list, file=sys.stderr)
     result = []
     for i in range(len(vis_list)):
         tmp = []
@@ -180,7 +189,6 @@ def calculation(vis_name,vis_lat,vis_lng,unvis_name,unvis_lat,unvis_lng,data,rec
             if vis_list[i][0] == cluster[j][4]:
                 tmp.append(cluster[j])
         result.append(tmp)
-    # print(result, file=sys.stderr)
     data = normal_distribution(result) ## 正規分布計算
     json_data = select_and_resp_data(data, record_id, sql_unvis, sql_vis, sql_word)
     return json_data
