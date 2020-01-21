@@ -78,7 +78,7 @@ def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
             else:
                 cossim = (math.sqrt(res[i][j][7]) + 1) / 2
 
-            if round(cossim,2) > 0 and round(cossim,2) <= 0.1:
+            if round(cossim,2) >= 0 and round(cossim,2) <= 0.1:
                 c = "rgb(0, 255, 0)"
             if round(cossim,2) > 0.1 and round(cossim,2) <= 0.2:
                 c = "rgb(60, 255, 0)"

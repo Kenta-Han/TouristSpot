@@ -810,7 +810,7 @@
               $(".vector_result").html("<h2>表示するまで最大150秒かかる場合があります．<br>「Timeout」が表示された場合，再読込を行なってください．</h2><img src='../data/loading4.gif' style='width:30%'></img>");
               window.onerror = function() {
                 alert("Error：入力に問題が見つかったため，もう一度やり直してください．\nまた，目的に合致するスポットがないため，目的を変更してください．");
-                // location.reload();
+                location.reload();
               };
               $.ajax({
                   url: "../cgi-bin/analogy_master_feature/processing.py",
