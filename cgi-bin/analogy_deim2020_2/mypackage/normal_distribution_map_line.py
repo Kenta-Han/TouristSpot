@@ -12,12 +12,14 @@ sys.path.append(path)
 from mysql_connect import jalan_ktylab_new
 conn,cur = jalan_ktylab_new.main()
 
-def random_latlng(list, n, lat_s, lat_f, lng_s, lng_f):
-    i = 0
-    while i < n:
-       list.append([random.uniform(lat_s, lat_f),random.uniform(lng_s, lng_f)])
-       i += 1
-    return list
+def random_latlng(lat_s, lat_f, lng_s, lng_f):
+    lis = []
+    for lat in range(17):
+        tmp = lat_s + (lat_f - lat_s) / 17 * lat
+        for lng in range(17):
+            tmp2 = lng_s + (lng_f -lng_s) / 17 * lng
+            lis.append([tmp,tmp2])
+    return lis
 
 def euclid_distance(x,t):
     return np.linalg.norm(x-t)
@@ -29,7 +31,7 @@ def normal_distribution(data):
         min_lat, max_lat = float(min([j[1] for j in data[i]]))-0.02, float(max([j[1] for j in data[i]]))+0.02
         min_lng, max_lng = float(min([j[2] for j in data[i]]))-0.02, float(max([j[2] for j in data[i]]))+0.02
         latlng = []
-        rlatlng = random_latlng(latlng, 200, min_lat, max_lat, min_lng, max_lng)
+        rlatlng = random_latlng(min_lat, max_lat, min_lng, max_lng)
 
         # cossim = (res[i][j][7] - min_cossim) / (max_cossim - min_cossim)
         res = []
@@ -41,9 +43,9 @@ def normal_distribution(data):
                 x_latlng = np.array([float(data[i][j][1]),float(data[i][j][2])])
                 dis = euclid_distance(x_latlng, t_latlng)
                 P_xt = norm.pdf(dis, average, standard_deviation)
-                if cossim < 0:
+                if cossim < 0.05:
                     tmp.append(-0.5 * P_xt)
-                elif cossim > 0:
+                elif cossim > 0.05:
                     tmp.append(1 * P_xt)
                 else :
                     tmp.append(0)
@@ -76,7 +78,7 @@ def select_and_resp_data(data,record_id,sql_unvis,sql_vis,sql_word):
                 cossim = ((math.sqrt(tmp) * (-1)) + 1) / 2
             else:
                 cossim = (math.sqrt(res[i][j][7]) + 1) / 2
-            if round(cossim,2) > 0 and round(cossim,2) <= 0.1:
+            if round(cossim,2) >= 0 and round(cossim,2) <= 0.1:
                 c = "rgb(0, 255, 0)"
             if round(cossim,2) > 0.1 and round(cossim,2) <= 0.2:
                 c = "rgb(60, 255, 0)"

@@ -40,7 +40,7 @@ def sort_tfidf_UtoV_relative(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
     return top10
 
 ## tfidf
-def sort_tfidf_UtoV_tfidfcos(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,result):
+def sort_tfidf_UtoV_tfidfcos(cluid,vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,result):
     ## TFIDFの結果にスポット名を追加
     vis_spot,unvis_spot = [],[]
     for i in range(len(vis_spot_name)):
@@ -60,7 +60,7 @@ def sort_tfidf_UtoV_tfidfcos(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
     all_spot.extend([unvisited,visited])
     ## 一番類似するスポットの特徴語を求める
     # print(all_spot, file=sys.stderr)
-    all,top10 = [],[]
+    all_d,top10 = [],[]
     for i in tqdm(range(len(all_spot[0]))):
         temp = []
         same_word = list(set([all_spot[0][i][j][0] for j in range(len(all_spot[0][i]))]) & set([all_spot[1][i][j][0] for j in range(len(all_spot[1][i]))]))
@@ -69,10 +69,13 @@ def sort_tfidf_UtoV_tfidfcos(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name
             vi = [j for j in range(len(all_spot[1][i])) if all_spot[1][i][j][0] == sw][0]
             if len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None:
                  temp.append([all_spot[0][i][un][0],abs(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))])
-        all.append(temp)
-        all[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
+        all_d.append(temp)
+        all_d[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
         # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
-        top10.append([result[i][0],result[i][1],result[i][2],all[i][:11]])
+        tmp = []
+        for j in range(len(all_d[i])):
+            tmp.append(all_d[i][j][0])
+        top10.append([cluid,result[i][0],result[i][1],result[i][2],tmp[:10]])
     return top10
 
 ## doc2vec特徴(一的)

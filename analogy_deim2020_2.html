@@ -52,6 +52,23 @@
             <li>入力すると候補が表示されるので，その中から選択ください</li>
           </ul>
         </h3>
+        <table class="visited">
+          <tr>
+            <td><input type="text" class="visited" name="visited"  /></td>
+            <td><input type="text" class="visited" name="visited"  /></td>
+            <td><input type="text" class="visited" name="visited"  /></td>
+          </tr>
+          <tr>
+            <td><input type="text" class="visited" name="visited"  /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited"  /></td>
+          </tr>
+          <tr>
+            <td><input type="text" class="visited" name="visited"  /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+          </tr>
+        </table>
         <!-- <table class="visited">
           <tr>
             <td><input type="text" class="visited" name="visited" value="成田山新勝寺---千葉" /></td>
@@ -69,7 +86,7 @@
             <td><input type="text" class="visited" name="visited" /></td>
           </tr>
         </table> -->
-        <table class="visited">
+        <!-- <table class="visited">
           <tr>
             <td><input type="text" class="visited" name="visited" value="富士急ハイランド---山梨" /></td>
             <td><input type="text" class="visited" name="visited" value="ユニバーサル・スタジオ・ジャパン（USJ）---大阪" /></td>
@@ -85,7 +102,7 @@
             <td><input type="text" class="visited" name="visited" /></td>
             <td><input type="text" class="visited" name="visited" /></td>
           </tr>
-        </table>
+        </table> -->
       </div>
       <div id="unfamiliar">
         <img src="../data/crowdworks_id_img.png" style="width:20%;"></img>
@@ -144,7 +161,7 @@
         </h3>
 
         <h3>エリア(任意)：
-          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" value="渋谷・目黒・世田谷" />
+          <input type="text" id="area" name="area" placeholder="函館・大沼・松前" />
         </h3>
       </div>
       <p style="text-align:center;font-size:20px; clear:both;">「実験開始」をクリックしてから，結果が表示されるまで，その間再読込を行わないでください．</p>
@@ -553,7 +570,7 @@
                 // location.reload();
               };
               $.ajax({
-                  url: "../cgi-bin/analogy_deim2020/processing.py",
+                  url: "../cgi-bin/analogy_deim2020_2/processing.py",
                   type: "post",
                   dataType: "text",
                   data: {
@@ -573,7 +590,7 @@
                   console.log(res);
                   // console.log(typeof res);
                   if (res["word"].length == 1) {
-                    $(".cluster_result").html("<h2>Search Results：合致するスポット情報は見つかりませんでした．<br>異なるスポットを入力して，もう一度試してください．</h2><h3><a href='http://127.0.0.1:8000/analogy_deim2020.html'>実験ページへ</a></h3>");
+                    $(".cluster_result").html("<h2>Search Results：合致するスポット情報は見つかりませんでした．<br>異なるスポットを入力して，もう一度試してください．</h2><h3><a href='http://127.0.0.1:8000/analogy_deim2020_2.html'>実験ページへ</a></h3>");
                   } else {
                     document.getElementById("cluster_result").style.display="none";
                     var table_st = $("<table border='1' style='width:80%;'><tr><th style='width:10%;'>番号</th><th>内容</th></tr>");
@@ -651,7 +668,7 @@
             // location.reload();
           };
           $.ajax({
-              url: "../cgi-bin/analogy_deim2020/processing2.py",
+              url: "../cgi-bin/analogy_deim2020_2/processing2.py",
               type: "post",
               dataType: "text",
               data: {

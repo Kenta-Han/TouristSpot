@@ -11,6 +11,7 @@ import mypackage.feature_mean as myp_feature
 import mypackage.normal_distribution_map_line as myp_norm_l
 import mypackage.cos_sim_tfidf as myp_cos_tfidf
 import mypackage.cluster as myp_cluster
+from collections import defaultdict
 
 import MySQLdb
 import os, sys ## 全フォルダ参照
@@ -179,25 +180,55 @@ for i in unvis_use_index_num:
 # print("処理時間：{} sec".format(time.time() - start_time), file=sys.stderr)
 
 ############################################################
+## 既訪問スポットと未訪問スポットの計算 ベクトル総当たり
+############################################################
+## クラスタに属する既訪問スポットレビューベクトル
+vis_use_review_id = [j[2] for j in [i for i in vis_score_dic] if j[0] == choice_num][0]
+select_vis_spot_vectors = "SELECT * FROM review_vectors_spotname WHERE id IN {};".format(tuple(vis_use_review_id))
+cur.execute(select_vis_spot_vectors)
+vis_dic = defaultdict(list)
+for j in cur:
+    vis_dic[j[-1]].append(list(j[1:-2]))
+vis_key = list(vis_dic.keys())
+
+## クラスタに属する未訪問スポットレビューベクトル
+select_unvis_spot_reviews = "SELECT * FROM review_vectors_spotname WHERE id IN {};".format(tuple(unvis_use_review_id))
+cur.execute(select_unvis_spot_vectors)
+unvis_dic = defaultdict(list)
+for j in cur:
+    unvis_dic[j[-1]].append(list(j[1:-2]))
+unvis_key = list(unvis_dic.keys())
+
+unvis_vis_set = []
+for i in tqdm(range(len(unvis_key))):
+    unvis_vis_one_set = []
+    for j in range(len(vis_key)):
+        tmp2 = []
+        for ix in range(len(unvis_dic[unvis_key[i]])):
+            tmp = []
+            for jx in range(len(vis_dic[vis_key[j]])):
+                tmp.append(cos_sim(np.array(unvis_dic[unvis_key[i]][ix]),np.array(vis_dic[vis_key[j]][jx])))
+            tmp2.extend(tmp)
+        unvis_vis_one_set.append([unvis_key[i],vis_key[j],np.mean(np.array(tmp2))])
+    unvis_vis_set.append(unvis_vis_one_set)
+print("unvis_vis_set", unvis_vis_set, file=sys.stderr)
+
+
+############################################################
 ## 既訪問スポットと未訪問スポットの計算
 ############################################################
 ## クラスタに属する既訪問スポットレビューの単語に重みつけ
 vis_use_index_num = [i[0] for i in vis_score_dic].index(str(choice_num))
 select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(vis_score_dic[vis_use_index_num][2]))
-# print(select_visited_spot_reviews, file=sys.stderr)
 visited_spot_reviews = myp_tfidf.spot_list_tfidf(select_visited_spot_reviews)
 visited_tfidf = myp_tfidf.tfidf(visited_spot_reviews)
 
 ## クラスタに属する未訪問スポットレビューの単語に重みつけ
 select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(unvis_use_review_id))
-# print(select_unvisited_spot_reviews, file=sys.stderr)
 unvisited_spot_reviews = myp_tfidf.spot_list_tfidf(select_unvisited_spot_reviews)
 unvisited_tfidf = myp_tfidf.tfidf(unvisited_spot_reviews)
 
-print(unvisited_tfidf, file=sys.stderr)
-
 ## TFIDFの結果にスポット名を追加
-# select_visited_spot_name =
 cur.execute("SELECT name,count(name) FROM review_all WHERE review_id IN {} GROUP BY name;".format(tuple(vis_score_dic[vis_use_index_num][2])))
 visited_spot_name_all,visited_spot_review_num = [],[]
 for i in cur.fetchall():
@@ -223,11 +254,6 @@ for i in range(len(visited_spot_name_all)):
 for i in range(len(unvisited_spot_name_all)):
     unvis_spot.append([unvisited_spot_name_all[i],unvisited_tfidf[i]])
 
-
-# print("vis_spot", file=sys.stderr)
-# print(vis_spot, file=sys.stderr)
-# print("unvis_spot", file=sys.stderr)
-# print(unvis_spot, file=sys.stderr)
 ## TFIDFによるコサイン類似度計算
 sctfidf = myp_cos_tfidf.SimCalculator()
 result_cos_tfidf = []

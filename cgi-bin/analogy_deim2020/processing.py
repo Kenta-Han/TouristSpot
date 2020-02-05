@@ -8,6 +8,7 @@ import mypackage.other as myp_other
 import mypackage.tfidf as myp_tfidf
 import mypackage.cluster as myp_cluster
 import mypackage.json_cluster as myp_json_cluster
+from collections import Counter ## 単語出現頻度
 
 import MySQLdb
 import os, sys ## 全フォルダ参照
@@ -46,32 +47,6 @@ for i in range(len(like_spot_list[0])):
     else:
         vis_spot_id.append(spot_data)
 
-# for i in range(len(like_spot_list[0])):
-#     select_user_history = "SELECT id,name,lat,lng,area_id,url,description,category1 from spot_mst2 where name like '{spot}' AND address like '{area}' AND review=(SELECT max(review) FROM spot_mst WHERE name like '{spot}' AND address like '{area}' AND review != 0);".format(spot=like_spot_list[0][i],area=like_area_list[0][i])
-#     cur.execute(select_user_history)
-#     spot_data = cur.fetchone()
-#     if spot_data is None:
-#         continue
-#     else:
-#         visited_spot_list.append(spot_data)
-#
-# visited_spot_id_list = []
-# vis_spot_id,vis_name,vis_lat,vis_lng,vis_url,vis_description,vis_cate = [],[],[],[],[],[],[]
-# for i in range(len(visited_spot_list)):
-#     visited_spot_id_list.append(visited_spot_list[i][0])
-#     if visited_spot_list[i][2]!=0 and visited_spot_list[i][3]!=0:
-#         vis_spot_id.append(visited_spot_list[i][0])
-#         vis_name.append(visited_spot_list[i][1])
-#         vis_lat.append(str(visited_spot_list[i][2]))
-#         vis_lng.append(str(visited_spot_list[i][3]))
-#         vis_url.append(str(visited_spot_list[i][5]))
-#         vis_description.append(str(visited_spot_list[i][6]))
-#         vis_cate.append(str(visited_spot_list[i][7]))
-#     else:
-#         continue
-#
-# vis_cate = [x for x in set(vis_cate) if vis_cate.count(x) >= 1]
-
 ############################################################
 ## 既訪問スポット 階層的クラスタリング
 ############################################################
@@ -88,17 +63,6 @@ vis_res = myp_cluster.kaisoClustering(select_vis_spot_vectors,threshold)
 ## 階層的クラスタリングの結果から，各クラスタのスコアを求める
 vis_score_dic = myp_cluster.clusterScorering(vis_res, len(vis_spot_id))
 # print(len(vis_score_dic), file=sys.stderr)
-# vis_center_use = []
-# for i in range(len(vis_score_dic)):
-#     for j in range(len(vis_center)):
-#         if vis_score_dic[i][0] == str(j):
-#             vis_center_use.append([j,vis_center[j].tolist()])
-# print(vis_center_use, file=sys.stderr)
-# ## 利用するクラスタ数を設定
-# # use_cluster = len(score_dic)
-# # norm_threshold = 1.95 ## 提示レビューのL2ノルムの閾値
-# ## 検索スポットの全レビューをクラスタスコアと類似度で重み付け
-# # review_score = myp_cluster.reviewScorering(vis_center, str(vis_spot_id)[1:-1], use_cluster, norm_threshold, vis_score_dic)
 
 vis_reviews = []
 for i in range(len(vis_score_dic)):
@@ -108,14 +72,24 @@ for i in range(len(vis_score_dic)):
     for i in cur:
         tmp.extend(list(i)[0].split())
     vis_reviews.append(tmp)
-# print(vis_reviews, file=sys.stderr)
+
+## TFIDFによる特徴語抽出
 visited_tfidf = myp_tfidf.tfidf(vis_reviews)
 visited_tfidf_set = []
 for i in range(len(vis_score_dic)):
     visited_tfidf_set.append([vis_score_dic[i][0],visited_tfidf[i]])
-# print(visited_tfidf_set, file=sys.stderr)
 
-print("処理時間：{} sec".format(time.time() - start_time), file=sys.stderr)
+# ## 単語出現頻度による特徴語抽出
+# conter_list = []
+# for i in range(len(vis_reviews)):
+#     tmp = []
+#     for word, cnt in Counter(vis_reviews[i]).most_common():
+#         tmp.append([word, cnt])
+#     conter_list.append([vis_score_dic[i][0],tmp])
+#
+# ## ATFによる特徴語抽出
+# avg_tf = myp_tfidf.atf(conter_list)
+
 
 ############################################################
 ## DB挿入
@@ -133,10 +107,14 @@ record_id = cur.fetchone()[0]
 ## レスポンス
 ############################################################
 try:
-    json_data = myp_json_cluster.response(visited_tfidf_set[:3],record_id,vis_score_dic[:3])
+    ## tfidfによるクラスタ特徴語抽出
+    json_data = myp_json_cluster.response_tfidf(visited_tfidf_set[:5],record_id,vis_score_dic[:5])
+    ## 単語出現頻度によるクラスタ特徴語抽出
+    # json_data = myp_json_cluster.response_conter(conter_list[:5],record_id,vis_score_dic[:5])
+    # json_data = myp_json_cluster.response_atf(avg_tf[:5],record_id,vis_score_dic[:5])
 except:
     import traceback
     traceback.print_exc()
-# print(json_data, file=sys.stderr)
 
+print("処理時間：{} sec".format(time.time() - start_time), file=sys.stderr)
 print(json.dumps(json_data))
