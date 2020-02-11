@@ -88,23 +88,3 @@ def tfidf_res1(dictionary,data_length,review_all):
         tfidf_sort = sorted(tfidf_data,key=lambda x:x[1],reverse=True)
         spot.append(tfidf_sort) ## スポット毎のTFIDF
     return spot
-
-
-
-
-
-
-def kld(dic_pxa,clu_review_all,clu_set):
-    spot = []
-    for i in range(len(clu_review_all)):
-        dic_px = corpora.Dictionary(clu_review_all[i])
-        data = []
-        vec = dic_px.doc2bow(clu_review_all[i])
-        for word_id,word_num in vec:
-            Px = dic_px.dfs[word_id] / len(clu_review_all[i])
-            Pall = dic_pxa.dfs[word_id] / len(clu_set)
-            res = math.log(Px*Pall) * Px
-            data.append([dic_px[word_id], res])
-        data_sort = sorted(data,key=lambda x:x[1],reverse=True)
-        spot.append(data_sort)
-    return spot

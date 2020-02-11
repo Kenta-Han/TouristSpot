@@ -432,19 +432,6 @@ for i in range(len(unvis_dic_all_keys)):
             del unvis_tmp[unvis_keys[j]]
         else:
             pass
-# for i in range(len(vis_dic_all_keys)):
-#     vis_tmp = dict(vis_dic_all[vis_dic_all_keys[i]])
-#     vis_keys = list(unvis_tmp.keys()) ## スポットidリスト
-#     for j in range(len(vis_keys)):
-#         if len(vis_tmp[vis_keys[j]]) <=5:
-#             del vis_tmp[vis_keys[j]]
-#         else:
-#             pass
-
-
-# print("unvis_dic_all_new",unvis_dic_all, file=sys.stderr)
-# print("vis_dic_all_new",vis_dic_all, file=sys.stderr)
-
 
 for i in tqdm(range(len(unvis_dic_all_keys))):
     unvis_tmp = dict(unvis_dic_all[unvis_dic_all_keys[i]])
@@ -507,50 +494,6 @@ for i in range(len(use_clu_num)):
         if use_clu_num[i] == vis_score_dic[j][0]:
             use_vis_review.append(vis_score_dic[j])
 # print("use_vis_review",use_vis_review, file=sys.stderr)
-
-
-
-# ############################################################
-# ## kld作成途中
-# ############################################################
-# visited_spot_reviews,visited_spot_count = [],[]
-# vis_clu_set = []
-# cluster_set = []
-# for i in range(len(vis_review_vectors_clu)):
-#     tmp = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(use_vis_review[i][2]))
-#     everyspot = myp_tfidf.spot_list_tfidf(tmp)
-#     visited_spot_reviews.extend(everyspot)
-#     vis_clu_set.append(visited_spot_reviews)
-#     visited_spot_count.append([use_vis_review[i][0],len(visited_spot_reviews)])
-#     # one_cluster = [ f for i in visited_spot_reviews for f in i ]
-#     # clusters_set.append(one_cluster)
-#     tmp = []
-#     for j in everyspot:
-#         tmp.extend(j)
-#     cluster_set.append(tmp)
-# # print("vis_clu_set",vis_clu_set, file=sys.stderr)
-#
-# dictionary_px_all = corpora.Dictionary(cluster_set)
-# # dictionary_px = corpora.Dictionary(vis_clu_set)
-# visited_kld_tmp = myp_tfidf.kld(dictionary_px_all,vis_clu_set,cluster_set)
-#
-# visited_kld = []
-# s = 0
-# for i in range(len(visited_spot_count)):
-#     visited_kld.append([visited_spot_count[i][0],visited_kld_tmp[s:visited_spot_count[i][1]]])
-#     s = visited_spot_count[i][1]
-# print("visited_kld",visited_kld, file=sys.stderr)
-#
-# ## TFIDFの結果にスポット名を追加
-# visited_spot_name_all,visited_spot_review_num = [],[]
-# for i in range(len(vis_review_vectors_clu)):
-#     tmp_name_all = []
-#     cur.execute("SELECT name,count(name) FROM review_all WHERE review_id IN {} GROUP BY name;".format(tuple(use_vis_review[i][2])))
-#     for j in cur.fetchall():
-#         tmp_name_all.append(j[0])
-#     visited_spot_name_all.append([use_vis_review[i][0],tmp_name_all])
-# print("\nvisited_spot_name_all",visited_spot_name_all, file=sys.stderr)
-
 
 
 ############################################################
