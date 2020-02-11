@@ -1,5 +1,5 @@
 from tqdm import tqdm
-import re
+import re,sys
 
 bytesymbols = re.compile("[!-/:*-@[-`{-~\d]") ## 半角記号，数字\d
 ## 調和平均 差が小値が大，差が大値が小 → 値が大の方が良い(昇順後ろから10個)
@@ -68,7 +68,10 @@ def sort_tfidf_UtoV_tfidfcos(cluid,vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spo
             un = [j for j in range(len(all_spot[0][i])) if all_spot[0][i][j][0] == sw][0]
             vi = [j for j in range(len(all_spot[1][i])) if all_spot[1][i][j][0] == sw][0]
             if len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None:
-                 temp.append([all_spot[0][i][un][0],abs(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))])
+                if all_spot[1][i][vi][1]==0 or all_spot[0][i][un][1]==0:
+                    temp.append([all_spot[0][i][un][0],0])
+                else:
+                    temp.append([all_spot[0][i][un][0],abs(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))])
         all_d.append(temp)
         all_d[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
         # ## 未訪問，既訪問，類似度，単語(最初の10個まで)

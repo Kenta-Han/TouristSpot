@@ -60,32 +60,51 @@ def tfidf(review_all):
         j += 1
     return doc2
 
-## ATFを求める(単語に重み付け)，特徴ベクトル用
-def atf(conter_list):
-    word_data = []
-    for i in range(len(conter_list)):
-        for j in range(len(conter_list[i][1])):
-            word_data.append([conter_list[i][1][j][0],conter_list[i][1][j][1]])
-    word_data_sort = sorted(word_data,key=lambda x:x[0])
-    word_data_sort.append(["-finish-",1])
-    res, tmp = [],[]
-    for i in range(1,len(word_data_sort)):
-        if word_data_sort[i-1][0] == word_data_sort[i][0]:
-            tmp.append(word_data_sort[i-1][1])
-        else:
-            tmp.append(word_data_sort[i-1][1])
-            res.append([word_data_sort[i-1][0],tmp])
-            tmp = []
-    word_val = []
-    for i in range(len(res)):
-        word_val.append([res[i][0],sum(res[i][1])/len(conter_list)])
-    result = []
-    for i in tqdm(range(len(conter_list))):
-        tmp = []
-        for j in range(len(conter_list[i][1])):
-            for k in range(len(word_val)):
-                if conter_list[i][1][j][0] == word_val[k][0]:
-                    tmp.append([conter_list[i][1][j][0],conter_list[i][1][j][1]/(word_val[k][1]**0.3)])
-        s = sorted(tmp,key=lambda x:x[1],reverse=True)
-        result.append([conter_list[i][0],s[:10]])
-    return result
+## TFIDFを求める（IDF範囲は既訪問スポット全クラスタ）
+def tfidf_new(dictionary,review_all,idf_length):
+    spot = []
+    for i in range(len(review_all)):
+        tfidf_data = []
+        vec = dictionary.doc2bow(review_all[i]) ## 辞書
+        for word_id,word_num in vec:
+            tf = word_num / len(review_all[i]) ## 既訪問 or 検索結果
+            idf = math.log(idf_length / (dictionary.dfs[word_id] + 1)) ## 既訪問
+            tfidf_data.append([dictionary[word_id], tf * idf])
+        tfidf_sort = sorted(tfidf_data,key=lambda x:x[1],reverse=True)
+        spot.append(tfidf_sort) ## スポット毎のTFIDF
+    return spot
+
+
+## 既訪問スポットと未訪問スポットの特徴語抽出（既訪問スポットの特徴語は，RCfからTFを，クラスタ関係なく既訪問スポットをdとしたIDF．検索結果は，RCfをRCu，IDFも同様に変更したもの．(既訪問：IDFの分子の全文書数=全既訪問スポットの数．検索結果：IDFの分子の全文書数=全検索結果スポットの数．)
+def tfidf_res1(dictionary,data_length,review_all):
+    spot = []
+    for i in range(len(review_all)):
+        tfidf_data = []
+        vec = dictionary.doc2bow(review_all[i])
+        for word_id,word_num in vec:
+            tf = word_num / len(review_all[i])
+            idf = math.log(data_length / (dictionary.dfs[word_id] + 1))
+            tfidf_data.append([dictionary[word_id], tf * idf])
+        tfidf_sort = sorted(tfidf_data,key=lambda x:x[1],reverse=True)
+        spot.append(tfidf_sort) ## スポット毎のTFIDF
+    return spot
+
+
+
+
+
+
+def kld(dic_pxa,clu_review_all,clu_set):
+    spot = []
+    for i in range(len(clu_review_all)):
+        dic_px = corpora.Dictionary(clu_review_all[i])
+        data = []
+        vec = dic_px.doc2bow(clu_review_all[i])
+        for word_id,word_num in vec:
+            Px = dic_px.dfs[word_id] / len(clu_review_all[i])
+            Pall = dic_pxa.dfs[word_id] / len(clu_set)
+            res = math.log(Px*Pall) * Px
+            data.append([dic_px[word_id], res])
+        data_sort = sorted(data,key=lambda x:x[1],reverse=True)
+        spot.append(data_sort)
+    return spot
