@@ -52,7 +52,7 @@
             <li>入力すると候補が表示されるので，その中から選択ください</li>
           </ul>
         </h3>
-        <table class="visited">
+        <!-- <table class="visited">
           <tr>
             <td><input type="text" class="visited" name="visited" value="富士急ハイランド---山梨" /></td>
             <td><input type="text" class="visited" name="visited" value="キッザニア東京---東京" /></td>
@@ -66,6 +66,23 @@
           <tr>
             <td><input type="text" class="visited" name="visited"  /></td>
             <td><input type="text" class="visited" name="visited" /></td>
+            <td><input type="text" class="visited" name="visited" /></td>
+          </tr>
+        </table> -->
+        <table class="visited">
+          <tr>
+            <td><input type="text" class="visited" name="visited" value="夢見ケ崎動物公園---神奈川" /></td>
+            <td><input type="text" class="visited" name="visited" value="江の島---神奈川" /></td>
+            <td><input type="text" class="visited" name="visited" value="明神ケ岳---神奈川" /></td>
+          </tr>
+          <tr>
+            <td><input type="text" class="visited" name="visited" value="国営ひたち海浜公園---茨城" /></td>
+            <td><input type="text" class="visited" name="visited" value="湘南平（高麗山公園）---神奈川" /></td>
+            <td><input type="text" class="visited" name="visited" value="伏見稲荷大社---京都"  /></td>
+          </tr>
+          <tr>
+            <td><input type="text" class="visited" name="visited" value="軽井沢プリンスショッピングプラザ---長野"  /></td>
+            <td><input type="text" class="visited" name="visited" value="猪苗代湖---福島" /></td>
             <td><input type="text" class="visited" name="visited" /></td>
           </tr>
         </table>
@@ -685,7 +702,7 @@
             // location.reload();
           };
           $.ajax({
-              url: "../cgi-bin/analogy_deim2020_2/processing2.py",
+              url: "../cgi-bin/analogy_deim2020_2/processing.py",
               type: "post",
               dataType: "text",
               data: {

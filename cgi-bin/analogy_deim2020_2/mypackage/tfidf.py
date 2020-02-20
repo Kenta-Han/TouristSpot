@@ -13,7 +13,8 @@ def spot_list_tfidf(select_spot):
     all_spot_list = []
     cur.execute(select_spot)
     for i in cur:
-        all_spot_list.append(i)
+        all_spot_list.append(list(i))
+    all_spot_list = sorted(all_spot_list,key=lambda x:x[0],reverse=True)
     spot_review_list = []
     temp = []
     for i in range(len(all_spot_list)):
@@ -75,7 +76,7 @@ def tfidf_new(dictionary,review_all,idf_length):
     return spot
 
 
-## 既訪問スポットと未訪問スポットの特徴語抽出（既訪問スポットの特徴語は，RCfからTFを，クラスタ関係なく既訪問スポットをdとしたIDF．検索結果は，RCfをRCu，IDFも同様に変更したもの．(既訪問：IDFの分子の全文書数=全既訪問スポットの数．検索結果：IDFの分子の全文書数=全検索結果スポットの数．)
+## 既訪問スポットの特徴語は，RCfからTFを，クラスタ関係なく既訪問スポットをdとしたIDF．検索結果は，RCfをRCu，IDFも同様に変更したもの．(既訪問：IDFの分子の全文書数=全既訪問スポットの数．検索結果：IDFの分子の全文書数=全検索結果スポットの数．)
 def tfidf_res1(dictionary,data_length,review_all):
     spot = []
     for i in range(len(review_all)):
@@ -83,8 +84,34 @@ def tfidf_res1(dictionary,data_length,review_all):
         vec = dictionary.doc2bow(review_all[i])
         for word_id,word_num in vec:
             tf = word_num / len(review_all[i])
-            idf = math.log(data_length / (dictionary.dfs[word_id] + 1))
-            tfidf_data.append([dictionary[word_id], tf * idf])
+            # idf = math.log(data_length / (dictionary.dfs[word_id] + 1))
+            idf = math.log((data_length + 1) / (dictionary.dfs[word_id] + 1))
+            tfidf_data.append([dictionary[word_id], tf * idf, tf, idf])
+        tfidf_sort = sorted(tfidf_data,key=lambda x:x[1],reverse=True)
+        spot.append(tfidf_sort) ## スポット毎のTFIDF
+    return spot
+
+## 既訪問スポットの特徴語は，RCfからTFを，各クラスタをdとしたIDF．検索結果に関しては以下略．(既訪問，検索結果：IDFの分子の全文書数 = 全！！クラスタ数)
+def tfidf_res2(dictionary,data_length,review_all):
+    spot = []
+    for i in range(len(review_all)):
+        tfidf_data = []
+        vec = dictionary.doc2bow(review_all[i])
+        for word_id,word_num in vec:
+            tf = word_num / len(review_all[i])
+            # idf = math.log(data_length / (dictionary.dfs[word_id] + 1))
+            idf = math.log((data_length + 1) / (dictionary.dfs[word_id] + 1))
+            tfidf_data.append([dictionary[word_id], tf * idf, tf, idf])
+        tfidf_sort = sorted(tfidf_data,key=lambda x:x[1],reverse=True)
+        spot.append(tfidf_sort) ## スポット毎のTFIDF
+    return spot
+
+def tfidf_res(dictionary,corpus_tfidf):
+    spot = []
+    for vec in corpus_tfidf:
+        tfidf_data = []
+        for word_id,value in vec:
+            tfidf_data.append([dictionary[word_id], value])
         tfidf_sort = sorted(tfidf_data,key=lambda x:x[1],reverse=True)
         spot.append(tfidf_sort) ## スポット毎のTFIDF
     return spot

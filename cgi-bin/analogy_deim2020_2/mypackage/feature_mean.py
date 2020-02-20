@@ -3,6 +3,7 @@ import re,sys
 
 bytesymbols = re.compile("[!-/:*-@[-`{-~\d]") ## 半角記号，数字\d
 ## 調和平均 差が小値が大，差が大値が小 → 値が大の方が良い(昇順後ろから10個)
+checkword = ["行く","行う","とても","思う","良い","よい","できる","また","とにかく","それほど","そんなに","あまり","ない","無い","もう","もっと","かなり","いい","ぜひ","いつも","なかなか","ちょっと","出来る","とっても","やはり","入れる","いれる","なぜ","みる","見る"]
 
 ## 相対的特徴 元sort_tfidf_UtoV_harmonic
 def sort_tfidf_UtoV_relative(vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spot_name,result):
@@ -47,7 +48,7 @@ def sort_tfidf_UtoV_tfidfcos(cluid,vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spo
         vis_spot.append([vis_spot_name[i],vis_tfidf[i]])
     for i in range(len(unvis_spot_name)):
         unvis_spot.append([unvis_spot_name[i],unvis_tfidf[i]])
-    ## 一番類似するスポットを関連付ける
+    ## スポットを関連付ける
     visited,unvisited,all_spot = [],[],[]
     for i in range(len(result)):
         for j in range(len(unvis_spot)):
@@ -59,7 +60,7 @@ def sort_tfidf_UtoV_tfidfcos(cluid,vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spo
                 visited.append(vis_spot[j][1])
     all_spot.extend([unvisited,visited])
     ## 一番類似するスポットの特徴語を求める
-    # print(all_spot, file=sys.stderr)
+    # print("all_spot",all_spot, file=sys.stderr)
     all_d,top10 = [],[]
     for i in tqdm(range(len(all_spot[0]))):
         temp = []
@@ -70,15 +71,18 @@ def sort_tfidf_UtoV_tfidfcos(cluid,vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spo
             if len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None:
                 if all_spot[1][i][vi][1]==0 or all_spot[0][i][un][1]==0:
                     temp.append([all_spot[0][i][un][0],0])
+                # elif  (2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1])) < 0.002:
+                #     temp.append([all_spot[0][i][un][0],(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))*(-1)])
                 else:
-                    temp.append([all_spot[0][i][un][0],abs(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))])
+                    temp.append([all_spot[0][i][un][0],(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))])
         all_d.append(temp)
         all_d[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
+        top10.append([cluid,result[i][0],result[i][1],result[i][2],all_d[i][:10]])
         # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
-        tmp = []
-        for j in range(len(all_d[i])):
-            tmp.append(all_d[i][j][0])
-        top10.append([cluid,result[i][0],result[i][1],result[i][2],tmp[:10]])
+        # tmp = []
+        # for j in range(len(all_d[i])):
+        #     tmp.append(all_d[i][j][0])
+        # top10.append([cluid,result[i][0],result[i][1],result[i][2],tmp[:10]])
     return top10
 
 ## doc2vec特徴(一的)

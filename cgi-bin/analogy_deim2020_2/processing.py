@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import cgi,cgitb
 from tqdm import tqdm
-import datetime, re, json, copy, time
+import datetime, re, json, copy, time, math
 import numpy as np
 import mypackage.other as myp_other
 import mypackage.doc2vec_recommend as myp_doc_rec
@@ -34,6 +34,9 @@ def Response_Random():
     random = Randomname(12)
     json_random["randomname"] = random
     return random,json_random
+
+def new_idf(docfreq, totaldocs, log_base=2.0, add=0.0):
+    return add + math.log(1.0 * totaldocs / (docfreq+1), log_base)
 
 cgitb.enable()
 form = cgi.FieldStorage()
@@ -279,12 +282,14 @@ def Response_Mean(data,name,lat,lng,url):
 
     return sql_word,json_wmean
 
-
-
-
-
-
 print("\n================================\n", file=sys.stderr)
+
+
+
+
+
+
+
 
 
 
@@ -329,7 +334,7 @@ def tfidf_set(data,vis_score_dic):
         for j in range(len(tfidf[i][1])):
             tmp.append(tfidf[i][1][j][0])
         ## 各クラスタ提示キーワード：上位10件
-        word.append([tfidf[i][0],tmp[:10]])
+        word.append([tfidf[i][0],tmp[:50]])
     # for i in range(len(vis_score_dic)):
     #     vis_score_dic[i][2] = [int(n) for n in vis_score_dic[i][2]]
     return word
@@ -356,9 +361,8 @@ for i in range(len(vis_score_dic)):
             review_set.append([j[0],list(j[1:-2])])
         tmp.extend(review_set)
         vis_review_vectors_clu.append([vis_score_dic[i][0],vis_score_dic[i][1],tmp])
-
-# print("vis_score_dic",vis_score_dic, file=sys.stderr)
-### print("vis_review_vectors_clu",vis_review_vectors_clu, file=sys.stderr)
+print("vis_score_dic",vis_score_dic, file=sys.stderr)
+# print("vis_review_vectors_clu",vis_review_vectors_clu, file=sys.stderr)
 
 ## 未訪問スポットのレビューベクトルを得る
 select_unvis_spot_vectors = "SELECT * FROM review_vectors_spotname WHERE spot_id IN ({});".format(str(unvis_spot_id)[1:-1])
@@ -378,14 +382,14 @@ for i in tqdm(range(len(unvis_review_vectors))): ## 未訪問エリアのレビ�
     short = max(unvis_review_avg,key=lambda x:x[1])
     if short[1] >= 0.125:
         unvis_review_groupby_vis_cluster.append([short[0],unvis_review_vectors[i][0]])
-
 # print("unvis_review_groupby_vis_cluster",unvis_review_groupby_vis_cluster, file=sys.stderr)
 
 dic_unvis_review_groupby_vis_cluster_id = defaultdict(list)
 for i in unvis_review_groupby_vis_cluster:
     dic_unvis_review_groupby_vis_cluster_id[i[0]].append(i[1])
 dic_unvis_r_key = list(dic_unvis_review_groupby_vis_cluster_id.keys()) ## 全キー
-# print("dic_unvis_review_groupby_vis_cluster_id",dic_unvis_review_groupby_vis_cluster_id, file=sys.stderr)
+## クラスタに属する検査結果レビュー
+print("dic_unvis_review_groupby_vis_cluster_id", dic_unvis_review_groupby_vis_cluster_id, file=sys.stderr)
 
 ############################################################
 ## 既訪問スポットと未訪問スポットの計算 ベクトル総当たり
@@ -414,44 +418,32 @@ for i in range(len(vis_review_vectors_clu)):
     vis_dic_all[vis_review_vectors_clu[i][0]].extend(list(vis_dic.items()))
 # print("vis_dic_all", vis_dic_all, file=sys.stderr)
 
-
-
-# print("unvis_dic_all_old",unvis_dic_all, file=sys.stderr)
-# print("vis_dic_all_old",vis_dic_all, file=sys.stderr)
-
 ## ベクトル総当たり
 unvis_vis_set_clu = []
 unvis_dic_all_keys = list(unvis_dic_all.keys())
 vis_dic_all_keys = list(vis_dic_all.keys())
-for i in range(len(unvis_dic_all_keys)):
-    unvis_tmp = dict(unvis_dic_all[unvis_dic_all_keys[i]])
-    unvis_keys = list(unvis_tmp.keys()) ## スポットidリスト
-    for j in range(len(unvis_keys)):
-        if len(unvis_tmp[unvis_keys[j]]) <=5:
-            # print("del",unvis_tmp[unvis_keys[j]], file=sys.stderr)
-            del unvis_tmp[unvis_keys[j]]
-        else:
-            pass
-
 for i in tqdm(range(len(unvis_dic_all_keys))):
-    unvis_tmp = dict(unvis_dic_all[unvis_dic_all_keys[i]])
-    # print("unvis_tmp", unvis_tmp, file=sys.stderr)
-    unvis_keys = list(unvis_tmp.keys())
-    # print("unvis_keys", unvis_keys, file=sys.stderr)
+    unvis_tmp = dict(unvis_dic_all[unvis_dic_all_keys[i]]) ## クラスタ
+    unvis_keys = list(unvis_tmp.keys()) ## 検索結果スポット
     vis_tmp = dict(vis_dic_all[unvis_dic_all_keys[i]])
-    # print("vis_tmp", vis_tmp, file=sys.stderr)
     vis_keys = list(vis_tmp.keys())
-    # print("vis_keys", vis_keys, file=sys.stderr)
     unvis_vis_one_set = []
     for j in range(len(unvis_keys)):
-        for k in range(len(vis_keys)):
-            tmp2 = []
-            for jx in range(len(unvis_tmp[unvis_keys[j]])):
-                tmp = []
-                for kx in range(len(vis_tmp[vis_keys[k]])):
-                    tmp.append(cos_sim(unvis_tmp[unvis_keys[j]][jx],vis_tmp[vis_keys[k]][kx]))
-                tmp2.extend(tmp)
-            unvis_vis_one_set.append([unvis_keys[j],vis_keys[k],np.mean(np.array(tmp2))])
+        if len(unvis_tmp[unvis_keys[j]]) <= 5: ## レビュー数5以下の検索結果を無視
+            # print("pass",unvis_dic_all_keys[i],unvis_keys[j],len(unvis_tmp[unvis_keys[j]]), file=sys.stderr)
+            pass
+        else:
+            for k in range(len(vis_keys)):
+                if len(vis_tmp[vis_keys[k]]) <= 5: ## レビュー数5以下の検索結果を無視
+                    pass
+                else:
+                    tmp2 = []
+                    for jx in range(len(unvis_tmp[unvis_keys[j]])):
+                        tmp = []
+                        for kx in range(len(vis_tmp[vis_keys[k]])):
+                            tmp.append(cos_sim(unvis_tmp[unvis_keys[j]][jx],vis_tmp[vis_keys[k]][kx]))
+                        tmp2.extend(tmp)
+                    unvis_vis_one_set.append([unvis_keys[j],vis_keys[k],np.mean(np.array(tmp2))])
     tmp3,main_tmp = [],[]
     for j in range(len(unvis_vis_one_set)):
         try:
@@ -480,7 +472,15 @@ for i in range(len(unvis_vis_set_clu)):
 ## クラスタ毎ソート
 for i in range(len(unvis_vis_set_clu)):
     unvis_vis_set_clu[i][1] = sorted(unvis_vis_set_clu[i][1],key=lambda x:x[3],reverse=True)
-print("\nクラスタ結果", unvis_vis_set_clu, file=sys.stderr)
+# print("\nクラスタ結果", unvis_vis_set_clu, file=sys.stderr)
+
+## ターミナルに表示用
+cmd = []
+for i in range(len(unvis_vis_set_clu)):
+    for j in range(len(unvis_vis_set_clu[i][1])):
+        cmd.append(unvis_vis_set_clu[i][1][j])
+cmd.sort(key=lambda x:x[3],reverse=True)
+print("\nクラスタ結果", cmd, file=sys.stderr)
 
 use_clu_num = []
 for i in range(len(unvis_vis_set_clu)):
@@ -493,31 +493,44 @@ for i in range(len(use_clu_num)):
     for j in range(len(vis_score_dic)):
         if use_clu_num[i] == vis_score_dic[j][0]:
             use_vis_review.append(vis_score_dic[j])
-# print("use_vis_review",use_vis_review, file=sys.stderr)
+# print("use_vis_review",use_vis_review, file=sys.stderr) ## クラスタに属する既訪問レビュー
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ############################################################
-## 既訪問スポットと未訪問スポットの特徴語抽出（既訪問スポットの特徴語は，RCfからTFを，クラスタ関係なく既訪問スポットをdとしたIDF．検索結果は，RCfをRCu，IDFも同様に変更したもの．(既訪問：IDFの分子の全文書数=全既訪問スポットの数．検索結果：IDFの分子の全文書数=全検索結果スポットの数．)
+## 既訪問スポットと未訪問スポットの特徴語抽出（既訪問スポットの特徴語は，RCfからTFを，クラスタ関係なく既訪問スポットをdとしたIDF．検索結果は，RCfをRCu，IDFも同様に変更したもの．(既訪問：IDFの分子の全文書数=全既訪問スポットの数．検索結果：IDFの分子の全文書数=全検索結果スポットの数．))
 ############################################################
 print("\n================\n IDF範囲：既訪問or検索結果スポット \n================", file=sys.stderr)
-visited_spot_reviews = []
+# print("visited_spot_reviews",visited_spot_reviews, file=sys.stderr)
+# print("unvisited_spot_reviews",unvisited_spot_reviews, file=sys.stderr)
+visited_reviews = []
 visited_spot_count = []
-idf_visited_set = []
 ## クラスタに属する既訪問スポットレビューの単語に重みつけ
 for i in range(len(vis_review_vectors_clu)):
     tmp = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(use_vis_review[i][2]))
-    # print(myp_tfidf.spot_list_tfidf(tmp), file=sys.stderr)
     everyspot = myp_tfidf.spot_list_tfidf(tmp)
-    visited_spot_reviews.extend(everyspot)
-    visited_spot_count.append([use_vis_review[i][0],len(visited_spot_reviews)])
-    tmp = []
-    for j in everyspot:
-        tmp.extend(j)
-    idf_visited_set.append(tmp)
+    visited_reviews.extend(everyspot)
+    visited_spot_count.append([use_vis_review[i][0],len(visited_reviews)])
 
 dictionary = corpora.Dictionary(visited_spot_reviews)
-vis_length = len(visited_spot_id_list) ##全既訪問スポット数
-visited_tfidf_tmp = myp_tfidf.tfidf_res1(dictionary,vis_length,visited_spot_reviews)
+vis_length = len(visited_spot_reviews) ##全既訪問スポット数
+visited_tfidf_tmp = myp_tfidf.tfidf_res1(dictionary,vis_length,visited_reviews)
+
+# corpus = list(map(dictionary.doc2bow,visited_reviews))
+# test_model = models.TfidfModel(corpus,wglobal=new_idf,normalize=False)
+# corpus_tfidf = list(test_model[corpus])
+# visited_tfidf_tmp = myp_tfidf.tfidf_res(dictionary,corpus_tfidf)
 
 visited_tfidf = []
 s = 0
@@ -542,21 +555,27 @@ vis_spot_clu = defaultdict(list)
 for i in range(len(visited_spot_name_all)):
     for j in range(len(visited_spot_name_all[i][1])):
         vis_spot_clu[visited_spot_name_all[i][0]].append([visited_spot_name_all[i][1][j],visited_tfidf[i][1][j]])
-# print("vis_spot_clu",vis_spot_clu, file=sys.stderr)
 
 ################################################################
-unvisited_spot_reviews = []
+unvisited_reviews = []
 unvisited_spot_count = []
 ## クラスタに属する未訪問スポットレビューの単語に重みつけ
 for i in range(len(dic_unvis_review_groupby_vis_cluster_id)):
     tmp = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(dic_unvis_review_groupby_vis_cluster_id[dic_unvis_r_key[i]]))
-    unvisited_spot_reviews.extend(myp_tfidf.spot_list_tfidf(tmp))
-    unvisited_spot_count.append([dic_unvis_r_key[i],len(unvisited_spot_reviews)])
-# print("unvisited_spot_reviews",unvisited_spot_reviews, file=sys.stderr)
+    unvisited_reviews.extend(myp_tfidf.spot_list_tfidf(tmp))
+    unvisited_spot_count.append([dic_unvis_r_key[i],len(unvisited_reviews)])
+# print("unvisited_reviews",unvisited_reviews, file=sys.stderr)
 
-# unvisited_tfidf_tmp = myp_tfidf.tfidf_new(dictionary,unvisited_spot_reviews,visited_length)
-unvis_length = len(unvisited_spot_id_list) ## 検索結果スポット数
-unvisited_tfidf_tmp = myp_tfidf.tfidf_res1(dictionary,unvis_length,unvisited_spot_reviews)
+del dictionary
+dictionary = corpora.Dictionary(unvisited_spot_reviews)
+unvis_length = len(unvisited_spot_reviews) ##全検索結果スポット数
+unvisited_tfidf_tmp = myp_tfidf.tfidf_res1(dictionary,unvis_length,unvisited_reviews)
+
+# corpus = list(map(dictionary.doc2bow,unvisited_reviews))
+# test_model = models.TfidfModel(corpus,wglobal=new_idf,normalize=False)
+# corpus_tfidf = list(test_model[corpus])
+# unvisited_tfidf_tmp = myp_tfidf.tfidf_res(dictionary,corpus_tfidf)
+
 unvisited_tfidf = []
 s = 0
 for i in range(len(unvisited_spot_count)):
@@ -604,30 +623,23 @@ print("対応付けキーワード",res, file=sys.stderr)
 
 
 
-############################################################
-## 既訪問スポットと未訪問スポットの特徴語抽出（IDF範囲は既訪問スポット全クラスタ）
-############################################################
-print("\n================\n IDF範囲：既訪問スポット全クラスタ \n================", file=sys.stderr)
-visited_spot_reviews = []
-visited_spot_count = []
-idf_visited_set = []
-# print(vis_score_dic, file=sys.stderr)
-## クラスタに属する既訪問スポットレビューの単語に重みつけ
-for i in range(len(vis_review_vectors_clu)):
-    tmp = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(use_vis_review[i][2]))
-    # print(myp_tfidf.spot_list_tfidf(tmp), file=sys.stderr)
-    everyspot = myp_tfidf.spot_list_tfidf(tmp)
-    visited_spot_reviews.extend(everyspot)
-    visited_spot_count.append([use_vis_review[i][0],len(visited_spot_reviews)])
-    tmp = []
-    for j in everyspot:
-        tmp.extend(j)
-    idf_visited_set.append(tmp)
-# print("visited_spot_reviews",len(visited_spot_reviews), visited_spot_reviews, file=sys.stderr)
 
-dictionary = corpora.Dictionary(idf_visited_set)
-idf_length = len(idf_visited_set) ## 既訪問クラスタの数
-visited_tfidf_tmp = myp_tfidf.tfidf_new(dictionary,visited_spot_reviews,idf_length)
+
+
+
+############################################################
+## 既訪問スポットと未訪問スポットの特徴語抽出（既訪問スポットの特徴語は，RCfからTFを，各クラスタをdとしたIDF．検索結果に関しては以下略．(既訪問，検索結果：IDFの分子の全文書数 = 全！！クラスタ数))
+############################################################
+print("\n================\n IDF範囲：全クラスタ数 \n================", file=sys.stderr)
+del dictionary
+dictionary = corpora.Dictionary(vis_reviews)
+vis_allclu_length = len(vis_reviews) ##全クラスタ数
+visited_tfidf_tmp = myp_tfidf.tfidf_res2(dictionary,vis_allclu_length,visited_reviews)
+
+# corpus = list(map(dictionary.doc2bow,visited_reviews))
+# test_model = models.TfidfModel(corpus,wglobal=new_idf,normalize=False)
+# corpus_tfidf = list(test_model[corpus])
+# visited_tfidf_tmp = myp_tfidf.tfidf_res(dictionary,corpus_tfidf)
 
 visited_tfidf = []
 s = 0
@@ -652,26 +664,21 @@ vis_spot_clu = defaultdict(list)
 for i in range(len(visited_spot_name_all)):
     for j in range(len(visited_spot_name_all[i][1])):
         vis_spot_clu[visited_spot_name_all[i][0]].append([visited_spot_name_all[i][1][j],visited_tfidf[i][1][j]])
-# print("vis_spot_clu",vis_spot_clu, file=sys.stderr)
 
 ################################################################
-unvisited_spot_reviews = []
-unvisited_spot_count = []
-## クラスタに属する未訪問スポットレビューの単語に重みつけ
-for i in range(len(dic_unvis_review_groupby_vis_cluster_id)):
-    tmp = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(dic_unvis_review_groupby_vis_cluster_id[dic_unvis_r_key[i]]))
-    unvisited_spot_reviews.extend(myp_tfidf.spot_list_tfidf(tmp))
-    unvisited_spot_count.append([dic_unvis_r_key[i],len(unvisited_spot_reviews)])
-# print("unvisited_spot_reviews",unvisited_spot_reviews, file=sys.stderr)
+unvisited_tfidf_tmp = myp_tfidf.tfidf_res2(dictionary,vis_allclu_length,unvisited_reviews)
 
-# unvisited_tfidf_tmp = myp_tfidf.tfidf_new(dictionary,unvisited_spot_reviews,visited_length)
-unvisited_tfidf_tmp = myp_tfidf.tfidf_new(dictionary,unvisited_spot_reviews,idf_length)
+# corpus = list(map(dictionary.doc2bow,unvisited_reviews))
+# test_model = models.TfidfModel(corpus,wglobal=new_idf,normalize=False)
+# corpus_tfidf = list(test_model[corpus])
+# unvisited_tfidf_tmp = myp_tfidf.tfidf_res(dictionary,corpus_tfidf)
+
 unvisited_tfidf = []
 s = 0
 for i in range(len(unvisited_spot_count)):
     unvisited_tfidf.append([unvisited_spot_count[i][0],unvisited_tfidf_tmp[s:unvisited_spot_count[i][1]]])
     s = unvisited_spot_count[i][1]
-# print("unvisited_tfidf",unvisited_tfidf, file=sys.stderr)
+print("unvisited_tfidf",unvisited_tfidf, file=sys.stderr)
 
 ## TFIDFの結果にスポット名を追加
 unvisited_spot_name_all,unvisited_spot_review_num = [],[]
@@ -713,6 +720,115 @@ print("対応付けキーワード",res, file=sys.stderr)
 
 
 
+# ############################################################
+# ## 既訪問スポットと未訪問スポットの特徴語抽出（IDF範囲は既訪問スポット全クラスタ）
+# ############################################################
+# print("\n================\n IDF範囲：既訪問スポット全クラスタ \n================", file=sys.stderr)
+# visited_eviews = []
+# visited_spot_count = []
+# idf_visited_set = []
+# # print(vis_score_dic, file=sys.stderr)
+# ## クラスタに属する既訪問スポットレビューの単語に重みつけ
+# for i in range(len(vis_review_vectors_clu)):
+#     tmp = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(use_vis_review[i][2]))
+#     # print(myp_tfidf.spot_list_tfidf(tmp), file=sys.stderr)
+#     everyspot = myp_tfidf.spot_list_tfidf(tmp)
+#     visited_reviews.extend(everyspot)
+#     visited_spot_count.append([use_vis_review[i][0],len(visited_reviews)])
+#     tmp = []
+#     for j in everyspot:
+#         tmp.extend(j)
+#     idf_visited_set.append(tmp)
+# # print("visited_reviews",len(visited_reviews), visited_reviews, file=sys.stderr)
+#
+# dictionary = corpora.Dictionary(idf_visited_set)
+# idf_length = len(idf_visited_set) ## 既訪問クラスタの数
+# visited_tfidf_tmp = myp_tfidf.tfidf_new(dictionary,visited_reviews,idf_length)
+#
+# visited_tfidf = []
+# s = 0
+# for i in range(len(visited_spot_count)):
+#     visited_tfidf.append([visited_spot_count[i][0],visited_tfidf_tmp[s:visited_spot_count[i][1]]])
+#     s = visited_spot_count[i][1]
+# # print("visited_tfidf",visited_tfidf, file=sys.stderr)
+#
+# ## TFIDFの結果にスポット名を追加
+# visited_spot_name_all,visited_spot_review_num = [],[]
+# for i in range(len(vis_review_vectors_clu)):
+#     tmp_name_all = []
+#     cur.execute("SELECT name,count(name) FROM review_all WHERE review_id IN {} GROUP BY name;".format(tuple(use_vis_review[i][2])))
+#     for j in cur.fetchall():
+#         tmp_name_all.append(j[0])
+#     # print(use_vis_review[i], file=sys.stderr)
+#     # print(tmp_name_all, file=sys.stderr)
+#     visited_spot_name_all.append([use_vis_review[i][0],tmp_name_all])
+# print("\nvisited_spot_name_all",visited_spot_name_all, file=sys.stderr)
+#
+# vis_spot_clu = defaultdict(list)
+# for i in range(len(visited_spot_name_all)):
+#     for j in range(len(visited_spot_name_all[i][1])):
+#         vis_spot_clu[visited_spot_name_all[i][0]].append([visited_spot_name_all[i][1][j],visited_tfidf[i][1][j]])
+# # print("vis_spot_clu",vis_spot_clu, file=sys.stderr)
+#
+# ################################################################
+# unvisited_reviews = []
+# unvisited_spot_count = []
+# ## クラスタに属する未訪問スポットレビューの単語に重みつけ
+# for i in range(len(dic_unvis_review_groupby_vis_cluster_id)):
+#     tmp = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(dic_unvis_review_groupby_vis_cluster_id[dic_unvis_r_key[i]]))
+#     unvisited_reviews.extend(myp_tfidf.spot_list_tfidf(tmp))
+#     unvisited_spot_count.append([dic_unvis_r_key[i],len(unvisited_reviews)])
+# # print("unvisited_reviews",unvisited_reviews, file=sys.stderr)
+#
+# # unvisited_tfidf_tmp = myp_tfidf.tfidf_new(dictionary,unvisited_reviews,visited_length)
+# unvisited_tfidf_tmp = myp_tfidf.tfidf_new(dictionary,unvisited_reviews,idf_length)
+# unvisited_tfidf = []
+# s = 0
+# for i in range(len(unvisited_spot_count)):
+#     unvisited_tfidf.append([unvisited_spot_count[i][0],unvisited_tfidf_tmp[s:unvisited_spot_count[i][1]]])
+#     s = unvisited_spot_count[i][1]
+# # print("unvisited_tfidf",unvisited_tfidf, file=sys.stderr)
+#
+# ## TFIDFの結果にスポット名を追加
+# unvisited_spot_name_all,unvisited_spot_review_num = [],[]
+# for i in range(len(dic_unvis_review_groupby_vis_cluster_id)):
+#     tmp_name_all = []
+#     cur.execute("SELECT name,count(name) FROM review_all WHERE review_id IN {} GROUP BY name;".format(tuple(dic_unvis_review_groupby_vis_cluster_id[dic_unvis_r_key[i]])))
+#     for j in cur.fetchall():
+#         tmp_name_all.append(j[0])
+#     unvisited_spot_name_all.append([dic_unvis_r_key[i],tmp_name_all])
+# print("\nunvisited_spot_name_all", unvisited_spot_name_all, file=sys.stderr)
+#
+# unvis_spot_clu = defaultdict(list)
+# for i in range(len(unvisited_spot_name_all)):
+#     for j in range(len(unvisited_spot_name_all[i][1])):
+#         unvis_spot_clu[unvisited_spot_name_all[i][0]].append([unvisited_spot_name_all[i][1][j],unvisited_tfidf[i][1][j]])
+#
+# ## TFIDFによるコサイン類似度計算
+# # print("vis_spot_clu",vis_spot_clu, file=sys.stderr)
+# # print("unvis_spot_clu",unvis_spot_clu, file=sys.stderr)
+# sctfidf = myp_cos_tfidf.SimCalculator()
+# result_cos_tfidf = []
+# for i in vis_spot_clu:
+#     tmp = []
+#     for j in range(len(vis_spot_clu[i])):
+#         for k in range(len(unvis_spot_clu[i])):
+#             cos_tfidf = sctfidf.sim_cos(vis_spot_clu[i][j],unvis_spot_clu[i][k])
+#             tmp.append([unvis_spot_clu[i][k][0],vis_spot_clu[i][j][0],cos_tfidf])
+#     result_cos_tfidf.append([i,tmp])
+# # print("result_cos_tfidf", result_cos_tfidf, file=sys.stderr)
+#
+# res = []
+# for i in range(len(result_cos_tfidf)):
+#     if result_cos_tfidf == []:
+#         pass
+#     else:
+#         tmp = myp_feature.sort_tfidf_UtoV_tfidfcos(result_cos_tfidf[i][0],visited_tfidf[i][1],unvisited_tfidf[i][1],visited_spot_name_all[i][1],unvisited_spot_name_all[i][1],result_cos_tfidf[i][1])
+#         res.append([result_cos_tfidf[i][0],tmp])
+# print("対応付けキーワード",res, file=sys.stderr)
+#
+#
+#
 # ############################################################
 # ## 既訪問スポットと未訪問スポットの特徴語抽出（IDF範囲既訪問スポットのクラスタ内）
 # ############################################################
@@ -722,10 +838,10 @@ print("対応付けキーワード",res, file=sys.stderr)
 # unvisited_tfidf = []
 # ## クラスタに属する未訪問スポットレビューの単語に重みつけ
 # for i in range(len(dic_unvis_review_groupby_vis_cluster_id)):
-#     select_unvisited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(dic_unvis_review_groupby_vis_cluster_id[dic_unvis_r_key[i]]))
-#     unvisited_spot_reviews = myp_tfidf.spot_list_tfidf(select_unvisited_spot_reviews)
-#     # print("unvisited_spot_reviews",unvisited_spot_reviews, file=sys.stderr)
-#     unvisited_tfidf.append([dic_unvis_r_key[i],myp_tfidf.tfidf(unvisited_spot_reviews)])
+#     tmp = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(dic_unvis_review_groupby_vis_cluster_id[dic_unvis_r_key[i]]))
+#     unvisited_reviews = myp_tfidf.spot_list_tfidf(tmp)
+#     # print("unvisited_reviews",unvisited_reviews, file=sys.stderr)
+#     unvisited_tfidf.append([dic_unvis_r_key[i],myp_tfidf.tfidf(unvisited_reviews)])
 # # print("unvisited_tfidf", unvisited_tfidf, file=sys.stderr)
 #
 # ## TFIDFの結果にスポット名を追加
@@ -746,9 +862,9 @@ print("対応付けキーワード",res, file=sys.stderr)
 # visited_tfidf = []
 # ## クラスタに属する既訪問スポットレビューの単語に重みつけ
 # for i in range(len(vis_review_vectors_clu)):
-#     select_visited_spot_reviews = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(use_vis_review[i][2]))
-#     visited_spot_reviews = myp_tfidf.spot_list_tfidf(select_visited_spot_reviews)
-#     visited_tfidf.append([use_vis_review[i][0],myp_tfidf.tfidf(visited_spot_reviews)])
+#     tmp = "SELECT spot_id,wakachi_neologd5 FROM review_all WHERE review_id IN {} GROUP BY spot_id,wakachi_neologd5;".format(tuple(use_vis_review[i][2]))
+#     visited_reviews = myp_tfidf.spot_list_tfidf(tmp)
+#     visited_tfidf.append([use_vis_review[i][0],myp_tfidf.tfidf(visited_reviews)])
 # # print("visited_tfidf", visited_tfidf, file=sys.stderr)
 #
 # ## TFIDFの結果にスポット名を追加
@@ -798,4 +914,4 @@ print("対応付けキーワード",res, file=sys.stderr)
 #         res.append([result_cos_tfidf[i][0],tmp])
 # print("\n対応付けキーワード",res, file=sys.stderr)
 #
-# print("処理時間：{} sec".format(time.time() - start_time), file=sys.stderr)
+print("処理時間：{} sec".format(time.time() - start_time), file=sys.stderr)
