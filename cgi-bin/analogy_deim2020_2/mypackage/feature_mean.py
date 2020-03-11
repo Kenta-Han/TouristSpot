@@ -60,24 +60,31 @@ def sort_tfidf_UtoV_tfidfcos(cluid,vis_tfidf,unvis_tfidf,vis_spot_name,unvis_spo
                 visited.append(vis_spot[j][1])
     all_spot.extend([unvisited,visited])
     ## 一番類似するスポットの特徴語を求める
-    # print("all_spot",all_spot, file=sys.stderr)
     all_d,top10 = [],[]
+    # print("all_spot",all_spot, file=sys.stderr)
     for i in tqdm(range(len(all_spot[0]))):
         temp = []
         same_word = list(set([all_spot[0][i][j][0] for j in range(len(all_spot[0][i]))]) & set([all_spot[1][i][j][0] for j in range(len(all_spot[1][i]))]))
         for sw in same_word:
             un = [j for j in range(len(all_spot[0][i])) if all_spot[0][i][j][0] == sw][0]
             vi = [j for j in range(len(all_spot[1][i])) if all_spot[1][i][j][0] == sw][0]
-            if len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None:
+            if (len(all_spot[0][i][un][0])>1 and re.search(bytesymbols,all_spot[0][i][un][0])==None):
                 if all_spot[1][i][vi][1]==0 or all_spot[0][i][un][1]==0:
                     temp.append([all_spot[0][i][un][0],0])
-                # elif  (2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1])) < 0.002:
-                #     temp.append([all_spot[0][i][un][0],(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))*(-1)])
                 else:
                     temp.append([all_spot[0][i][un][0],(2/(1/all_spot[0][i][un][1]+1/all_spot[1][i][vi][1]))])
+        temp.append(["__finish__",0])
         all_d.append(temp)
-        all_d[i].sort(key=lambda x:x[1],reverse=True)## 降順ソート
-        top10.append([cluid,result[i][0],result[i][1],result[i][2],all_d[i][:10]])
+        all_d[i].sort(key=lambda x:x[1],reverse=True)
+        ## 対応付け(調和平均>=0)のキーワードを取り出す
+        for a in range(len(all_d[i])):
+            if all_d[i][a][1] <= 0:
+                tmp = []
+                for j in range(len(all_d[i][:a])):
+                    tmp.append(all_d[i][j][0])
+                # top10.append([cluid,result[i][0],result[i][1],result[i][2],all_d[i][:a]])
+                top10.append([cluid,result[i][0],result[i][1],result[i][2],tmp[:15]])
+                break
         # ## 未訪問，既訪問，類似度，単語(最初の10個まで)
         # tmp = []
         # for j in range(len(all_d[i])):

@@ -61,6 +61,18 @@ def tfidf(review_all):
         j += 1
     return doc2
 
+## TFIDFを求める(単語に重み付け)，特徴ベクトル用
+def tfidf_fea_new(dictionary,data_length,review_all):
+    tfidf_data = []
+    vec = dictionary.doc2bow(review_all[0])
+    for word_id,word_num in vec:
+        tf = word_num / len(review_all)
+        # idf = math.log(data_length / (dictionary.dfs[word_id] + 1))
+        idf = math.log((data_length + 1) / (dictionary.dfs[word_id] + 1))
+        tfidf_data.append([dictionary[word_id], tf * idf, tf, idf])
+    tfidf_sort = sorted(tfidf_data,key=lambda x:x[1],reverse=True)
+    return tfidf_sort
+
 ## TFIDFを求める（IDF範囲は既訪問スポット全クラスタ）
 def tfidf_new(dictionary,review_all,idf_length):
     spot = []
